@@ -50,24 +50,6 @@ class GAIL(TRPO):
         self.solver = Solver(self.reward_model, 0.0, 0.0, adam_steps, self.gail_batch_size, None,
                              tf_optimizer_cls= fo_optimizer_cls, tf_optimizer_args= fo_optimizer_args)
 
-        """
-        obs_ex= self.expert_data['obs']
-        act_ex= self.expert_data['act']
-
-        p1 = np.random.choice(obs_ex.shape[0], size=(self.batch_size,), replace=False)
-        p2 = np.random.choice(trajbatch.obs.stacked.shape[0], size=(self.batch_size,), replace=False)
-
-        ex_obs_batch = obs_ex[p1]
-        ex_act_batch = act_ex[p1]
-
-        pi_obs_batch = trajbatch.obs.stacked[p2]
-        pi_act_batch = trajbatch.a.stacked[p2]
-
-        reward_print_fields= self.reward.fit(sess, pi_obs_batch, pi_act_batch,
-                                             ex_obs_batch, ex_act_batch)
-
-        self.reward.fit(sess, pi_obs_batch, pi_act_batch, ex_obs_batch, ex_act_batch)
-        """
 
     @overrides
     def optimize_policy(self, itr, samples_data):
@@ -82,20 +64,22 @@ class GAIL(TRPO):
         if self.policy.recurrent:
             all_input_values += (samples_data["valids"],)
 
-        # update policy
+        ## UPDATE POLICY
         super(GAIL, self).optimize_policy_from_inputs(all_input_values)
 
-        # update discriminator
+        ## UPDATE DISCRIMINATOR
+        # "full" policy (pi) and expert (ex) datasets.
         obs_pi = all_input_values[0].reshape((-1, np.prod(self.env.observation_space.shape)))
         act_pi = all_input_values[1].reshape((-1, np.prod(self.env.action_space.shape)))
+        
+        obs_ex= self.expert_data['obs']
+        act_ex= self.expert_data['act']        
 
         # normalize actions . observations are normalized by environment
         act_pi -= self.act_mean
         act_pi /= self.act_std
 
-        obs_ex= self.expert_data['obs']
-        act_ex= self.expert_data['act']
-
+        # shuffle and extract batches from pi and ex dataset (according to gail batch size).
         p_ex = np.random.choice(obs_ex.shape[0], size=(self.gail_batch_size,), replace=False)
         p_pi = np.random.choice(obs_pi.shape[0], size=(self.gail_batch_size,), replace=False)
 
@@ -105,6 +89,7 @@ class GAIL(TRPO):
         obs_ex_batch = obs_ex[p_ex]
         act_ex_batch = act_ex[p_ex]
 
+        # stack observations and actions into transition pairs.
         trans_Bpi_Do = np.column_stack((obs_pi_batch,act_pi_batch))
         trans_Bex_Do = np.column_stack((obs_ex_batch,act_ex_batch))
         trans_B_Do = np.row_stack((trans_Bpi_Do,trans_Bex_Do))
@@ -112,26 +97,20 @@ class GAIL(TRPO):
         Bpi = trans_Bpi_Do.shape[0] # policy batch size.
         Bex = trans_Bex_Do.shape[0] # expert batch size.
 
-        assert Bpi == Bex
+        assert Bpi == Bex # if we want to remove this assumption, we need to weight the labels.
 
         labels= np.concatenate((np.zeros(Bpi), np.ones(Bex)))[...,None] # 0s for policy, 1s for expert
-        # weights=np.concatenate((np.ones(Bpi)/Bpi, np.ones(Bex)/Bex))
 
+        # train the discriminator network using supervised backprop / adam.
         self.solver.train(trans_B_Do, labels)
         scores = self.reward_model.compute_score(trans_B_Do)
 
         self.global_step += 1
 
-        #accuracy = .5 * ((scores < 0) == (labels == 0)).sum()
         accuracy = ((scores < 0) == (labels == 0)).mean()
         accuracy_for_currpolicy = (scores[:Bpi] <= 0).mean()
         accuracy_for_expert = (scores[Bpi:] > 0).mean()
         assert np.allclose(accuracy, .5*(accuracy_for_currpolicy + accuracy_for_expert))
-
-        # assign a new mean activation on expert data
-        #mu_ex = tf.reduce_sum(self.matching_layer * tf.expand_dims(self.targets_B,-1),
-                              #reduction_indices= 0) / tf.reduce_sum(self.targets_B)
-        #sess.run(self.mu_ex.assign(mu_ex), feed)
 
         logger.record_tabular('racc', accuracy)
         logger.record_tabular('raccpi', accuracy_for_currpolicy)
@@ -143,11 +122,15 @@ class GAIL(TRPO):
     def process_samples(self, itr, paths):
         for path in paths:
             X = np.column_stack((path['observations'],path['actions']))
+            # if env returns some ambient reward, we want to ignore these for training.
+            # but still keep track of it for diagnostics.
             path['env_rewards'] = path['rewards']
+            
+            # compute new rewards with discriminator network. Replace env reward in the rollouts.
             rewards = np.squeeze( self.reward_model.compute_reward(X) )
             if rewards.ndim == 0:
                 rewards = rewards[np.newaxis]
-            path['rewards'] = rewards
+            path['rewards'] = rewards 
 
         assert all([path['rewards'].ndim == 1 for path in paths])
 
