@@ -1,0 +1,4 @@
+"""
+Has Neural net encoder
+"""
+

@@ -743,7 +743,7 @@ class SpatialExpectedSoftmaxLayer(Layer):
     """
 
     def __init__(self, incoming, **kwargs):
-        super().__init__(incoming, **kwargs)
+        super(SpatialExpectedSoftmaxLayer, self).__init__(incoming, **kwargs)
         # self.temp = self.add_param(tf.ones_initializer, shape=(), name="temperature")
 
     def get_output_shape_for(self, input_shape):
