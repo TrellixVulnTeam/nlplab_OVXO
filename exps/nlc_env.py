@@ -5,7 +5,8 @@ This is a Seq2Seq text enviornment
 from __future__ import absolute_import
 from __future__ import division
 
-from rllab.envs.base import Env
+from rllab.envs.base import Env, Step
+from rllab.envs.base import EnvSpec
 import re
 from tensorflow.python.platform import gfile
 import tensorflow as tf
@@ -13,108 +14,89 @@ import os
 import numpy as np
 import random
 from nltk.translate.bleu_score import corpus_bleu, sentence_bleu
+from exps.preprocess import EOS_ID, SOS_ID
+from tensorflow.python.ops import variable_scope as vs
+from tensorflow.python.ops import embedding_ops
+from sandbox.rocky.tf.spaces.discrete import Discrete
+from cached_property import cached_property
+from sandbox.rocky.tf.envs.base import TfEnv
+from exps.normalized_env import normalize
+import pickle
+from sandbox.rocky.tf.envs.vec_env_executor import VecEnvExecutor
+from rllab.sampler.stateful_pool import ProgBarCounter
+import time
+from rllab.misc import tensor_utils
+import itertools
+from rllab.spaces.discrete import Discrete as TheanoDiscrete
 
-FLAGS = tf.app.flags.FLAGS
+# set seed
+np.random.seed(1234)
 
-# Special vocabulary symbols - we always put them at the start.
-_PAD = b"_PAD"
-_SOS = b"_SOS"
-_EOS = b"_EOS"
-_UNK = b"_UNK"
-_START_VOCAB = [_PAD, _SOS, _EOS, _UNK]
+# TODO: Today
+# TODO: 2. Write policy to continue env testing
 
-PAD_ID = 0
-SOS_ID = 1
-EOS_ID = 2
-UNK_ID = 3
+class DataDistributor(object):
+    """
+    Pass into NLCEnv, same reference copy
+    it is used to store randomly shuffled data
+    """
+    def __init__(self, config):
+        self.source = config["source"]
+        self.target = config["target"]
+        self.rand_inds = self.shuffle_data()
+        self.target_trackid = -1
 
-# Regular expressions used to tokenize.
-_WORD_SPLIT = re.compile(b"([.,!?\"':;)(])")
-_DIGIT_RE = re.compile(br"\d")
+    def shuffle_data(self):
+        inds = range(self.source.shape[0])
+        np.random.shuffle(inds)
+        return inds
 
+    def get_seq_id(self, target_trackid):
+        # every env uses their own target_trackid to get from this class
+        return self.rand_inds[target_trackid]
 
-def basic_tokenizer(sentence):
-    """Very basic tokenizer: split the sentence into a list of tokens."""
-    # used by NLCEnv
-    words = []
-    for space_separated_fragment in sentence.strip().split():
-        words.extend(re.split(_WORD_SPLIT, space_separated_fragment))
-    return [w for w in words if w]
-
-
-def char_tokenizer(sentence):
-    # used by NLCEnv
-    return list(sentence.strip())
-
-
-def tokenize(string):
-    # used by util code
-    return [int(s) for s in string.split()]
-
-
-def pair_iter(fnamex, fnamey, batch_size, num_layers):
-    fdx, fdy = open(fnamex), open(fnamey)
-    batches = []
-
-    while True:
-        if len(batches) == 0:
-            refill(batches, fdx, fdy, batch_size)
-        if len(batches) == 0:
-            break
-
-        x_tokens, y_tokens = batches.pop(0)
-        y_tokens = add_sos_eos(y_tokens)
-        x_padded, y_padded = padded(x_tokens, num_layers), padded(y_tokens, 1)
-
-        source_tokens = np.array(x_padded).T
-        source_mask = (source_tokens != PAD_ID).astype(np.int32)
-        target_tokens = np.array(y_padded).T
-        target_mask = (target_tokens != PAD_ID).astype(np.int32)
-
-        yield (source_tokens, source_mask, target_tokens, target_mask)
-
-    return
-
-
-def refill(batches, fdx, fdy, batch_size):
-    line_pairs = []
-    linex, liney = fdx.readline(), fdy.readline()
-
-    while linex and liney:
-        x_tokens, y_tokens = tokenize(linex), tokenize(liney)
-
-        if len(x_tokens) < FLAGS.max_seq_len and len(y_tokens) < FLAGS.max_seq_len:
-            line_pairs.append((x_tokens, y_tokens))
-        if len(line_pairs) == batch_size * 16:
-            break
-        linex, liney = fdx.readline(), fdy.readline()
-
-    line_pairs = sorted(line_pairs, key=lambda e: len(e[0]))
-
-    for batch_start in xrange(0, len(line_pairs), batch_size):
-        x_batch, y_batch = zip(*line_pairs[batch_start:batch_start + batch_size])
-        #    if len(x_batch) < batch_size:
-        #      break
-        batches.append((x_batch, y_batch))
-
-    random.shuffle(batches)
-    return
-
-
-def add_sos_eos(tokens):
-    return map(lambda token_list: [SOS_ID] + token_list + [EOS_ID], tokens)
-
-
-def padded(tokens, depth):
-    maxlen = max(map(lambda x: len(x), tokens))
-    align = pow(2, depth - 1)
-    padlen = maxlen + (align - maxlen) % align
-    return map(lambda token_list: token_list + [PAD_ID] * (padlen - len(token_list)), tokens)
+    def next_sen(self):
+        self.target_trackid += 1
+        return self.target_trackid
 
 
 class NLCEnv(Env):
-    def __init__(self, config):
+
+    target_trackid = 0  # class variable, will be set by reset() each time
+
+    def __init__(self, distributor, config):
         """
+        Train encoder decoder as normal,
+        then import embedding into Env
+        (but how to use decoder's trained weights to initialize policy?)
+        (maybe pass in the tensors to policy....)
+
+        It also interacts with VectorizedSampler
+
+        this enviornment is not a vectorized env (checked by VecotirzedSampler)
+
+        rllab/sampler/utils.py has function rollout()
+        calls step()
+
+        algorithm can define a self.max_path_length
+        in GAIL it's args.max_traj_len (set this to some number)
+
+        1. Generate a shuffled list of training sets
+
+        2. def step() returns embedding of the previous action (selected vocab)
+            requires access to decoder embedding
+            - NLCEnv stores decoder embedding now
+            - step(action), will have action as a placeholder, and load embedding with it
+
+        3. def step() also returns attention map from the encoder as "info", so that decoder (policy)
+            can use it
+        4. Override decoder on a CategoricalGaussian policy that has stochastic action
+            and deterministic action
+                - Form actor network (policy) and critic network (Q) inside the policy
+                -
+        5. Write train code for encoder-decoder, as well as for policy training
+
+        NOTICE: this env will be copied 12 times, they can't commnicate...
 
         Parameters
         ----------
@@ -122,124 +104,28 @@ class NLCEnv(Env):
             vocab_file: location of vocab file
 
         """
-        self.vocab_file = FLAGS.data_dir + "vocab.dat"
-        self.vocab_size = 0
-        self.batch_size = FLAGS.batch_size
-        self.max_seq_len = FLAGS.max_seq_len
-        self.new_state = np.zeros(self.max_seq_len, dtype="int32")
-        self.step_counter = 0  # record how many steps we have generated
-        self.seq_y_trackid = -1 # so when you pull first data point, it's +1 to be 0
-        self.encoder = None  # neural net encoder, enviornment pretrains one
-        self.x = config["x"]
-        self.y = config["y"]
+        self.config = config
+        self.distributor = distributor
+        self.size = config['gru_size']
+        self.vocab_file = config['data_dir'] + "vocab.dat"
+        self.vocab_size = self.count_vocab()
+        self.batch_size = config['batch_size']
+        self.max_seq_len = config['max_seq_len']
+        self.curr_sent = np.zeros(self.max_seq_len, dtype="int32")  # store sentence for one rollout
+        self.target_trackid = 0
+        self.step_counter = 0
+        self.source = config["source"]
+        self.target = config["target"]
+        self.encoder = config["encoder"]  # pass in the encoder
+        self.L_dec = config["L_dec"]  # we get numpy form of decoder embedding
+        self.L_enc = config["L_enc"]  # same as above
+        self.measure = config["measure"]  # "CER" (character error rate) or "BLEU"
 
         super(NLCEnv, self).__init__()
 
-    @staticmethod
-    def preprocess_nlc_data(data_dir, max_vocabulary_size, custom_appendix="", tokenizer=char_tokenizer):
-        """
-        Parameters
-        data_dir: with ending slash
-        max_vocabulary_size: normally 10k
-        custom_appendix: like ".30.", should be seperated by period
-
-        We preprocess our corpus in a similar manner like in NLC paper
-        Notice that this method generates indices files
-        and does NOT generate batched data but store index files
-        """
-
-        train_path = data_dir + "train" + custom_appendix
-        dev_path = data_dir + "valid" + custom_appendix
-
-        # Create vocabularies of the appropriate sizes.
-        vocab_path = os.path.join(data_dir, "vocab.dat")
-        NLCEnv.create_vocabulary(vocab_path, [train_path + ".y.txt", train_path + ".x.txt"],
-                                 max_vocabulary_size, tokenizer)
-
-        # Create token ids for the training data.
-        y_train_ids_path = train_path + ".ids.y"
-        x_train_ids_path = train_path + ".ids.x"
-        NLCEnv.data_to_token_ids(train_path + ".y.txt", y_train_ids_path, vocab_path, tokenizer)
-        NLCEnv.data_to_token_ids(train_path + ".x.txt", x_train_ids_path, vocab_path, tokenizer)
-
-        # Create token ids for the development data.
-        y_dev_ids_path = dev_path + ".ids.y"
-        x_dev_ids_path = dev_path + ".ids.x"
-        NLCEnv.data_to_token_ids(dev_path + ".y.txt", y_dev_ids_path, vocab_path, tokenizer)
-        NLCEnv.data_to_token_ids(dev_path + ".x.txt", x_dev_ids_path, vocab_path, tokenizer)
-
-        return (x_train_ids_path, y_train_ids_path,
-                x_dev_ids_path, y_dev_ids_path, vocab_path)
-
-    @staticmethod
-    def create_vocabulary(vocabulary_path, data_paths, max_vocabulary_size,
-                          tokenizer=None, normalize_digits=False):
-
-        if not gfile.Exists(vocabulary_path):
-            print("Creating vocabulary %s from data %s" % (vocabulary_path, str(data_paths)))
-            vocab = {}
-            for path in data_paths:
-                with gfile.GFile(path, mode="rb") as f:
-                    counter = 0
-                    for line in f:
-                        counter += 1
-                        if counter % 100000 == 0:
-                            print("  processing line %d" % counter)
-                        tokens = tokenizer(line) if tokenizer else basic_tokenizer(line)
-                        for w in tokens:
-                            word = re.sub(_DIGIT_RE, b"0", w) if normalize_digits else w
-                            if word in vocab:
-                                vocab[word] += 1
-                            else:
-                                vocab[word] = 1
-            vocab_list = _START_VOCAB + sorted(vocab, key=vocab.get, reverse=True)
-            print("Vocabulary size: %d" % len(vocab_list))
-            if len(vocab_list) > max_vocabulary_size:
-                vocab_list = vocab_list[:max_vocabulary_size]
-            with gfile.GFile(vocabulary_path, mode="wb") as vocab_file:
-                for w in vocab_list:
-                    vocab_file.write(w + b"\n")
-
-    @staticmethod
-    def initialize_vocabulary(vocabulary_path):
-        if gfile.Exists(vocabulary_path):
-            rev_vocab = []
-            with gfile.GFile(vocabulary_path, mode="rb") as f:
-                rev_vocab.extend(f.readlines())
-            rev_vocab = [line.strip('\n') for line in rev_vocab]
-            vocab = dict([(x, y) for (y, x) in enumerate(rev_vocab)])
-            return vocab, rev_vocab
-        else:
-            raise ValueError("Vocabulary file %s not found.", vocabulary_path)
-
-    @staticmethod
-    def sentence_to_token_ids(sentence, vocabulary,
-                              tokenizer=None, normalize_digits=False):
-        if tokenizer:
-            words = tokenizer(sentence)
-        else:
-            words = basic_tokenizer(sentence)
-        if not normalize_digits:
-            return [vocabulary.get(w, UNK_ID) for w in words]
-            # Normalize digits by 0 before looking words up in the vocabulary.
-        return [vocabulary.get(re.sub(_DIGIT_RE, b"0", w), UNK_ID) for w in words]
-
-    @staticmethod
-    def data_to_token_ids(data_path, target_path, vocabulary_path,
-                          tokenizer=None, normalize_digits=True):
-        if not gfile.Exists(target_path):
-            print("Tokenizing data in %s" % data_path)
-            vocab, _ = NLCEnv.initialize_vocabulary(vocabulary_path)
-            with gfile.GFile(data_path, mode="rb") as data_file:
-                with gfile.GFile(target_path, mode="w") as tokens_file:
-                    counter = 0
-                    for line in data_file:
-                        counter += 1
-                        if counter % 100000 == 0:
-                            print("  tokenizing line %d" % counter)
-                        token_ids = NLCEnv.sentence_to_token_ids(line, vocab, tokenizer,
-                                                                 normalize_digits)
-                        tokens_file.write(" ".join([str(tok) for tok in token_ids]) + "\n")
+    def get_target(self):
+        # so this way it will be a shuffled example
+        return self.distributor.get_seq_id(self.target_trackid)
 
     def step(self, action):
         """
@@ -258,15 +144,18 @@ class NLCEnv(Env):
             instead of return batch_size
             we return (max_seq_len) action
 
+            sandbox/rocky/tf/samplers/batch_sampler.py
+            Can return numpy array, but not TF tensor
+
+            meaning that we must pretrain.
+
             (observation, reward, done, info)
         """
-        assert np.nonzero(self.new_state[self.step_counter]) == 0
 
         done = action == EOS_ID  # policy outputs <EOS>
+        info = self.encoder  # TODO: encoder must encode the previous sentence
 
-        self.new_state[self.step_counter] += action
-        if not done:
-            self.step_counter += 1
+        self.curr_sent[self.step_counter] += action
 
         # Traditionally, BLEU is only generated when the entire dev set
         # is generated since BLEU is corpus-level, not really sentence-level
@@ -274,43 +163,62 @@ class NLCEnv(Env):
         # we can also compute other forms of measure,
         # like how many tokens are correctly predicted
 
-        # self.y[0] is index number
-        rew = sentence_bleu([self.y[self.seq_y_trackid]], self.new_state[:self.step_counter+1].tolist())
-
-        if done:
+        if done or self.step_counter >= self.max_seq_len:
             # reset() will initialize new_state
-            # state = np.copy(self.new_state)
-            # self.new_state = np.zeros(self.max_seq_len, dtype="int32")
-            return np.copy(self.new_state), rew, done, None
+            if self.measure == "BLEU":
+                # careful out of bounds with self.step_counter + 1
+                rew = sentence_bleu([self.get_target()],
+                                    self.curr_sent[:self.step_counter + 1].tolist())
+            else:
+                rew = self.count_cer(self.get_target(), self.curr_sent[:self.step_counter + 1])
+            return Step(self.L_dec[action, :], rew, True, init_hidden=None)  # TODO: should I return this observation?
         else:
-            return self.new_state, 0, done, None
+            # not done, and within limit
+            self.step_counter += 1
+            return Step(self.L_dec[action, :], 0, False, init_hidden=None)  # action needs to be 0-based
+
+    def count_cer(self, a, b):
+        """
+        (works with 1-dim array)
+        We pad a or b, whoever is shorter
+        """
+        if a.shape[0] > b.shape[0]:
+            b_padded = np.pad(a, (0, a.shape[0] - b.shape[0]), 'constant', constant_values=(-1))
+            a_padded = a
+        elif a.shape[0] < b.shape[0]:
+            b_padded = b
+            a_padded = np.pad(a, (0, b.shape[0] - a.shape[0]), 'constant', constant_values=(-1))
+        else:
+            a_padded = a
+            b_padded = b
+        return (a_padded == b_padded).sum() / float(a_padded.shape[0])
 
     def reset(self):
         """
         Returns
+        in rllab/sampler/utils, rollout
+        rollout is never used in VectorizedSampler
+        we are good
         -------
-        (start_token, encoder feature)
+        (start_token, encoder_feature)
         """
-        self.new_state = np.zeros(self.max_seq_len, dtype="int32")
-        self.seq_y_trackid += 1  # sequentially pull out data
-        return self.new_state
+        # TODO: will be 12 envs, each is seperate
+        self.curr_sent = np.zeros(self.max_seq_len, dtype="int32")
+        self.target_trackid = self.distributor.next_sen()
+        return self.L_dec[SOS_ID, :]  # start of sentence token
 
     def count_vocab(self):
         count = 0
         for _ in open(self.vocab_file).xreadlines(): count += 1
         return count
 
-    @property
+    @cached_property
     def action_space(self):
-        if self.vocab_size == 0:
-            self.vocab_size = self.count_vocab()
-        return self.vocab_size
-        # if self.char_or_word == "char":
-        #     return 122
-        # else:
-        #     return 40000
+        # now Policy can call flatten_n() on these classes
+        # also it's cached now
+        return TheanoDiscrete(self.vocab_size)
 
-    @property
+    @cached_property
     def observation_space(self):
         """
         I think this is where padding comes in
@@ -319,18 +227,134 @@ class NLCEnv(Env):
         Returns
         -------
         """
-        return self.batch_size, self.max_seq_len
+        return TheanoDiscrete(self.max_seq_len)
 
+    @property
+    def vectorized(self):
+        return True
+
+    def vec_env_executor(self, n_envs, max_path_length):
+        # this is a weird function....it basically construct itself
+        envs = [NLCEnv(self.distributor, self.config) for _ in range(n_envs)]
+        return VecEnvExecutor(
+                envs=envs,
+                max_path_length=max_path_length
+            )
+
+    def candy(self):
+        return "there is a candy :)"
 
 if __name__ == '__main__':
-    pass
-    # ======= Test on Vocab/ind Creation ========
-    # nlc char-level vocab: 122
-    # ptb: Vocabulary size: 52
-    x_train, y_train, x_dev, y_dev, vocab_path \
-        = NLCEnv.preprocess_nlc_data(data_dir="/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/ptb_data/", max_vocabulary_size=40000)
-    print x_train
-    print y_train
-    print x_dev
-    print y_dev
-    print vocab_path
+    config = {
+        "gru_size": 100,
+        "source": np.ones((20, 5)),
+        "target": np.ones((20, 5)),
+        "encoder": None,
+        "L_dec": np.ones((100, 50)),  # vocab_size: 100, hidden_size: 50
+        "L_enc": None,
+        "measure": "CER",
+        'data_dir': "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/ptb_data/",
+        "max_seq_len": 10,  # 200
+        "batch_size": 128
+    }
+    ddist = DataDistributor(config)
+    # it appears that TFEnv is compatible with NLCEnv...for now
+    env = TfEnv(normalize(NLCEnv(ddist, config)))
+
+    # print env.vectorized  # false
+    # print getattr(env, 'vectorized', False)  # false
+    # print "wrapped_env: ", getattr(env, 'wrapped_env', False)
+    # print env.vec_env_executor  # exist
+
+    print "wrapped wrapped env: ", env.wrapped_env.wrapped_env
+
+    # these code is from vectorized_sampler
+    n_envs = int(config["batch_size"] / config["max_seq_len"])
+    n_envs = max(1, min(n_envs, 100))
+
+    print n_envs # 1 / 12 (for max_seq_len 10)
+
+    # it's not parallel, and not that mysterious, since it's always going to be 1
+    # so technically it should be alright
+    vec_env = env.vec_env_executor(n_envs=n_envs, max_path_length=config["max_seq_len"])
+
+    print vec_env
+    # we also test if track_y_id is working
+    # second vec_env is the VecEnvExecutor
+    vec_env.vec_env.envs[0].reset()
+    vec_env.vec_env.envs[1].reset()
+    vec_env.vec_env.envs[2].reset()
+
+    print vec_env.vec_env.envs[0].target_trackid
+    print vec_env.vec_env.envs[1].target_trackid
+    print vec_env.vec_env.envs[2].target_trackid
+
+    # ====== testing vectorized_sampler's def obtain_samples =======
+
+    paths = []
+    n_samples = 0
+    obses = vec_env.reset()  # TODO: so env's reset() is called before policy, needs to populate it
+    dones = np.asarray([True] * vec_env.num_envs)
+    running_paths = [None] * vec_env.num_envs
+
+    # pbar = ProgBarCounter(config["batch_size"])
+    policy_time = 0
+    env_time = 0
+    process_time = 0
+
+    print len(obses)
+    print obses[0].shape  # 50
+
+    # TODO: now we need policy to continue testing...
+
+    # while n_samples < config["batch_size"]:
+    #     t = time.time()
+    #     policy.reset(dones)
+    #     actions, agent_infos = policy.get_actions(obses)
+    #
+    #     policy_time += time.time() - t
+    #     t = time.time()
+    #     next_obses, rewards, dones, env_infos = vec_env.step(actions)
+    #     env_time += time.time() - t
+    #
+    #     t = time.time()
+    #
+    #     agent_infos = tensor_utils.split_tensor_dict_list(agent_infos)
+    #     env_infos = tensor_utils.split_tensor_dict_list(env_infos)
+    #     if env_infos is None:
+    #         env_infos = [dict() for _ in range(vec_env.num_envs)]
+    #     if agent_infos is None:
+    #         agent_infos = [dict() for _ in range(vec_env.num_envs)]
+    #     for idx, observation, action, reward, env_info, agent_info, done in zip(itertools.count(), obses, actions,
+    #                                                                             rewards, env_infos, agent_infos,
+    #                                                                             dones):
+    #         if running_paths[idx] is None:
+    #             running_paths[idx] = dict(
+    #                 observations=[],
+    #                 actions=[],
+    #                 rewards=[],
+    #                 env_infos=[],
+    #                 agent_infos=[],
+    #             )
+    #         running_paths[idx]["observations"].append(observation)
+    #         running_paths[idx]["actions"].append(action)
+    #         running_paths[idx]["rewards"].append(reward)
+    #         running_paths[idx]["env_infos"].append(env_info)
+    #         running_paths[idx]["agent_infos"].append(agent_info)
+    #         if done:
+    #             paths.append(dict(
+    #                 observations=env.spec.observation_space.flatten_n(running_paths[idx]["observations"]),
+    #                 actions=env.spec.action_space.flatten_n(running_paths[idx]["actions"]),
+    #                 rewards=tensor_utils.stack_tensor_list(running_paths[idx]["rewards"]),
+    #                 env_infos=tensor_utils.stack_tensor_dict_list(running_paths[idx]["env_infos"]),
+    #                 agent_infos=tensor_utils.stack_tensor_dict_list(running_paths[idx]["agent_infos"]),
+    #             ))
+    #             n_samples += len(running_paths[idx]["rewards"])
+    #             running_paths[idx] = None
+    #     process_time += time.time() - t
+    #     pbar.inc(len(obses))
+    #     obses = next_obses
+    #
+    # pbar.stop()
+
+    # ========== Testing sampler/base.py (BaseSampler's) Process_samples() =======
