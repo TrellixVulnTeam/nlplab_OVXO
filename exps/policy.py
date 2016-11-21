@@ -6,7 +6,7 @@ from sandbox.rocky.tf.core.network import GRUNetwork, MLP
 from sandbox.rocky.tf.distributions.recurrent_categorical import RecurrentCategorical
 from sandbox.rocky.tf.misc import tensor_utils
 from sandbox.rocky.tf.spaces.discrete import Discrete
-from sandbox.rocky.tf.policies.base import StochasticPolicy
+from sandbox.rocky.tf.policies.base import StochasticPolicy, Policy
 
 from rllab.core.serializable import Serializable
 from rllab.misc import special
@@ -23,18 +23,36 @@ to alter reset()
 
 """
 
+
 # TODO: 1. Policy assumes env can provide init_states h0 for GRU
+# TODO: 2. Policy uses tf.assign() to give its weights
+
+# I guess the difficulty is that Policy already assembles layers....
+
+class TokenPolicy(Policy):
+    def __init__(self, env_spec):
+        super(TokenPolicy, self).__init__(env_spec)
+
+    def reset(self, **kwargs):
+        pass
+
+    def get_actions(self, observations):
+        flat_obs = self.observation_space.flatten_n(observations)
+        all_input = flat_obs
+
 
 class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
     """
     This is a customized version of the CategoricalGRUPolicy
     more specifically
     """
+
     def __init__(
             self,
             name,
             env_spec,
             env,
+            model,
             hidden_dim=32,
             feature_network=None,
             state_include_action=True,
@@ -62,29 +80,20 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
             else:
                 input_dim = obs_dim
 
+            # We use the new placeholder, since we use tf.assign()
+            # old computational graph is meaningless to us now
+            # Keep in mind InputLayer doesn't contain any any params, just placeholder
             l_input = L.InputLayer(
                 shape=(None, None, input_dim),
                 name="input"
             )
 
-            if feature_network is None:
-                feature_dim = input_dim
-                l_flat_feature = None
-                l_feature = l_input
-            else:
-                feature_dim = feature_network.output_layer.output_shape[-1]
-                l_flat_feature = feature_network.output_layer
-                l_feature = L.OpLayer(
-                    l_flat_feature,
-                    extras=[l_input],
-                    name="reshape_feature",
-                    op=lambda flat_feature, input: tf.reshape(
-                        flat_feature,
-                        tf.pack([tf.shape(input)[0], tf.shape(input)[1], feature_dim])
-                    ),
-                    shape_op=lambda _, input_shape: (input_shape[0], input_shape[1], feature_dim)
-                )
+            # feature_network is None:
+            feature_dim = input_dim
+            l_flat_feature = None
+            l_feature = l_input
 
+            # TODO: we want to assign tf vars in GRUNetwork
             prob_network = GRUNetwork(
                 input_shape=(feature_dim,),
                 input_layer=l_feature,
@@ -95,6 +104,9 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
                 gru_layer_cls=gru_layer_cls,
                 name="prob_network"
             )
+
+            # ===== Assign GRUNetwork's weights ======
+
 
             self.prob_network = prob_network
             self.feature_network = feature_network

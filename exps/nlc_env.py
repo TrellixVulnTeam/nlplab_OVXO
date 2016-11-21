@@ -116,7 +116,7 @@ class NLCEnv(Env):
         self.step_counter = 0
         self.source = config["source"]
         self.target = config["target"]
-        self.encoder = config["encoder"]  # pass in the encoder
+        self.model = config["model"]  # seq2seq model
         self.L_dec = config["L_dec"]  # we get numpy form of decoder embedding
         self.L_enc = config["L_enc"]  # same as above
         self.measure = config["measure"]  # "CER" (character error rate) or "BLEU"
@@ -249,7 +249,7 @@ if __name__ == '__main__':
         "gru_size": 100,
         "source": np.ones((20, 5)),
         "target": np.ones((20, 5)),
-        "encoder": None,
+        "model": None,
         "L_dec": np.ones((100, 50)),  # vocab_size: 100, hidden_size: 50
         "L_enc": None,
         "measure": "CER",
@@ -307,54 +307,54 @@ if __name__ == '__main__':
 
     # TODO: now we need policy to continue testing...
 
-    # while n_samples < config["batch_size"]:
-    #     t = time.time()
-    #     policy.reset(dones)
-    #     actions, agent_infos = policy.get_actions(obses)
-    #
-    #     policy_time += time.time() - t
-    #     t = time.time()
-    #     next_obses, rewards, dones, env_infos = vec_env.step(actions)
-    #     env_time += time.time() - t
-    #
-    #     t = time.time()
-    #
-    #     agent_infos = tensor_utils.split_tensor_dict_list(agent_infos)
-    #     env_infos = tensor_utils.split_tensor_dict_list(env_infos)
-    #     if env_infos is None:
-    #         env_infos = [dict() for _ in range(vec_env.num_envs)]
-    #     if agent_infos is None:
-    #         agent_infos = [dict() for _ in range(vec_env.num_envs)]
-    #     for idx, observation, action, reward, env_info, agent_info, done in zip(itertools.count(), obses, actions,
-    #                                                                             rewards, env_infos, agent_infos,
-    #                                                                             dones):
-    #         if running_paths[idx] is None:
-    #             running_paths[idx] = dict(
-    #                 observations=[],
-    #                 actions=[],
-    #                 rewards=[],
-    #                 env_infos=[],
-    #                 agent_infos=[],
-    #             )
-    #         running_paths[idx]["observations"].append(observation)
-    #         running_paths[idx]["actions"].append(action)
-    #         running_paths[idx]["rewards"].append(reward)
-    #         running_paths[idx]["env_infos"].append(env_info)
-    #         running_paths[idx]["agent_infos"].append(agent_info)
-    #         if done:
-    #             paths.append(dict(
-    #                 observations=env.spec.observation_space.flatten_n(running_paths[idx]["observations"]),
-    #                 actions=env.spec.action_space.flatten_n(running_paths[idx]["actions"]),
-    #                 rewards=tensor_utils.stack_tensor_list(running_paths[idx]["rewards"]),
-    #                 env_infos=tensor_utils.stack_tensor_dict_list(running_paths[idx]["env_infos"]),
-    #                 agent_infos=tensor_utils.stack_tensor_dict_list(running_paths[idx]["agent_infos"]),
-    #             ))
-    #             n_samples += len(running_paths[idx]["rewards"])
-    #             running_paths[idx] = None
-    #     process_time += time.time() - t
-    #     pbar.inc(len(obses))
-    #     obses = next_obses
-    #
+    while n_samples < config["batch_size"]:
+        t = time.time()
+        policy.reset()
+        actions, agent_infos = policy.get_actions(obses)
+
+        policy_time += time.time() - t
+        t = time.time()
+        next_obses, rewards, dones, env_infos = vec_env.step(actions)
+        env_time += time.time() - t
+
+        t = time.time()
+
+        agent_infos = tensor_utils.split_tensor_dict_list(agent_infos)
+        env_infos = tensor_utils.split_tensor_dict_list(env_infos)
+        if env_infos is None:
+            env_infos = [dict() for _ in range(vec_env.num_envs)]
+        if agent_infos is None:
+            agent_infos = [dict() for _ in range(vec_env.num_envs)]
+        for idx, observation, action, reward, env_info, agent_info, done in zip(itertools.count(), obses, actions,
+                                                                                rewards, env_infos, agent_infos,
+                                                                                dones):
+            if running_paths[idx] is None:
+                running_paths[idx] = dict(
+                    observations=[],
+                    actions=[],
+                    rewards=[],
+                    env_infos=[],
+                    agent_infos=[],
+                )
+            running_paths[idx]["observations"].append(observation)
+            running_paths[idx]["actions"].append(action)
+            running_paths[idx]["rewards"].append(reward)
+            running_paths[idx]["env_infos"].append(env_info)
+            running_paths[idx]["agent_infos"].append(agent_info)
+            if done:
+                paths.append(dict(
+                    observations=env.spec.observation_space.flatten_n(running_paths[idx]["observations"]),
+                    actions=env.spec.action_space.flatten_n(running_paths[idx]["actions"]),
+                    rewards=tensor_utils.stack_tensor_list(running_paths[idx]["rewards"]),
+                    env_infos=tensor_utils.stack_tensor_dict_list(running_paths[idx]["env_infos"]),
+                    agent_infos=tensor_utils.stack_tensor_dict_list(running_paths[idx]["agent_infos"]),
+                ))
+                n_samples += len(running_paths[idx]["rewards"])
+                running_paths[idx] = None
+        process_time += time.time() - t
+        # pbar.inc(len(obses))
+        obses = next_obses
+
     # pbar.stop()
 
     # ========== Testing sampler/base.py (BaseSampler's) Process_samples() =======
