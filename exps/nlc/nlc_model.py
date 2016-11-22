@@ -29,10 +29,13 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import embedding_ops
 from tensorflow.python.ops import rnn
-from tensorflow.python.ops import rnn_cell
+from tensorflow.python.ops.rnn_cell import _linear as tf_linear
+from sandbox.rocky.tf.core import rnn_cell
 from tensorflow.python.ops import variable_scope as vs
 from tensorflow.python.ops.math_ops import sigmoid
 from tensorflow.python.ops.math_ops import tanh
+
+import h5py
 
 import nlc_data
 
@@ -42,7 +45,7 @@ class GRUCellAttn(rnn_cell.GRUCell):
     with vs.variable_scope(scope or type(self).__name__):
       with vs.variable_scope("Attn1"):
         hs2d = tf.reshape(self.hs, [-1, num_units])
-        phi_hs2d = tanh(rnn_cell._linear(hs2d, num_units, True, 1.0))
+        phi_hs2d = tanh(tf_linear(hs2d, num_units, True, 1.0))
         self.phi_hs = tf.reshape(phi_hs2d, tf.shape(self.hs))
     super(GRUCellAttn, self).__init__(num_units)
 
@@ -50,13 +53,13 @@ class GRUCellAttn(rnn_cell.GRUCell):
     gru_out, gru_state = super(GRUCellAttn, self).__call__(inputs, state, scope)
     with vs.variable_scope(scope or type(self).__name__):
       with vs.variable_scope("Attn2"):
-        gamma_h = tanh(rnn_cell._linear(gru_out, self._num_units, True, 1.0))
+        gamma_h = tanh(tf_linear(gru_out, self._num_units, True, 1.0))
       weights = tf.reduce_sum(self.phi_hs * gamma_h, reduction_indices=2, keep_dims=True)
       weights = tf.exp(weights - tf.reduce_max(weights, reduction_indices=0, keep_dims=True))
       weights = weights / (1e-6 + tf.reduce_sum(weights, reduction_indices=0, keep_dims=True))
       context = tf.reduce_sum(self.hs * weights, reduction_indices=0)
       with vs.variable_scope("AttnConcat"):
-        out = tf.nn.relu(rnn_cell._linear([context, gru_out], self._num_units, True, 1.0))
+        out = tf.nn.relu(tf_linear([context, gru_out], self._num_units, True, 1.0))
       self.attn_map = tf.squeeze(tf.slice(weights, [0, 0, 0], [-1, -1, 1]))
       return (out, out) 
 
@@ -188,7 +191,7 @@ class NLCModel(object):
 
       with vs.variable_scope("Logistic", reuse=True):
         do2d = tf.reshape(decoder_output, [-1, self.size])
-        logits2d = rnn_cell._linear(do2d, self.vocab_size, True, 1.0)
+        logits2d = tf_linear(do2d, self.vocab_size, True, 1.0)
         logprobs2d = tf.nn.log_softmax(logits2d)
 
       total_probs = logprobs2d + tf.reshape(beam_probs, [-1, 1])
@@ -233,7 +236,7 @@ class NLCModel(object):
       doshape = tf.shape(self.decoder_output)
       T, batch_size = doshape[0], doshape[1]
       do2d = tf.reshape(self.decoder_output, [-1, self.size])
-      logits2d = rnn_cell._linear(do2d, self.vocab_size, True, 1.0)
+      logits2d = tf_linear(do2d, self.vocab_size, True, 1.0)
       outputs2d = tf.nn.log_softmax(logits2d)
       self.outputs = tf.reshape(outputs2d, tf.pack([T, batch_size, self.vocab_size]))
 
@@ -255,7 +258,7 @@ class NLCModel(object):
       inshape = tf.shape(inp)
       T, batch_size, dim = inshape[0], inshape[1], inshape[2]
       inp2d = tf.reshape(tf.transpose(inp, perm=[1, 0, 2]), [-1, 2 * self.size])
-      out2d = rnn_cell._linear(inp2d, self.size, True, 1.0)
+      out2d = tf_linear(inp2d, self.size, True, 1.0)
       out3d = tf.reshape(out2d, tf.pack((batch_size, tf.to_int32(T/2), dim)))
       out3d = tf.transpose(out3d, perm=[1, 0, 2])
       out3d.set_shape([None, None, self.size])
@@ -366,3 +369,63 @@ class NLCModel(object):
     outputs = session.run(output_feed, input_feed)
 
     return outputs[0], outputs[1]
+  
+  def save_decoder_to_h5(self, sess):
+    """
+    [u'W_hc:0', u'W_hr:0', u'W_hu:0', u'W_xc:0', u'W_xr:0', u'W_xu:0', u'b_c:0', u'b_r:0', u'b_u:0', u'h0:0']
+(Pdb) hf['iter00000']['gru_policy']['mean_network'].keys()
+[u'gru', u'output_flat']
+(Pdb) hf['iter00000']['gru_policy']['mean_network']['output_flat'].keys()
+
+    """
+    M_gates = self.decoder_cell.M_gates.eval(session= sess)
+    M_candidates = self.decoder_cell.M_candidate.eval(session=sess)
+    b_gates = self.decoder_cell.b_gates.eval(session= sess)
+    b_candidate = self.decoder_cell.b_candidate.eval(session=sess)
+    
+    #W_hc, W_hr, W_hu, W_xc, W_xr, W_xu, b_c, b_r, b_u =\
+      #session.run([self.decoder_cell.W_hc, self.decoder_cell.W_hr, self.decoder_cell.W_hu,
+                   #self.decoder_cell.W_xc, self.decoder_cell.W_xr, self.decoder_cell.W_xu,
+                   #self.decoder_cell.b_c, self.decoder_cell.b_r, self.decoder_cell.b_u])
+                   
+    W1, W2 = M_gates[:self.size], M_gates[self.size:]
+    W_xr, W_xu = np.split(W1,2,axis=1)
+    W_hr, W_hu = np.split(W2,2,axis=1)
+    
+    W_xc, W_hc = M_candidates[:self.size], M_candidates[self.size:]
+    W_xr, W_xu = np.split(W1,2,axis=1)
+    W_hr, W_hu = np.split(W2,2,axis=1)
+    
+    b_r, b_u = np.split(b_gates, 2)
+    b_c = b_candidate
+                   
+    with h5py.File("./NLC_weights.h5","a") as hf:
+      gru_path = "iter00000/gru_policy/mean_network/gru/"
+      output_path = "iter00000/gru_policy/mean_network/output_flat/"
+      hf.create_dataset(gru_path+"W_hc:0", data=W_hc)
+      hf.create_dataset(gru_path+"W_hr:0", data=W_hr)
+      hf.create_dataset(gru_path+"W_hu:0", data=W_hu)
+      hf.create_dataset(gru_path+"W_xc:0", data=W_xc)
+      hf.create_dataset(gru_path+"W_xr:0", data=W_xr)
+      hf.create_dataset(gru_path+"W_xu:0", data=W_xu)
+      
+      hf.create_dataset(gru_path+"b_c:0", data=b_c)
+      hf.create_dataset(gru_path+"b_r:0", data=b_r)
+      hf.create_dataset(gru_path+"b_u:0", data=b_u)
+      
+      ## TO DO
+      # h5.create_dataset(output_path+"W:0", something)
+      # h5.create_dataset(output_path+"b:)", something)
+  
+if __name__ == '__main__':
+  with tf.variable_scope("NLC") as scope:
+    A = tf.get_collection(tf.GraphKeys, scope="NLC/NLC/Decoder")
+    
+    nn = NLCModel(100, 150, 3, 1.0, 30,
+               1e-3, 0.99, False)
+    
+    sess= tf.Session()
+    sess.run(tf.initialize_all_variables())
+    nn.save_decoder_to_h5(sess)
+
+halt= True
