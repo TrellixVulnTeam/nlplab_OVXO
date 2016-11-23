@@ -60,7 +60,8 @@ class GRUCellAttn(rnn_cell.GRUCell):
       context = tf.reduce_sum(self.hs * weights, reduction_indices=0)
       with vs.variable_scope("AttnConcat"):
         out = tf.nn.relu(tf_linear([context, gru_out], self._num_units, True, 1.0))
-      self.attn_map = tf.squeeze(tf.slice(weights, [0, 0, 0], [-1, -1, 1]))
+      _slice_map = tf.slice(weights, [0, 0, 0], [-1, -1, 1])
+      self.attn_map = tf.squeeze(_slice_map)
       return (out, out) 
 
 class NLCModel(object):
@@ -370,52 +371,60 @@ class NLCModel(object):
 
     return outputs[0], outputs[1]
   
-  def save_decoder_to_h5(self, sess):
-    """
-    [u'W_hc:0', u'W_hr:0', u'W_hu:0', u'W_xc:0', u'W_xr:0', u'W_xu:0', u'b_c:0', u'b_r:0', u'b_u:0', u'h0:0']
-(Pdb) hf['iter00000']['gru_policy']['mean_network'].keys()
-[u'gru', u'output_flat']
-(Pdb) hf['iter00000']['gru_policy']['mean_network']['output_flat'].keys()
-
-    """
-    M_gates = self.decoder_cell.M_gates.eval(session= sess)
-    M_candidates = self.decoder_cell.M_candidate.eval(session=sess)
-    b_gates = self.decoder_cell.b_gates.eval(session= sess)
-    b_candidate = self.decoder_cell.b_candidate.eval(session=sess)
+  def save_decoder_to_h5(self,sess):
     
-    #W_hc, W_hr, W_hu, W_xc, W_xr, W_xu, b_c, b_r, b_u =\
-      #session.run([self.decoder_cell.W_hc, self.decoder_cell.W_hr, self.decoder_cell.W_hu,
-                   #self.decoder_cell.W_xc, self.decoder_cell.W_xr, self.decoder_cell.W_xu,
-                   #self.decoder_cell.b_c, self.decoder_cell.b_r, self.decoder_cell.b_u])
-                   
-    W1, W2 = M_gates[:self.size], M_gates[self.size:]
-    W_xr, W_xu = np.split(W1,2,axis=1)
-    W_hr, W_hu = np.split(W2,2,axis=1)
+    def _preface(L, path):
+      return [(path+"/{}:0".format(name),val) for (name,val) in L]
     
-    W_xc, W_hc = M_candidates[:self.size], M_candidates[self.size:]
-    W_xr, W_xu = np.split(W1,2,axis=1)
-    W_hr, W_hu = np.split(W2,2,axis=1)
+    def _pull(var, gru, tensor_name):
+      L = []
+      
+      if tensor_name == "Matrix":
+        M = var.eval(session=sess)
+        if gru == "Gates":
+          W1, W2 = M[:self.size], M[self.size:]
+          W_xr, W_xu = np.split(W1,2,axis=1)
+          W_hr, W_hu = np.split(W2,2,axis=1)
+          L += [("W_xr",W_xr),("W_xu",W_xu),("W_hr",W_hr),("W_hu",W_hu)]
+          
+        elif gru == "Candidate":
+          W_xc, W_hc = M[:self.size], M[self.size:]
+          L += [("W_xc",W_xc),("W_hc",W_hc)]     
+                
+      elif tensor_name == "Bias":
+        b = var.eval(session=sess)
+        if gru == "Gates":
+          b_r, b_u = np.split(b,2)
+          L += [("b_r",b_r),("b_u",b_u)]
+          
+        elif gru == "Candidate":
+          b_c = b
+          L += [("b_c",b_c)]
+          
+      return L
     
-    b_r, b_u = np.split(b_gates, 2)
-    b_c = b_candidate
-                   
+    L = []
+    base_path = "iter00000/gru_policy/mean_network/"
+    for var in tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES):
+      names = var.name.split('/')
+      tensor_name = names[-1].split(":")[0]
+      if names[2] == "Decoder":
+        if names[3] == "DecoderAttnCell":
+          path = base_path +  "attngru"
+        else:
+          path = base_path + "gru_{}".format(names[3][-1])
+        
+        if names[5] == "Gates":
+          l = _pull(var, "Gates", tensor_name)
+          L += _preface(l, path)
+        elif names[5] == "Candidate":
+          l = _pull(var, "Candidate", tensor_name)
+          L += _preface(l, path)
+          
+          
     with h5py.File("./NLC_weights.h5","a") as hf:
-      gru_path = "iter00000/gru_policy/mean_network/gru/"
-      output_path = "iter00000/gru_policy/mean_network/output_flat/"
-      hf.create_dataset(gru_path+"W_hc:0", data=W_hc)
-      hf.create_dataset(gru_path+"W_hr:0", data=W_hr)
-      hf.create_dataset(gru_path+"W_hu:0", data=W_hu)
-      hf.create_dataset(gru_path+"W_xc:0", data=W_xc)
-      hf.create_dataset(gru_path+"W_xr:0", data=W_xr)
-      hf.create_dataset(gru_path+"W_xu:0", data=W_xu)
-      
-      hf.create_dataset(gru_path+"b_c:0", data=b_c)
-      hf.create_dataset(gru_path+"b_r:0", data=b_r)
-      hf.create_dataset(gru_path+"b_u:0", data=b_u)
-      
-      ## TO DO
-      # h5.create_dataset(output_path+"W:0", something)
-      # h5.create_dataset(output_path+"b:)", something)
+      for name, data in L:
+        hf.create_dataset(name, data=data)
   
 if __name__ == '__main__':
   with tf.variable_scope("NLC") as scope:
