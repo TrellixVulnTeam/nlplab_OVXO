@@ -1086,7 +1086,7 @@ class GRULayer(Layer):
     def __init__(self, incoming, num_units, hidden_nonlinearity,
                  gate_nonlinearity=tf.nn.sigmoid, W_x_init=XavierUniformInitializer(), W_h_init=OrthogonalInitializer(),
                  b_init=tf.zeros_initializer, hidden_init=tf.zeros_initializer, hidden_init_trainable=False,
-                 layer_normalization=False, **kwargs):
+                 layer_normalization=False, add_h0=True, **kwargs):
 
         if hidden_nonlinearity is None:
             hidden_nonlinearity = tf.identity
@@ -1103,8 +1103,10 @@ class GRULayer(Layer):
         self.layer_normalization = layer_normalization
 
         # Weights for the initial hidden state
-        self.h0 = self.add_param(hidden_init, (num_units,), name="h0", trainable=hidden_init_trainable,
-                                 regularizable=False)
+        if add_h0:
+            self.h0 = self.add_param(hidden_init, (num_units,), name="h0", trainable=hidden_init_trainable,
+                                     regularizable=False)
+
         # Weights for the reset gate
         self.W_xr = self.add_param(W_x_init, (input_dim, num_units), name="W_xr")
         self.W_hr = self.add_param(W_h_init, (num_units, num_units), name="W_hr")
@@ -1209,7 +1211,17 @@ class GRUStepLayer(MergeLayer):
         x = tf.reshape(x, tf.pack([n_batch, -1]))
         x.set_shape((None, self.input_shapes[0][1]))
         return self._gru_layer.step(hprev, x)
-
+    
+    
+class AttnGRULayer(GRULayer):
+    def __init__(self, incoming, **kwargs):
+        super(GRULayer, self).__init__(incoming, add_h0= False, **kwargs)
+        self.hs = tf.placeholder(tf.float32, shape=(max_length,n_env,n_units), name="hs")
+        self.h0 = self.hs[-1,:]
+        
+    def step(self, hprev, x):
+        h = super(GRULayer, self).step(hprev,x)
+        # do attention based post-processing using hs.
 
 class TfGRULayer(Layer):
     """
