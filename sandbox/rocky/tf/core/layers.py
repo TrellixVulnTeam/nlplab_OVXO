@@ -1132,9 +1132,11 @@ class GRULayer(Layer):
         self.norm_params = dict()
 
         # pre-run the step method to initialize the normalization parameters
-        h_dummy = tf.placeholder(dtype=tf.float32, shape=(None, num_units), name="h_dummy")
-        x_dummy = tf.placeholder(dtype=tf.float32, shape=(None, input_dim), name="x_dummy")
-        self.step(h_dummy, x_dummy)
+        
+        # we are not using layer normalization ...
+        #h_dummy = tf.placeholder(dtype=tf.float32, shape=(None, num_units), name="h_dummy")
+        #x_dummy = tf.placeholder(dtype=tf.float32, shape=(None, input_dim), name="x_dummy")
+        #self.step(h_dummy, x_dummy)
 
     def step(self, hprev, x):
         if self.layer_normalization:
@@ -1214,14 +1216,53 @@ class GRUStepLayer(MergeLayer):
     
     
 class AttnGRULayer(GRULayer):
-    def __init__(self, incoming, **kwargs):
-        super(GRULayer, self).__init__(incoming, add_h0= False, **kwargs)
-        self.hs = tf.placeholder(tf.float32, shape=(max_length,n_env,n_units), name="hs")
-        self.h0 = self.hs[-1,:]
+    def __init__(self, incoming,
+                 W_hs_init=XavierUniformInitializer(),
+                 W_gamma_init=XavierUniformInitializer(),
+                 W_concat_init=XavierUniformInitializer(),
+                 b_init = tf.zeros_initializer,
+                 **kwargs):
+        
+        max_length, n_env, num_units = kwargs["max_length"], kwargs["n_env"], kwargs["num_units"]
+        
+        # instantiate GRULayer        
+        super(AttnGRULayer, self).__init__(incoming, add_h0= False, **kwargs)
+        
+        with tf.variable_scope("attn"):
+            self.W_hs = self.add_param(W_hs_init, (num_units, num_units), name="W_hs")
+            self.b_hs = self.add_param(b_init, (num_units,), name="b_c", regularizable=False)
+        
+            self.W_gamma = self.add_param(W_gamma_init, (num_units, num_units), name="W_gamma")
+            self.b_gamma = self.add_param(b_init, (num_units,), name="b_gamma")
+        
+            self.W_concat = self.add_param(W_concat_init, (2 * num_units, num_units), name="W_concat")
+            self.b_concat = self.add_param(b_init, (num_units,), name="b_concat")        
+
+        self.hs = tf.placeholder(tf.float32, shape=(max_length,n_env,num_units), name="hs")
+        self.h0 = self.hs[-1,:] # last timestep, every environment.
+        
+        hs2d = tf.reshape(self.hs, [-1, num_units])
+        phi_hs2d = tf.nn.tanh(tf.nn.xw_plus_b(hs2d, self.W_hs, self.b_hs))
+        self.phi_hs = tf.reshape(phi_hs2d, tf.shape(self.hs))
+        
         
     def step(self, hprev, x):
-        h = super(GRULayer, self).step(hprev,x)
+        gru_out = super(AttnGRULayer, self).step(hprev,x)
         # do attention based post-processing using hs.
+        
+        gamma_h = tf.nn.tanh(tf.nn.xw_plus_b(gru_out, self.W_gamma, self.b_gamma))
+        weights = tf.reduce_sum(self.phi_hs * gamma_h, reduction_indices=2, keep_dims=True)
+        weights = tf.exp(weights - tf.reduce_max(weights, reduction_indices=0, keep_dims=True))
+        weights = weights / (1e-6 + tf.reduce_sum(weights, reduction_indices=0, keep_dims=True))
+        context = tf.reduce_sum(self.hs * weights, reduction_indices=0)
+        
+        out = tf.nn.relu(tf.nn.xw_plus_b(tf.concat(1,[context, gru_out]), self.W_concat, self.b_concat))
+        
+        _slice_map = tf.slice(weights, [0, 0, 0], [-1, -1, 1])
+        self.attn_map = tf.squeeze(_slice_map)
+        
+        return out
+    
 
 class TfGRULayer(Layer):
     """

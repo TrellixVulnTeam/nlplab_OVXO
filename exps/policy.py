@@ -51,13 +51,13 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
             self,
             name,
             env_spec,
-            env,
-            model,
+            #env,
+            #model,
             hidden_dim=32,
             feature_network=None,
             state_include_action=True,
             hidden_nonlinearity=tf.tanh,
-            gru_layer_cls=L.GRULayer,
+            gru_layer_cls=L.AttnGRULayer,
     ):
         """
         :param env: we pass in the enviornment
@@ -102,7 +102,11 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
                 hidden_nonlinearity=hidden_nonlinearity,
                 output_nonlinearity=tf.nn.softmax,
                 gru_layer_cls=gru_layer_cls,
-                name="prob_network"
+                name="prob_network",
+                # not sure what to put for this ...
+                layer_args={"max_length":100,
+                            "n_env":12
+                            }
             )
 
             # ===== Assign GRUNetwork's weights ======
@@ -122,7 +126,7 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
             self.f_step_prob = tensor_utils.compile_function(
                 [
                     flat_input_var,
-                    prob_network.step_prev_hidden_layer.input_var
+                    prob_network.step_prev_state_layer.input_var
                 ],
                 L.get_output([
                     prob_network.step_output_layer,
@@ -244,3 +248,29 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
             ]
         else:
             return []
+        
+if __name__ == '__main__':
+    from exps.nlc_env import NLCEnv
+    
+    config = {
+        "gru_size": 100,
+        "source": np.ones((20, 5)),
+        "target": np.ones((20, 5)),
+        "model": None,
+        "L_dec": np.ones((100, 50)),  # vocab_size: 100, hidden_size: 50
+        "L_enc": None,
+        "measure": "CER",
+        'data_dir': "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/ptb_data/",
+        "max_seq_len": 10,  # 200
+        "batch_size": 128
+    }
+    from exps.nlc_env import DataDistributor
+    from sandbox.rocky.tf.envs.base import TfEnv
+    ddist = DataDistributor(config)
+    
+    env = TfEnv(NLCEnv(ddist, config))
+    nn = CategoricalGRUPolicy('gru', env.spec, state_include_action=False)
+    for p in nn.get_params():
+        print p.name
+    
+    halt= True
