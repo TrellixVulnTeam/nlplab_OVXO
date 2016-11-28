@@ -29,12 +29,13 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import embedding_ops
 from tensorflow.python.ops import rnn
-from tensorflow.python.ops import rnn_cell
+from tensorflow.python.ops.rnn_cell import _linear as tf_linear
+from sandbox.rocky.tf.core import rnn_cell
 from tensorflow.python.ops import variable_scope as vs
 from tensorflow.python.ops.math_ops import sigmoid
 from tensorflow.python.ops.math_ops import tanh
 import exps.nlc.nlc_data as nlc_data
-
+import h5py
 
 class GRUCellAttn(rnn_cell.GRUCell):
   def __init__(self, num_units, encoder_output, scope=None):
@@ -42,7 +43,7 @@ class GRUCellAttn(rnn_cell.GRUCell):
     with vs.variable_scope(scope or type(self).__name__):
       with vs.variable_scope("Attn1"):
         hs2d = tf.reshape(self.hs, [-1, num_units])
-        phi_hs2d = tanh(rnn_cell._linear(hs2d, num_units, True, 1.0))
+        phi_hs2d = tanh(tf_linear(hs2d, num_units, True, 1.0))
         self.phi_hs = tf.reshape(phi_hs2d, tf.shape(self.hs))
     super(GRUCellAttn, self).__init__(num_units)
 
@@ -50,14 +51,15 @@ class GRUCellAttn(rnn_cell.GRUCell):
     gru_out, gru_state = super(GRUCellAttn, self).__call__(inputs, state, scope)
     with vs.variable_scope(scope or type(self).__name__):
       with vs.variable_scope("Attn2"):
-        gamma_h = tanh(rnn_cell._linear(gru_out, self._num_units, True, 1.0))
+        gamma_h = tanh(tf_linear(gru_out, self._num_units, True, 1.0))
       weights = tf.reduce_sum(self.phi_hs * gamma_h, reduction_indices=2, keep_dims=True)
       weights = tf.exp(weights - tf.reduce_max(weights, reduction_indices=0, keep_dims=True))
       weights = weights / (1e-6 + tf.reduce_sum(weights, reduction_indices=0, keep_dims=True))
       context = tf.reduce_sum(self.hs * weights, reduction_indices=0)
       with vs.variable_scope("AttnConcat"):
-        out = tf.nn.relu(rnn_cell._linear([context, gru_out], self._num_units, True, 1.0))
-      self.attn_map = tf.squeeze(tf.slice(weights, [0, 0, 0], [-1, -1, 1]))
+        out = tf.nn.relu(tf_linear([context, gru_out], self._num_units, True, 1.0))
+      _slice_map = tf.slice(weights, [0, 0, 0], [-1, -1, 1])
+      self.attn_map = tf.squeeze(_slice_map)
       return (out, out) 
 
 class NLCModel(object):
@@ -189,7 +191,7 @@ class NLCModel(object):
 
       with vs.variable_scope("Logistic", reuse=True):
         do2d = tf.reshape(decoder_output, [-1, self.size])
-        logits2d = rnn_cell._linear(do2d, self.vocab_size, True, 1.0)
+        logits2d = tf_linear(do2d, self.vocab_size, True, 1.0)
         logprobs2d = tf.nn.log_softmax(logits2d)
 
       total_probs = logprobs2d + tf.reshape(beam_probs, [-1, 1])
@@ -234,7 +236,7 @@ class NLCModel(object):
       doshape = tf.shape(self.decoder_output)
       T, batch_size = doshape[0], doshape[1]
       do2d = tf.reshape(self.decoder_output, [-1, self.size])
-      logits2d = rnn_cell._linear(do2d, self.vocab_size, True, 1.0)
+      logits2d = tf_linear(do2d, self.vocab_size, True, 1.0)
       outputs2d = tf.nn.log_softmax(logits2d)
       self.outputs = tf.reshape(outputs2d, tf.pack([T, batch_size, self.vocab_size]))
 
@@ -256,7 +258,7 @@ class NLCModel(object):
       inshape = tf.shape(inp)
       T, batch_size, dim = inshape[0], inshape[1], inshape[2]
       inp2d = tf.reshape(tf.transpose(inp, perm=[1, 0, 2]), [-1, 2 * self.size])
-      out2d = rnn_cell._linear(inp2d, self.size, True, 1.0)
+      out2d = tf_linear(inp2d, self.size, True, 1.0)
       out3d = tf.reshape(out2d, tf.pack((batch_size, tf.to_int32(T/2), dim)))
       out3d = tf.transpose(out3d, perm=[1, 0, 2])
       out3d.set_shape([None, None, self.size])
@@ -367,3 +369,71 @@ class NLCModel(object):
     outputs = session.run(output_feed, input_feed)
 
     return outputs[0], outputs[1]
+  
+  def save_decoder_to_h5(self,sess):
+    
+    def _preface(L, path):
+      return [(path+"/{}:0".format(name),val) for (name,val) in L]
+    
+    def _pull(var, gru, tensor_name):
+      L = []
+      
+      if tensor_name == "Matrix":
+        M = var.eval(session=sess)
+        if gru == "Gates":
+          W1, W2 = M[:self.size], M[self.size:]
+          W_xr, W_xu = np.split(W1,2,axis=1)
+          W_hr, W_hu = np.split(W2,2,axis=1)
+          L += [("W_xr",W_xr),("W_xu",W_xu),("W_hr",W_hr),("W_hu",W_hu)]
+          
+        elif gru == "Candidate":
+          W_xc, W_hc = M[:self.size], M[self.size:]
+          L += [("W_xc",W_xc),("W_hc",W_hc)]     
+                
+      elif tensor_name == "Bias":
+        b = var.eval(session=sess)
+        if gru == "Gates":
+          b_r, b_u = np.split(b,2)
+          L += [("b_r",b_r),("b_u",b_u)]
+          
+        elif gru == "Candidate":
+          b_c = b
+          L += [("b_c",b_c)]
+          
+      return L
+    
+    L = []
+    base_path = "iter00000/gru_policy/mean_network/"
+    for var in tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES):
+      names = var.name.split('/')
+      tensor_name = names[-1].split(":")[0]
+      if names[2] == "Decoder":
+        if names[3] == "DecoderAttnCell":
+          path = base_path +  "attngru"
+        else:
+          path = base_path + "gru_{}".format(names[3][-1])
+        
+        if names[5] == "Gates":
+          l = _pull(var, "Gates", tensor_name)
+          L += _preface(l, path)
+        elif names[5] == "Candidate":
+          l = _pull(var, "Candidate", tensor_name)
+          L += _preface(l, path)
+          
+          
+    with h5py.File("./NLC_weights.h5","a") as hf:
+      for name, data in L:
+        hf.create_dataset(name, data=data)
+  
+if __name__ == '__main__':
+  with tf.variable_scope("NLC") as scope:
+    A = tf.get_collection(tf.GraphKeys, scope="NLC/NLC/Decoder")
+    
+    nn = NLCModel(100, 150, 3, 1.0, 30,
+               1e-3, 0.99, False)
+    
+    sess= tf.Session()
+    sess.run(tf.initialize_all_variables())
+    nn.save_decoder_to_h5(sess)
+
+halt= True

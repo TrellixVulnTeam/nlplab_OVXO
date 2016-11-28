@@ -15,6 +15,8 @@ import numpy as np
 import random
 from nltk.translate.bleu_score import corpus_bleu, sentence_bleu
 from exps.preprocess import EOS_ID, SOS_ID, PAD_ID, padded, add_sos_eos, refill, tokenize
+#from nltk.translate.bleu_score import corpus_bleu, sentence_bleu
+from exps.preprocess import EOS_ID, SOS_ID
 from tensorflow.python.ops import variable_scope as vs
 from tensorflow.python.ops import embedding_ops
 from sandbox.rocky.tf.spaces.discrete import Discrete
@@ -160,7 +162,8 @@ class NLCEnv(Env):
         self.distributor = distributor
         self.size = config['gru_size']
         self.vocab_file = config['data_dir'] + "vocab.dat"
-        self.vocab_size = self.count_vocab()
+        #self.vocab_size = self.count_vocab()
+        self.vocab_size = 100
         self.batch_size = config['batch_size']
         self.max_seq_len = config['max_seq_len']
         self.curr_sent = np.zeros(self.max_seq_len, dtype="int32")  # store sentence for one rollout

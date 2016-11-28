@@ -24,17 +24,21 @@ class GRUCell(RNNCell):
         with vs.variable_scope(scope or type(self).__name__):  # "GRUCell"
             with vs.variable_scope("Gates"):  # Reset gate and update gate.
                 # We start with bias of 1.0 to not reset and not update.
-                out, W1, W2, b = _linear([inputs, state], 2 * self._num_units, True, 1.0)
+                out, M_gates, W1, W2, b_gates = _linear([inputs, state], 2 * self._num_units, True, 1.0)
                 self.W_xr, self.W_xu = tf.split(1,2,W1)
                 self.W_hr, self.W_hu = tf.split(1,2,W2)
-                self.b_r, self.b_u = tf.split(0,2,b)
+                
+                self.M_gates = M_gates
+                self.b_gates = b_gates
                 
                 r, u = array_ops.split(1, 2, out)
                 r, u = sigmoid(r), sigmoid(u)
             with vs.variable_scope("Candidate"):
-                out, W1, W2, b = _linear([inputs, r * state], self._num_units, True)
+                out, M_candidates, W1, W2, b_candidate = _linear([inputs, r * state], self._num_units, True)
                 self.W_xc, self.W_hc = W1, W2
-                self.b_c = b
+                
+                self.M_candidate = M_candidates
+                self.b_candidate = b_candidate
                 
                 c = self._activation(out)
             new_h = u * state + (1 - u) * c
@@ -94,7 +98,7 @@ def _linear(args, output_size, bias, bias_start=0.0, scope=None):
     #W1, W2 = tf.split(0, 2, matrix)
     in_dim = shapes[0][-1]
     W1, W2 = matrix[:in_dim], matrix[in_dim:]
-    return res + bias_term, W1, W2, bias_term
+    return res + bias_term, matrix, W1, W2, bias_term
 
 if __name__ == '__main__':
     import numpy as np
