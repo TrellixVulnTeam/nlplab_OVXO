@@ -33,8 +33,8 @@ from tensorflow.python.ops import rnn_cell
 from tensorflow.python.ops import variable_scope as vs
 from tensorflow.python.ops.math_ops import sigmoid
 from tensorflow.python.ops.math_ops import tanh
+import exps.nlc.nlc_data as nlc_data
 
-import nlc_data
 
 class GRUCellAttn(rnn_cell.GRUCell):
   def __init__(self, num_units, encoder_output, scope=None):
@@ -132,7 +132,7 @@ class NLCModel(object):
     if self.num_layers > 1:
       self.decoder_cell = rnn_cell.GRUCell(self.size)
     self.attn_cell = GRUCellAttn(self.size, self.encoder_output, scope="DecoderAttnCell")
-
+    i = -1
     with vs.variable_scope("Decoder"):
       inp = self.decoder_inputs
       for i in xrange(self.num_layers - 1):
@@ -155,6 +155,7 @@ class NLCModel(object):
     inp = decoder_inputs
 
     with vs.variable_scope("Decoder", reuse=True):
+      i = -1
       for i in xrange(self.num_layers - 1):
         with vs.variable_scope("DecoderCell%d" % i) as scope:
           inp, state_output = self.decoder_cell(inp, decoder_state_input[i])

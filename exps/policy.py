@@ -37,8 +37,10 @@ class TokenPolicy(Policy):
         pass
 
     def get_actions(self, observations):
-        flat_obs = self.observation_space.flatten_n(observations)
+        flat_obs = np.array(observations, dtype=observations[0].dtype)
         all_input = flat_obs
+        actions = np.ones(self.observation_space.n)
+        return actions
 
 
 class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
@@ -51,16 +53,18 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
             self,
             name,
             env_spec,
-            env,
             model,
+            distributor,
+            config,
             hidden_dim=32,
             feature_network=None,
             state_include_action=True,
             hidden_nonlinearity=tf.tanh,
             gru_layer_cls=L.GRULayer,
+            word_embed_dim=0
     ):
         """
-        :param env: we pass in the enviornment
+        :param config: has L_dec, L_enc
 
         :param env_spec: A spec for the env.
         :param hidden_dim: dimension of hidden layer
@@ -72,17 +76,23 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
             Serializable.quick_init(self, locals())
             super(CategoricalGRUPolicy, self).__init__(env_spec)
 
-            obs_dim = env_spec.observation_space.flat_dim
-            action_dim = env_spec.action_space.flat_dim
+            if word_embed_dim != 0:
+                obs_dim = word_embed_dim
+            else:
+                obs_dim = env_spec.observation_space.flat_dim
+
+            action_dim = env_spec.action_space.flat_dim  # over vocab space
 
             if state_include_action:
                 input_dim = obs_dim + action_dim
             else:
                 input_dim = obs_dim
 
-            # We use the new placeholder, since we use tf.assign()
             # old computational graph is meaningless to us now
             # Keep in mind InputLayer doesn't contain any any params, just placeholder
+
+            # l_input = tf.placeholder(shape=(None, None, input_dim))
+            # it could be 1, batch-size/n-env, input_dim
             l_input = L.InputLayer(
                 shape=(None, None, input_dim),
                 name="input"
@@ -105,9 +115,6 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
                 name="prob_network"
             )
 
-            # ===== Assign GRUNetwork's weights ======
-
-
             self.prob_network = prob_network
             self.feature_network = feature_network
             self.l_input = l_input
@@ -122,7 +129,7 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
             self.f_step_prob = tensor_utils.compile_function(
                 [
                     flat_input_var,
-                    prob_network.step_prev_hidden_layer.input_var
+                    prob_network.step_prev_state_layer.input_var,
                 ],
                 L.get_output([
                     prob_network.step_output_layer,
@@ -208,7 +215,18 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
 
     @overrides
     def get_actions(self, observations):
-        flat_obs = self.observation_space.flatten_n(observations)
+        """
+
+        Parameters
+        ----------
+        observations: [n_envs, word_dim]
+                       each elem is self.observation_space
+        """
+        # flatten_n won't work, it's to make observations one-hot
+        # we turn a list of observations into a matrix
+        # flat_obs = self.observation_space.flatten_n(observations)
+
+        flat_obs = np.array(observations, dtype="float32")
         if self.state_include_action:
             assert self.prev_actions is not None
             all_input = np.concatenate([
@@ -220,6 +238,8 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
         probs, hidden_vec = self.f_step_prob(all_input, self.prev_hiddens)
         actions = special.weighted_sample_n(probs, np.arange(self.action_space.n))
         prev_actions = self.prev_actions
+        # TODO: this line might have the same problem
+        # TODO: as observation_space.flatten_n as well
         self.prev_actions = self.action_space.flatten_n(actions)
         self.prev_hiddens = hidden_vec
         agent_info = dict(prob=probs)
