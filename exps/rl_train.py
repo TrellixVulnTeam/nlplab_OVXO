@@ -11,15 +11,16 @@ import random
 import numpy as np
 import tensorflow as tf
 
-import exps.nlc_env
-from exps.nlc_env import NLCEnv
+from sandbox.rocky.tf.envs.base import TfEnv
+from exps.nlc_env import NLCEnv, DataDistributor
 from exps.preprocess import pair_iter
 from exps.nlc.nlc_model import NLCModel
 import exps.nlc.nlc_data as nlc_data
-from sandbox.rocky.tf.policies.categorical_gru_policy import CategoricalGRUPolicy
+from exps.policy import CategoricalGRUPolicy
 from sandbox.rocky.tf.core.network import MLP, Baseline, GRUNetwork
 from sandbox.rocky.tf.optimizers.first_order_optimizer import FirstOrderOptimizer
 from rllab.misc.overrides import overrides
+from exps.nlc_env import build_data
 
 """
 Assemble the end-to-end encoder-decoder
@@ -28,22 +29,22 @@ then put the model into policy construction
 then train it with
 """
 
-tf.app.flags.DEFINE_float("learning_rate", 0.0003, "Learning rate.")
-tf.app.flags.DEFINE_float("learning_rate_decay_factor", 0.95, "Learning rate decays by this much.")
-tf.app.flags.DEFINE_float("max_gradient_norm", 10.0, "Clip gradients to this norm.")
-tf.app.flags.DEFINE_float("dropout", 0.15, "Fraction of units randomly dropped on non-recurrent connections.")
-tf.app.flags.DEFINE_integer("batch_size", 128, "Batch size to use during training.")
-tf.app.flags.DEFINE_integer("epochs", 5, "Number of epochs to train.")  # 40
-tf.app.flags.DEFINE_integer("size", 100, "Size of each model layer.")  # 400
-tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers in the model.")  # 3
-tf.app.flags.DEFINE_integer("max_vocab_size", 40000, "Vocabulary size limit.")
-tf.app.flags.DEFINE_integer("max_seq_len", 200, "Maximum sequence length.")
-tf.app.flags.DEFINE_string("data_dir", "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/ptb_data/",
-                           "Data directory")
-tf.app.flags.DEFINE_string("train_dir", "./tmp", "Training directory.")
-tf.app.flags.DEFINE_string("tokenizer", "CHAR", "Set to WORD to train word level model.")
-tf.app.flags.DEFINE_integer("print_every", 1, "How many iterations to do per print.")
-tf.app.flags.DEFINE_string("baseline_type", 'mlp', "linear|mlp")
+# tf.app.flags.DEFINE_float("learning_rate", 0.0003, "Learning rate.")
+# tf.app.flags.DEFINE_float("learning_rate_decay_factor", 0.95, "Learning rate decays by this much.")
+# tf.app.flags.DEFINE_float("max_gradient_norm", 10.0, "Clip gradients to this norm.")
+# tf.app.flags.DEFINE_float("dropout", 0.15, "Fraction of units randomly dropped on non-recurrent connections.")
+# tf.app.flags.DEFINE_integer("batch_size", 128, "Batch size to use during training.")
+# tf.app.flags.DEFINE_integer("epochs", 5, "Number of epochs to train.")  # 40
+# tf.app.flags.DEFINE_integer("size", 100, "Size of each model layer.")  # 400
+# tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers in the model.")  # 3
+# tf.app.flags.DEFINE_integer("max_vocab_size", 40000, "Vocabulary size limit.")
+# tf.app.flags.DEFINE_integer("max_seq_len", 200, "Maximum sequence length.")
+# tf.app.flags.DEFINE_string("data_dir", "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/ptb_data/",
+#                            "Data directory")
+# tf.app.flags.DEFINE_string("train_dir", "./tmp", "Training directory.")
+# tf.app.flags.DEFINE_string("tokenizer", "CHAR", "Set to WORD to train word level model.")
+# tf.app.flags.DEFINE_integer("print_every", 1, "How many iterations to do per print.")
+# tf.app.flags.DEFINE_string("baseline_type", 'mlp', "linear|mlp")
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -118,9 +119,6 @@ class BaselineMLP(MLP, Baseline):
         # self._regressor.fit(observations, returns.reshape((-1, 1)))
         self._optimizer.optimize([observations, returns[..., None]])
 
-
-
-
 if __name__ == '__main__':
 
     # ======== End2End Normal Training =========
@@ -130,10 +128,26 @@ if __name__ == '__main__':
     print("Preparing NLC data in %s" % FLAGS.data_dir)
 
     # TODO:  FLAGS.tokenizer.lower() doesn't belong here (we are only doing char)
-    x_train, y_train, x_dev, y_dev, vocab_path = nlc_data.prepare_nlc_data(
-        FLAGS.data_dir + '/' + FLAGS.tokenizer.lower(), FLAGS.max_vocab_size,
-        tokenizer=get_tokenizer(FLAGS))
+    # x_train, y_train, x_dev, y_dev, vocab_path = nlc_data.prepare_nlc_data(
+    #     FLAGS.data_dir, FLAGS.max_vocab_size,
+    #     tokenizer=get_tokenizer(FLAGS))  # FLAGS.tokenizer.lower()
+
+    x_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.x"
+    y_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.y"
+
+    x_dev = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.x"
+    y_dev = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.y"
+
+    vocab_path = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/vocab.dat"
+
+    source_tokens, source_mask, target_tokens, target_mask = build_data(fnamex="/Users/Aimingnie/Documents" +
+                                                                               "/School/Stanford/AA228/nlplab/ptb_data/train.ids.x",
+                                                                        fnamey="/Users/Aimingnie/Documents" +
+                                                                               "/School/Stanford/AA228/nlplab/ptb_data/train.ids.y",
+                                                                        num_layers=1, max_seq_len=200)
+
     vocab, _ = nlc_data.initialize_vocabulary(vocab_path)
+
     vocab_size = len(vocab)
     print("Vocabulary size: %d" % vocab_size)
 
@@ -212,10 +226,48 @@ if __name__ == '__main__':
         # TODO: 1. Build a RewardGRU (critic)
         # TODO: 2. Build a TargetGRU (target/slow critic)
 
-        # create a critic network
-        reward = RewardMLP('mlp_reward', 1, r_hspec, nonlinearity, tf.nn.sigmoid,
-                           input_shape=(np.prod(env.spec.observation_space.shape) + env.action_dim,),
-                           batch_normalization=args.batch_normalization)
+            # building an enviornment
+            # notice we are still in previous session!
+            # also notice that rllab will create a new session in Batchpolot
+
+            L_dec = model.L_dec.eval(session=sess)
+            L_enc = model.L_enc.eval(session=sess)
+
+            config = {
+                "gru_size": 20,  # remember train.py for NLC must be adjusted as well
+                "source": source_tokens,
+                "target": target_tokens,
+                "source_mask": source_mask,
+                "target_mask": target_mask,
+                "model": model,
+                "L_dec": L_dec,  # vocab_size: 52, hidden_size: 50
+                "L_enc": L_enc,
+                "measure": "CER",
+                'data_dir': "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/ptb_data/",
+                "max_seq_len": 32,
+                # This is determined by data preprocessing (for decoder it's 32, cause <start>, <end>)
+                "batch_size": 64,  # batch_size must be multiples of max_seq_len (did you mix
+                # batch-size with n_env in policy code???)
+                "sess": sess,  # tf_session
+                "vocab_size": L_dec.shape[0],
+                "encoder_max_seq_length": 30
+            }
+            ddist = DataDistributor(config)
+
+            env = TfEnv(NLCEnv(ddist, config))
+
+            # create a policy
+
+            policy = CategoricalGRUPolicy(name="gru_policy", env_spec=env.spec,
+                                          distributor=ddist, config=config,
+                                          hidden_dim=config["gru_size"],
+                                          hidden_nonlinearity=tf.nn.relu,
+                                          word_embed_dim=config["gru_size"],
+                                          )  # in character Seq2Seq,
+                                        # word_emb and hid_size are the same
+
+            # create a critic network
+
 
         # create baseline (paper didn't have a baseline)
 
@@ -237,8 +289,8 @@ if __name__ == '__main__':
         # create target network
 
         # create policy (exactly the same as seq2seq mode)
-        policy = CategoricalGRUPolicy(name='gru_policy', env_spec=env.spec,
-                                      hidden_dim=model.size,
-                                      feature_network=None,
-                                      state_include_action=False)
+        # policy = CategoricalGRUPolicy(name='gru_policy', env_spec=env.spec,
+        #                               hidden_dim=model.size,
+        #                               feature_network=None,
+        #                               state_include_action=False)
 

@@ -43,7 +43,8 @@ tf.app.flags.DEFINE_integer("size", 20, "Size of each model layer.")  # 400, als
 tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers in the model.")  # 1
 tf.app.flags.DEFINE_integer("max_vocab_size", 40000, "Vocabulary size limit.")
 tf.app.flags.DEFINE_integer("max_seq_len", 200, "Maximum sequence length.")
-tf.app.flags.DEFINE_string("data_dir", "/tmp", "Data directory")
+tf.app.flags.DEFINE_string("data_dir", "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/ptb_data/",
+                           "Data directory")
 tf.app.flags.DEFINE_string("train_dir", "/tmp", "Training directory.")
 tf.app.flags.DEFINE_string("tokenizer", "CHAR", "Set to WORD to train word level model.")
 tf.app.flags.DEFINE_integer("print_every", 1, "How many iterations to do per print.")
