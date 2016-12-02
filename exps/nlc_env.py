@@ -36,6 +36,7 @@ from exps.nlc.train import create_model
 from exps.layers import AttnGRULayer
 from exps.policy import CategoricalGRUPolicy
 from sandbox.rocky.tf.optimizers.first_order_optimizer import FirstOrderOptimizer
+from sandbox.rocky.tf.policies.gaussian_gru_policy import GaussianGRUPolicy
 
 import sys
 
