@@ -28,19 +28,19 @@ import numpy as np
 from six.moves import xrange
 import tensorflow as tf
 
-import nlc_model
-import nlc_data
+import exps.nlc.nlc_model as nlc_model
+import exps.nlc.nlc_data as nlc_data
 
-from util import pair_iter
+from exps.nlc.util import pair_iter
 
 tf.app.flags.DEFINE_float("learning_rate", 0.0003, "Learning rate.")
 tf.app.flags.DEFINE_float("learning_rate_decay_factor", 0.95, "Learning rate decays by this much.")
 tf.app.flags.DEFINE_float("max_gradient_norm", 10.0, "Clip gradients to this norm.")
 tf.app.flags.DEFINE_float("dropout", 0.15, "Fraction of units randomly dropped on non-recurrent connections.")
-tf.app.flags.DEFINE_integer("batch_size", 128, "Batch size to use during training.")
+tf.app.flags.DEFINE_integer("batch_size", 64, "Batch size to use during training.")  # 128
 tf.app.flags.DEFINE_integer("epochs", 40, "Number of epochs to train.")
-tf.app.flags.DEFINE_integer("size", 400, "Size of each model layer.")
-tf.app.flags.DEFINE_integer("num_layers", 3, "Number of layers in the model.")
+tf.app.flags.DEFINE_integer("size", 20, "Size of each model layer.")  # 400, also the size for word_emb
+tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers in the model.")  # 1
 tf.app.flags.DEFINE_integer("max_vocab_size", 40000, "Vocabulary size limit.")
 tf.app.flags.DEFINE_integer("max_seq_len", 200, "Maximum sequence length.")
 tf.app.flags.DEFINE_string("data_dir", "/tmp", "Data directory")

@@ -8,6 +8,8 @@ import os
 import numpy as np
 import random
 
+random.seed(1234)
+
 FLAGS = tf.app.flags.FLAGS
 
 # Special vocabulary symbols - we always put them at the start.
@@ -46,13 +48,13 @@ def tokenize(string):
     return [int(s) for s in string.split()]
 
 
-def pair_iter(fnamex, fnamey, batch_size, num_layers):
+def pair_iter(fnamex, fnamey, batch_size, num_layers, max_seq_len):
     fdx, fdy = open(fnamex), open(fnamey)
     batches = []
 
     while True:
         if len(batches) == 0:
-            refill(batches, fdx, fdy, batch_size)
+            refill(batches, fdx, fdy, batch_size, max_seq_len)
         if len(batches) == 0:
             break
 
@@ -62,22 +64,26 @@ def pair_iter(fnamex, fnamey, batch_size, num_layers):
 
         source_tokens = np.array(x_padded).T
         source_mask = (source_tokens != PAD_ID).astype(np.int32)
-        target_tokens = np.array(y_padded).T
+        target_tokens = np.array(y_padded)
         target_mask = (target_tokens != PAD_ID).astype(np.int32)
 
+        # source_tokens are transposed
+        # so that encoder RNN loop is better suited
+        # however, target_tokens are NOT transposed, unlike model
         yield (source_tokens, source_mask, target_tokens, target_mask)
 
     return
 
 
-def refill(batches, fdx, fdy, batch_size):
+def refill(batches, fdx, fdy, batch_size, max_seq_len):
     line_pairs = []
     linex, liney = fdx.readline(), fdy.readline()
 
     while linex and liney:
         x_tokens, y_tokens = tokenize(linex), tokenize(liney)
 
-        if len(x_tokens) < FLAGS.max_seq_len and len(y_tokens) < FLAGS.max_seq_len:
+        # this is not truncating, just ignoring
+        if len(x_tokens) < max_seq_len and len(y_tokens) < max_seq_len:
             line_pairs.append((x_tokens, y_tokens))
         if len(line_pairs) == batch_size * 16:
             break
@@ -96,10 +102,16 @@ def refill(batches, fdx, fdy, batch_size):
 
 
 def add_sos_eos(tokens):
-    return map(lambda token_list: [SOS_ID] + token_list + [EOS_ID], tokens)
+    # change this to work with only 1 sentence, instead of a batch of sentences
+    if isinstance(tokens[0], list):
+        return map(lambda token_list: [SOS_ID] + token_list + [EOS_ID], tokens)
+    else:
+        return [SOS_ID] + tokens + [EOS_ID]
 
 
 def padded(tokens, depth):
+    # this is actually variable padding, very smart!!
+    # align is used for pyramid shape Encoder
     maxlen = max(map(lambda x: len(x), tokens))
     align = pow(2, depth - 1)
     padlen = maxlen + (align - maxlen) % align

@@ -30,7 +30,7 @@ from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import embedding_ops
 from tensorflow.python.ops import rnn
 from tensorflow.python.ops.rnn_cell import _linear as tf_linear
-from sandbox.rocky.tf.core import rnn_cell
+from exps import rnn_cell
 from tensorflow.python.ops import variable_scope as vs
 from tensorflow.python.ops.math_ops import sigmoid
 from tensorflow.python.ops.math_ops import tanh

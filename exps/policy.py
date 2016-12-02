@@ -7,6 +7,7 @@ from sandbox.rocky.tf.distributions.recurrent_categorical import RecurrentCatego
 from sandbox.rocky.tf.misc import tensor_utils
 from sandbox.rocky.tf.spaces.discrete import Discrete
 from sandbox.rocky.tf.policies.base import StochasticPolicy, Policy
+from exps.layers import AttnGRULayer
 
 from rllab.core.serializable import Serializable
 from rllab.misc import special
@@ -24,8 +25,7 @@ to alter reset()
 """
 
 
-# TODO: 1. Policy assumes env can provide init_states h0 for GRU
-# TODO: 2. Policy uses tf.assign() to give its weights
+# TODO 1: it basically works by now.
 
 # I guess the difficulty is that Policy already assembles layers....
 
@@ -53,17 +53,14 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
             self,
             name,
             env_spec,
-            model,
             distributor,
             config,
-            #env,
-            #model,
             hidden_dim=32,
             feature_network=None,
-            state_include_action=True,
+            state_include_action=False,
             hidden_nonlinearity=tf.tanh,
             word_embed_dim=0,
-            gru_layer_cls=L.AttnGRULayer
+            gru_layer_cls=AttnGRULayer,
     ):
         """
         :param config: has L_dec, L_enc
@@ -73,6 +70,10 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
         :param hidden_nonlinearity: nonlinearity used for each hidden layer
         :return:
         """
+        self.distributor = distributor
+        self.config = config
+        n_envs = int(config["batch_size"] / config["max_seq_len"])
+        self.n_envs = max(1, min(n_envs, 100))
         with tf.variable_scope(name):
             assert isinstance(env_spec.action_space, Discrete)
             Serializable.quick_init(self, locals())
@@ -100,12 +101,28 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
                 name="input"
             )
 
-            # feature_network is None:
-            feature_dim = input_dim
-            l_flat_feature = None
-            l_feature = l_input
+            # we can add a feature_network
+            # but it's just an affine transformation between word_embedding
+            # and recurrent layer (we can, but do we need to?)
+            if feature_network is None:
+                feature_dim = input_dim
+                l_flat_feature = None
+                l_feature = l_input
+            else:
+                feature_dim = feature_network.output_layer.output_shape[-1]
+                l_flat_feature = feature_network.output_layer
+                l_feature = L.OpLayer(
+                    l_flat_feature,
+                    extras=[l_input],
+                    name="reshape_feature",
+                    op=lambda flat_feature, input: tf.reshape(
+                        flat_feature,
+                        tf.pack([tf.shape(input)[0], tf.shape(input)[1], feature_dim])
+                    ),
+                    shape_op=lambda _, input_shape: (input_shape[0], input_shape[1], feature_dim)
+                )
 
-            # TODO: we want to assign tf vars in GRUNetwork
+            # TODO: we want to assign tf vars in GRUNetwork (contact Alex)
             prob_network = GRUNetwork(
                 input_shape=(feature_dim,),
                 input_layer=l_feature,
@@ -115,10 +132,8 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
                 output_nonlinearity=tf.nn.softmax,
                 gru_layer_cls=gru_layer_cls,
                 name="prob_network",
-                # not sure what to put for this ...
-                layer_args={"max_length":100,
-                            "n_env":12
-                            }
+                layer_args={"encoder_max_seq_length":config["encoder_max_seq_length"],
+                            "n_env":self.n_envs}
             )
 
             self.prob_network = prob_network
@@ -136,11 +151,23 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
                 [
                     flat_input_var,
                     prob_network.step_prev_state_layer.input_var,
+                    prob_network.recurrent_layer.hs
                 ],
                 L.get_output([
                     prob_network.step_output_layer,
                     prob_network.step_hidden_layer
                 ], {prob_network.step_input_layer: feature_var})
+            )
+
+            self.f_output = tensor_utils.compile_function(
+                inputs=[
+                    self.prob_network.input_layer.input_var,  # (batch_size, time_step, input_dim)
+                    self.prob_network.recurrent_layer.h0_sym, # self.prev_hiddens
+                    prob_network.recurrent_layer.hs,  # self.hs
+                ],
+                outputs=L.get_output(
+                    self.prob_network.output_layer
+                )
             )
 
             self.input_dim = input_dim
@@ -149,6 +176,7 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
 
             self.prev_actions = None
             self.prev_hiddens = None
+            self.hs = None
             self.dist = RecurrentCategorical(env_spec.action_space.n)
 
             out_layers = [prob_network.output_layer]
@@ -157,17 +185,29 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
 
             LayersPowered.__init__(self, out_layers)
 
+    def get_action_probs(self, observations):
+        """
+        This is called by algorithm to obtain an action probability distribution
+
+        observations: (batch_size, time_step, )
+        """
+        # TODO: let's hope NLC model's weights are shaped the same way as this
+
+
     @overrides
     def dist_info_sym(self, obs_var, state_info_vars):
         n_batches = tf.shape(obs_var)[0]
         n_steps = tf.shape(obs_var)[1]
-        obs_var = tf.reshape(obs_var, tf.pack([n_batches, n_steps, -1]))
+        obs_var = tf.reshape(obs_var, tf.pack([n_batches, n_steps, -1]))  # since our obs is just (batch, step, dim),
+                                                                          # this won't change anything
         obs_var = tf.cast(obs_var, tf.float32)
         if self.state_include_action:
             prev_action_var = tf.cast(state_info_vars["prev_action"], tf.float32)
             all_input_var = tf.concat(2, [obs_var, prev_action_var])
         else:
             all_input_var = obs_var
+
+        # TODO: ho ho ho, this won't work. what is L.get_output() here doing?
         if self.feature_network is None:
             return dict(
                 prob=L.get_output(
@@ -184,31 +224,51 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
                 )
             )
 
+    # this is used to create state_info_vars by algorithms like VPG
+    # then pass into dist_info_sym()
+    @property
+    def state_info_specs(self):
+        if self.state_include_action:
+            return [
+                ("prev_action", (self.action_dim,)),
+            ]
+        else:
+            return []
+
     @property
     def vectorized(self):
         return True
 
     def reset(self, dones=None):
         """
-
-        Parameters
-        ----------
-        dones
-
-        Returns
-        -------
-
+        vec_env gets reset first, then policy gets reset
+        (only reset hs when it's truly new)
         """
-        # TODO: with vectorized dones, we can know how many envs are out there...
         if dones is None:
-            dones = [True]
+            dones = [True] * self.n_envs  # for vectorized_enviornment
+            # Vectorized_Sampler doesn't pass in dones
         dones = np.asarray(dones)
         if self.prev_actions is None or len(dones) != len(self.prev_actions):
+            # it's only called at the VERY FIRST time (of all loops)
             self.prev_actions = np.zeros((len(dones), self.action_space.flat_dim))
-            self.prev_hiddens = np.zeros((len(dones), self.hidden_dim))
+            self.prev_hiddens = np.zeros((len(dones), self.hidden_dim))  # n_env, self.hidden_dim
+
+        # populate self.hs (very inefficient, since we populate it every single time)
+        # the below code only populates when DONE is true
+        self.hs = self.distributor.encode_source()
+
+        # TODO: create hs as a parameter, then assign it's value
+        # TODO: use a default session to actually update the value
+        # TODO: doing this way, we don't need to pass in hs during optimization at all
 
         self.prev_actions[dones] = 0.
-        self.prev_hiddens[dones] = self.prob_network.hid_init_param.eval()  # get_value()
+        # hmmmm
+        # self.prev_hiddens[dones] = self.prob_network.hid_init_param.eval({
+        #     self.prob_network.recurrent_layer.hs: self.hs
+        # })  # get_value() maybe direct slicing is faster...
+
+        # we use "dones" because we only load in new hs when it's DONE
+        self.prev_hiddens[dones] = self.hs[-1,:,:]
 
     # The return value is a pair. The first item is a matrix (N, A), where each
     # entry corresponds to the action value taken. The second item is a vector
@@ -230,10 +290,10 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
         """
         # flatten_n won't work, it's to make observations one-hot
         # we turn a list of observations into a matrix
-        # flat_obs = self.observation_space.flatten_n(observations)
-
-        flat_obs = np.array(observations, dtype="float32")
+        flat_obs = self.observation_space.flatten_n(observations)
+        # flat_obs = np.array(observations, dtype="float32")  # no need for this line anymore
         if self.state_include_action:
+            raise NotImplementedError  # because action doesn't work
             assert self.prev_actions is not None
             all_input = np.concatenate([
                 flat_obs,
@@ -241,11 +301,14 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
             ], axis=-1)
         else:
             all_input = flat_obs
-        probs, hidden_vec = self.f_step_prob(all_input, self.prev_hiddens)
+
+        # retrieve self.hs from ddist
+
+        probs, hidden_vec = self.f_step_prob(all_input, self.prev_hiddens, self.hs)
         actions = special.weighted_sample_n(probs, np.arange(self.action_space.n))
         prev_actions = self.prev_actions
-        # TODO: this line might have the same problem
-        # TODO: as observation_space.flatten_n as well
+
+        # flatten_n doesn't work :(
         self.prev_actions = self.action_space.flatten_n(actions)
         self.prev_hiddens = hidden_vec
         agent_info = dict(prob=probs)
@@ -261,38 +324,3 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
     @property
     def distribution(self):
         return self.dist
-
-    @property
-    def state_info_specs(self):
-        if self.state_include_action:
-            return [
-                ("prev_action", (self.action_dim,)),
-            ]
-        else:
-            return []
-        
-if __name__ == '__main__':
-    from exps.nlc_env import NLCEnv
-    
-    config = {
-        "gru_size": 100,
-        "source": np.ones((20, 5)),
-        "target": np.ones((20, 5)),
-        "model": None,
-        "L_dec": np.ones((100, 50)),  # vocab_size: 100, hidden_size: 50
-        "L_enc": None,
-        "measure": "CER",
-        'data_dir': "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/ptb_data/",
-        "max_seq_len": 10,  # 200
-        "batch_size": 128
-    }
-    from exps.nlc_env import DataDistributor
-    from sandbox.rocky.tf.envs.base import TfEnv
-    ddist = DataDistributor(config)
-    
-    env = TfEnv(NLCEnv(ddist, config))
-    nn = CategoricalGRUPolicy('gru', env.spec, state_include_action=False)
-    for p in nn.get_params():
-        print p.name
-    
-    halt= True

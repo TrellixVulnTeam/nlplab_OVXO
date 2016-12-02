@@ -17,7 +17,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import nlc_data
+import exps.nlc.nlc_data as nlc_data
 import numpy as np
 from six.moves import xrange
 import tensorflow as tf

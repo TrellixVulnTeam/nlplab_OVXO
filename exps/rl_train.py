@@ -119,45 +119,6 @@ class BaselineMLP(MLP, Baseline):
         self._optimizer.optimize([observations, returns[..., None]])
 
 
-class RewardGRUNetwork(GRUNetwork):
-    """
-    overrides MLP with methods / properties used in generative adversarial learning.
-    """
-
-    def compute_reward(self, X):
-        predits = -tf.log(1.0 - self.output)
-        # predits = -tf.log(1.0 - tf.sigmoid(self.output))
-        Y_p = self._predict(predits, X)
-        return Y_p
-
-    def compute_score(self, X):
-        """
-        predict logits ...
-        """
-        logits = self.output_layer.get_logits_for(L.get_output(self.layers[-2]))
-        # logits = self.output
-        Y_p = self._predict(logits, X)
-        return Y_p
-
-    def likelihood_loss(self):
-        logits = self.output_layer.get_logits_for(L.get_output(self.layers[-2]))
-        # logits = L.get_output(self.layers[-1])
-        loss = tf.nn.sigmoid_cross_entropy_with_logits(logits, self.target_var)
-        # ent_B = tfutil.logit_bernoulli_entropy(logits)
-        # self.obj = tf.reduce_sum(loss_B - self.ent_reg_weight * ent_B)
-        return tf.reduce_sum(loss)
-
-    def complexity_loss(self, reg, cmx):
-        return tf.constant(0.0)
-
-    def loss(self, reg=0.0, cmx=0.0):
-        # logits = self.output_layer.get_logits_for(L.get_output(self.layers[-2]))
-        # loss = tf.nn.sigmoid_cross_entropy_with_logits(logits, self.target_var)
-        # ent_B = tfutil.logit_bernoulli_entropy(logits)
-        # self.obj = tf.reduce_sum(loss_B - self.ent_reg_weight * ent_B)
-        # return tf.reduce_sum(loss)
-        loss = self.likelihood_loss()
-        return loss
 
 
 if __name__ == '__main__':
@@ -168,6 +129,7 @@ if __name__ == '__main__':
     # Prepare NLC data.
     print("Preparing NLC data in %s" % FLAGS.data_dir)
 
+    # TODO:  FLAGS.tokenizer.lower() doesn't belong here (we are only doing char)
     x_train, y_train, x_dev, y_dev, vocab_path = nlc_data.prepare_nlc_data(
         FLAGS.data_dir + '/' + FLAGS.tokenizer.lower(), FLAGS.max_vocab_size,
         tokenizer=get_tokenizer(FLAGS))
@@ -199,7 +161,7 @@ if __name__ == '__main__':
 
             ## Train
             for source_tokens, source_mask, target_tokens, target_mask in pair_iter(x_train, y_train, FLAGS.batch_size,
-                                                                                    FLAGS.num_layers):
+                                                                                    FLAGS.num_layers, FLAGS.max_seq_len):
                 # Get a batch and make a step.
                 tic = time.time()
 
@@ -227,8 +189,7 @@ if __name__ == '__main__':
                 if current_step % FLAGS.print_every == 0:
                     print(
                         'epoch %d, iter %d, cost %f, exp_cost %f, grad norm %f, param norm %f, batch time %f, length mean/std %f/%f' %
-                        (
-                            epoch, current_step, cost, exp_cost / exp_length, grad_norm, param_norm, iter_time,
+                        (epoch, current_step, cost, exp_cost / exp_length, grad_norm, param_norm, iter_time,
                             mean_length,
                             std_length))
 
@@ -250,7 +211,7 @@ if __name__ == '__main__':
         # note that we are still inside the TF session scope
         # TODO: 1. Build a RewardGRU (critic)
         # TODO: 2. Build a TargetGRU (target/slow critic)
-=
+
         # create a critic network
         reward = RewardMLP('mlp_reward', 1, r_hspec, nonlinearity, tf.nn.sigmoid,
                            input_shape=(np.prod(env.spec.observation_space.shape) + env.action_dim,),
