@@ -338,10 +338,9 @@ def build_data(fnamex, fnamey, num_layers, max_seq_len):
 
 
 if __name__ == '__main__':
-    source_tokens, source_mask, target_tokens, target_mask = build_data(fnamex="/Users/Aimingnie/Documents" +
-                                                                               "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.x",
-                                                                        fnamey="/Users/Aimingnie/Documents" +
-                                                                               "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.y",
+    path = "/home/alex/stanford_dev/sisl/rllab"
+    source_tokens, source_mask, target_tokens, target_mask = build_data(fnamex=path+"/ptb_data/valid.ids.x",
+                                                                        fnamey=path+"/ptb_data/valid.ids.y",
                                                                         num_layers=1, max_seq_len=200)
 
     print source_tokens.shape  # 30
@@ -454,6 +453,9 @@ if __name__ == '__main__':
     # spin up a session
     sess = tf.InteractiveSession()
     sess.run(tf.initialize_all_variables())
+    
+    model.save_decoder_to_h5(sess,title="NLC_weights")
+    policy.load_params("NLC_weights", 0, [])
 
     # this loop is never executed twice (make sure of that)
     # otherwise our Env will break
