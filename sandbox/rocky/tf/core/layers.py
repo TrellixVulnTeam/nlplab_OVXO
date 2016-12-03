@@ -1230,7 +1230,7 @@ class AttnGRULayer(GRULayer):
         
         with tf.variable_scope("attn"):
             self.W_hs = self.add_param(W_hs_init, (num_units, num_units), name="W_hs")
-            self.b_hs = self.add_param(b_init, (num_units,), name="b_c", regularizable=False)
+            self.b_hs = self.add_param(b_init, (num_units,), name="b_hs", regularizable=False)
         
             self.W_gamma = self.add_param(W_gamma_init, (num_units, num_units), name="W_gamma")
             self.b_gamma = self.add_param(b_init, (num_units,), name="b_gamma")

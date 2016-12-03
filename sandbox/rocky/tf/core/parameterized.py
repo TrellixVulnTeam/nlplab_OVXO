@@ -115,8 +115,8 @@ class JointParameterized(Parameterized):
 
 
 class Model(Parameterized):
-    _load_dir = './models'
-    _log_dir = './models'
+    _load_dir = './weights'
+    _log_dir = './weights'
 
     def load_params(self, filename, itr, skip_params):
         print 'loading policy params...'
@@ -142,6 +142,8 @@ class Model(Parameterized):
                     assignments.append(
                         param.assign(hf[path][...])
                         )
+                else:
+                    halt= True
 
         sess = tf.get_default_session()
         sess.run(assignments)
