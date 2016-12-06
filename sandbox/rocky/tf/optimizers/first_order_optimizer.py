@@ -160,3 +160,31 @@ class Solver(object):
     def train(self, X_train, Y_train, X_validate= None, Y_validate= None):
         self._optimizer.optimize([X_train], extra_inputs= tuple([Y_train]), callback= self._callback,
                                 val_inputs= [X_validate], val_extra_inputs= tuple([Y_validate]))
+        
+        
+class SimpleSolver(object):
+    def __init__(self, model, epochs, batch_size):
+        self.learning_rate = tf.placeholder(tf.float32, shape=(), name='lr')
+        self.model = model
+        self.epochs = epochs
+        self.batch_size = batch_size
+
+        self.optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
+        self.opt = self.optimizer.minimize(model.loss())
+
+    def train(self, X_train, Y_train, lr):
+        sess = tf.get_default_session()
+
+        N = X_train.shape[0]
+        for epoch in range(self.epochs):
+            p = np.random.permutation(N)
+            X_train = X_train[p]
+            Y_train = Y_train[p]
+
+            for i in range(0,N,self.batch_size):
+                X_batch = X_train[i:i+self.batch_size]
+                Y_batch = Y_train[i:i+self.batch_size]
+
+                sess.run([self.opt],{self.model.input_var:X_batch,
+                                     self.model.target_var:Y_batch,
+                                     self.learning_rate:lr})

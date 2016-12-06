@@ -31,6 +31,7 @@ from tensorflow.python.ops import embedding_ops
 from tensorflow.python.ops import rnn
 from tensorflow.python.ops.rnn_cell import _linear as tf_linear
 from exps import rnn_cell
+from exps.rnn_cell import _linear
 from tensorflow.python.ops import variable_scope as vs
 from tensorflow.python.ops.math_ops import sigmoid
 from tensorflow.python.ops.math_ops import tanh
@@ -43,7 +44,8 @@ class GRUCellAttn(rnn_cell.GRUCell):
     with vs.variable_scope(scope or type(self).__name__):
       with vs.variable_scope("Attn1"):
         hs2d = tf.reshape(self.hs, [-1, num_units])
-        phi_hs2d = tanh(tf_linear(hs2d, num_units, True, 1.0))
+        phi_hs2d_logits, self.M_hs, _, _, self.b_hs = _linear(hs2d, num_units, True, 1.0)
+        phi_hs2d = tanh(phi_hs2d_logits)
         self.phi_hs = tf.reshape(phi_hs2d, tf.shape(self.hs))
     super(GRUCellAttn, self).__init__(num_units)
 
@@ -51,13 +53,15 @@ class GRUCellAttn(rnn_cell.GRUCell):
     gru_out, gru_state = super(GRUCellAttn, self).__call__(inputs, state, scope)
     with vs.variable_scope(scope or type(self).__name__):
       with vs.variable_scope("Attn2"):
-        gamma_h = tanh(tf_linear(gru_out, self._num_units, True, 1.0))
+        gamma_h_logits, self.M_gamma, _, _, self.b_gamma = _linear(gru_out, self._num_units, True, 1.0)
+        gamma_h = tanh(gamma_h_logits)
       weights = tf.reduce_sum(self.phi_hs * gamma_h, reduction_indices=2, keep_dims=True)
       weights = tf.exp(weights - tf.reduce_max(weights, reduction_indices=0, keep_dims=True))
       weights = weights / (1e-6 + tf.reduce_sum(weights, reduction_indices=0, keep_dims=True))
       context = tf.reduce_sum(self.hs * weights, reduction_indices=0)
       with vs.variable_scope("AttnConcat"):
-        out = tf.nn.relu(tf_linear([context, gru_out], self._num_units, True, 1.0))
+        out_logits, self.M_concat, _, _, self.b_concat = _linear([context, gru_out], self._num_units, True, 1.0)
+        out = tf.nn.relu(out_logits)
       _slice_map = tf.slice(weights, [0, 0, 0], [-1, -1, 1])
       self.attn_map = tf.squeeze(_slice_map)
       return (out, out) 
@@ -93,7 +97,7 @@ class NLCModel(object):
       self.setup_decoder()
       self.setup_loss()
 
-      self.setup_beam()
+      #self.setup_beam()
 
     params = tf.trainable_variables()
     if not forward_only:
@@ -370,10 +374,10 @@ class NLCModel(object):
 
     return outputs[0], outputs[1]
   
-  def save_decoder_to_h5(self,sess):
+  def save_decoder_to_h5(self,sess,title="NLC_weights"):
     
     def _preface(L, path):
-      return [(path+"/{}:0".format(name),val) for (name,val) in L]
+      return [(path+"{}:0".format(name),val) for (name,val) in L]
     
     def _pull(var, gru, tensor_name):
       L = []
@@ -388,7 +392,26 @@ class NLCModel(object):
           
         elif gru == "Candidate":
           W_xc, W_hc = M[:self.size], M[self.size:]
-          L += [("W_xc",W_xc),("W_hc",W_hc)]     
+          L += [("W_xc",W_xc),("W_hc",W_hc)]
+          
+        elif gru == "Attn1":
+          W_hs = M
+          L += [("W_hs",W_hs)]
+          
+        elif gru == "Attn2":
+          W_gamma = M
+          L += [("W_gamma",W_gamma)]
+          
+        elif gru == "AttnConcat":
+          W_concat = M
+          L += [("W_concat",W_concat)]
+          
+        elif gru == "Logistic":
+          W = M
+          L += [("W",W)]
+          
+        else:
+          raise NotImplementedError
                 
       elif tensor_name == "Bias":
         b = var.eval(session=sess)
@@ -400,28 +423,67 @@ class NLCModel(object):
           b_c = b
           L += [("b_c",b_c)]
           
+        elif gru == "Attn1":
+          b_hs = b
+          L += [("b_hs",b_hs)]
+          
+        elif gru == "Attn2":
+          b_gamma = b
+          L += [("b_gamma",b_gamma)]
+          
+        elif gru == "AttnConcat":
+          b_concat = b
+          L += [("b_concat",b_concat)]
+          
+        elif gru == "Logistic":
+          b = b
+          L += [("b",b)]
+          
+        else:
+          raise NotImplementedError
+          
       return L
     
     L = []
-    base_path = "iter00000/gru_policy/mean_network/"
-    for var in tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES):
+    base_path = "iter00000/gru_policy/prob_network/"
+    VARS = filter(lambda x: x.name.split('/')[0] == "NLC" and ("DecoderAttnCell" in x.name.split('/') or
+                                                               "Logistic" in x.name.split('/')),
+                  tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES))
+    
+    for var in VARS:
       names = var.name.split('/')
       tensor_name = names[-1].split(":")[0]
-      if names[2] == "Decoder":
-        if names[3] == "DecoderAttnCell":
-          path = base_path +  "attngru"
-        else:
-          path = base_path + "gru_{}".format(names[3][-1])
         
-        if names[5] == "Gates":
-          l = _pull(var, "Gates", tensor_name)
-          L += _preface(l, path)
-        elif names[5] == "Candidate":
-          l = _pull(var, "Candidate", tensor_name)
-          L += _preface(l, path)
-          
-          
-    with h5py.File("./NLC_weights.h5","a") as hf:
+      if "Attn1" in names:
+        path = base_path + "attn/gru/"
+        l = _pull(var, "Attn1", tensor_name)
+        L += _preface(l,path)
+        
+      if "Attn2" in names:
+        path = base_path + "attn/gru/"
+        l = _pull(var, "Attn2", tensor_name)
+        L += _preface(l,path)
+        
+      if "AttnConcat" in names:
+        path = base_path + "attn/gru/"
+        l = _pull(var, "AttnConcat", tensor_name)
+        L += _preface(l,path)
+        
+      if "Gates" in names:
+        path = base_path + "gru/"
+        l = _pull(var, "Gates", tensor_name)
+        L += _preface(l,path)
+      if "Candidate" in names:
+        path = base_path + "gru/"
+        l = _pull(var, "Candidate", tensor_name)
+        L += _preface(l,path)
+        
+      if "Logistic" in names:
+        path = base_path + "output_flat/"
+        l = _pull(var, "Logistic", tensor_name)
+        L += _preface(l,path)
+
+    with h5py.File("./weights/{}.h5".format(title),"a") as hf:
       for name, data in L:
         hf.create_dataset(name, data=data)
   
@@ -429,7 +491,7 @@ if __name__ == '__main__':
   with tf.variable_scope("NLC") as scope:
     A = tf.get_collection(tf.GraphKeys, scope="NLC/NLC/Decoder")
     
-    nn = NLCModel(100, 150, 3, 1.0, 30,
+    nn = NLCModel(100, 150, 1, 1.0, 30,
                1e-3, 0.99, False)
     
     sess= tf.Session()
