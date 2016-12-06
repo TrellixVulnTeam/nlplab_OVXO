@@ -1238,8 +1238,8 @@ class AttnGRULayer(GRULayer):
             self.W_concat = self.add_param(W_concat_init, (2 * num_units, num_units), name="W_concat")
             self.b_concat = self.add_param(b_init, (num_units,), name="b_concat")        
 
-        self.hs = tf.placeholder(tf.float32, shape=(max_length,n_env,num_units), name="hs")
-        self.h0 = self.hs[-1,:] # last timestep, every environment.
+        self.hs = tf.placeholder(tf.float32, shape=(max_length,n_env,num_units), name="hs")  # pass this in
+        self.h0 = self.hs[-1,:,:] # last timestep, every environment.
         
         hs2d = tf.reshape(self.hs, [-1, num_units])
         phi_hs2d = tf.nn.tanh(tf.nn.xw_plus_b(hs2d, self.W_hs, self.b_hs))
@@ -1953,6 +1953,7 @@ def get_output(layer_or_layers, inputs=None, **kwargs):
     treat_as_input = list(inputs.keys()) if isinstance(inputs, dict) else []
     all_layers = get_all_layers(layer_or_layers, treat_as_input)
     # initialize layer-to-expression mapping from all input layers
+    # {layer: layer.input_var}
     all_outputs = dict((layer, layer.input_var)
                        for layer in all_layers
                        if isinstance(layer, InputLayer) and
