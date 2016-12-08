@@ -1,6 +1,7 @@
 from sandbox.rocky.tf.core.network import MLP, GRUNetwork
 import tensorflow as tf
 import sandbox.rocky.tf.core.layers as L
+from sandbox.rocky.tf.core.layers_powered import LayersPowered
 from exps.layers import AttnGRULayer, GRULayer
 from sandbox.rocky.tf.misc import tensor_utils
 import numpy as np
@@ -47,7 +48,7 @@ class RewardMLP(MLP):
         return loss
 
 
-class RewardGRUNetwork(GRUNetwork):
+class RewardGRUNetwork(GRUNetwork, LayersPowered):
     """
     Hmmmm it's just a normal network,
     but with regression (affine transform) in the end
@@ -61,6 +62,9 @@ class RewardGRUNetwork(GRUNetwork):
     # TODO 2: disable attention on critic (focus on language modeling) (pretrain with LM task???)
     # TODO    for now, to be simple, we don't want attention (but it can be easily added)
     # TODO 3: test this? see if it can be properly trained (after knowing what rewards are)
+
+    # TODO 1: Figure out what paper means by inputting "correct" label
+    # TODO 2: Have Alex add weight regularization to this network!
 
     def __init__(self, name, config,
                  learning_rate=0.0003,
@@ -133,6 +137,13 @@ class RewardGRUNetwork(GRUNetwork):
         obs_var: numpy arrays!!!!!!!!!
         actions_var
 
+        They are not the same
+        even though obs is action, this obs is the previous timestep
+        action is for the future timestep
+
+        We can consider using word embedding of the action,
+        instead of a one-hot vector
+
         Returns
         -------
         """
@@ -185,9 +196,10 @@ class RewardGRUNetwork(GRUNetwork):
         input_feed[self.input_layer.input_var] = X
         input_feed[self.y_label] = y_label
 
-        output_feed = [self.updates, self.gradient_norm, self.param_norm]
+        output_feed = [self.updates, self.loss, self.gradient_norm, self.param_norm]
 
         outputs = session.run(output_feed, input_feed)
+        return outputs[1]  # return loss
 
 if __name__ == '__main__':
     config = {}
