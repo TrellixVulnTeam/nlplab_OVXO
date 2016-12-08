@@ -39,16 +39,16 @@ class GRULayer(L.Layer):
                                      regularizable=False)
 
         # Weights for the reset gate
-        self.W_xr = self.add_param(W_x_init, (input_dim, num_units), name="W_xr")
-        self.W_hr = self.add_param(W_h_init, (num_units, num_units), name="W_hr")
+        self.W_xr = self.add_param(W_x_init, (input_dim, num_units), name="W_xr", regularizer= kwargs['regularizer'])
+        self.W_hr = self.add_param(W_h_init, (num_units, num_units), name="W_hr", regularizer= kwargs['regularizer'])
         self.b_r = self.add_param(b_init, (num_units,), name="b_r", regularizable=False)
         # Weights for the update gate
-        self.W_xu = self.add_param(W_x_init, (input_dim, num_units), name="W_xu")
-        self.W_hu = self.add_param(W_h_init, (num_units, num_units), name="W_hu")
+        self.W_xu = self.add_param(W_x_init, (input_dim, num_units), name="W_xu", regularizer= kwargs['regularizer'])
+        self.W_hu = self.add_param(W_h_init, (num_units, num_units), name="W_hu", regularizer= kwargs['regularizer'])
         self.b_u = self.add_param(b_init, (num_units,), name="b_u", regularizable=False)
         # Weights for the cell gate
-        self.W_xc = self.add_param(W_x_init, (input_dim, num_units), name="W_xc")
-        self.W_hc = self.add_param(W_h_init, (num_units, num_units), name="W_hc")
+        self.W_xc = self.add_param(W_x_init, (input_dim, num_units), name="W_xc", regularizer= kwargs['regularizer'])
+        self.W_hc = self.add_param(W_h_init, (num_units, num_units), name="W_hc", regularizer= kwargs['regularizer'])
         self.b_c = self.add_param(b_init, (num_units,), name="b_c", regularizable=False)
 
         self.W_x_ruc = tf.concat(1, [self.W_xr, self.W_xu, self.W_xc])
