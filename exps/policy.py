@@ -151,7 +151,7 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
                 [
                     flat_input_var,
                     prob_network.step_prev_state_layer.input_var,
-                    prob_network.recurrent_layer.hs
+                    # prob_network.recurrent_layer.hs
                 ],
                 L.get_output([
                     prob_network.step_output_layer,
@@ -162,8 +162,8 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
             self.f_output = tensor_utils.compile_function(
                 inputs=[
                     self.prob_network.input_layer.input_var,  # (batch_size, time_step, input_dim)
-                    self.prob_network.recurrent_layer.h0_sym, # self.prev_hiddens
-                    prob_network.recurrent_layer.hs,  # self.hs
+                    # self.prob_network.recurrent_layer.h0_sym, # self.prev_hiddens (used because otherwise there's problem)
+                    # prob_network.recurrent_layer.hs,  # self.hs
                 ],
                 outputs=L.get_output(
                     self.prob_network.output_layer
@@ -176,7 +176,6 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
 
             self.prev_actions = None
             self.prev_hiddens = None
-            self.hs = None
             self.dist = RecurrentCategorical(env_spec.action_space.n)
 
             out_layers = [prob_network.output_layer]
@@ -243,10 +242,15 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
         """
         vec_env gets reset first, then policy gets reset
         (only reset hs when it's truly new)
+        Also every reset(), loads in h0 and hs
+
+        with correct h0 and hs, policy makes actions
+        but what about optimize? When is it called?
+
         """
         if dones is None:
             dones = [True] * self.n_envs  # for vectorized_enviornment
-            # Vectorized_Sampler doesn't pass in dones
+            # Vectorized_Sampler does pass in dones
         dones = np.asarray(dones)
         if self.prev_actions is None or len(dones) != len(self.prev_actions):
             # it's only called at the VERY FIRST time (of all loops)
@@ -255,11 +259,11 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
 
         # populate self.hs (very inefficient, since we populate it every single time)
         # the below code only populates when DONE is true
-        self.hs = self.distributor.encode_source()
+        hs = self.distributor.encode_source()
 
-        # TODO: create hs as a parameter, then assign it's value
-        # TODO: use a default session to actually update the value
-        # TODO: doing this way, we don't need to pass in hs during optimization at all
+        # assign the weights INTO the network, no need to pass around
+        # as a symbolic variable.
+        self.prob_network.recurrent_layer.assign_hs_weights(hs)
 
         self.prev_actions[dones] = 0.
         # hmmmm
@@ -268,7 +272,8 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
         # })  # get_value() maybe direct slicing is faster...
 
         # we use "dones" because we only load in new hs when it's DONE
-        self.prev_hiddens[dones] = self.hs[-1,:,:]
+        if (dones == True).sum() == dones.shape[0]:
+            self.prev_hiddens[dones] = hs[-1,:,:]
 
     # The return value is a pair. The first item is a matrix (N, A), where each
     # entry corresponds to the action value taken. The second item is a vector
@@ -287,6 +292,8 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
         ----------
         observations: [n_envs, word_dim]
                        each elem is self.observation_space
+
+        return actions: [n_envs, action_dim]
         """
         # flatten_n won't work, it's to make observations one-hot
         # we turn a list of observations into a matrix
@@ -303,8 +310,9 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
             all_input = flat_obs
 
         # retrieve self.hs from ddist
+        # hs is already loaded into the network through reset()
 
-        probs, hidden_vec = self.f_step_prob(all_input, self.prev_hiddens, self.hs)
+        probs, hidden_vec = self.f_step_prob(all_input, self.prev_hiddens)
         actions = special.weighted_sample_n(probs, np.arange(self.action_space.n))
         prev_actions = self.prev_actions
 
@@ -314,6 +322,7 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
         agent_info = dict(prob=probs)
         if self.state_include_action:
             agent_info["prev_action"] = np.copy(prev_actions)
+
         return actions, agent_info
 
     @property

@@ -3,7 +3,7 @@ import os
 
 PROJECT_PATH = osp.abspath(osp.join(osp.dirname(__file__), '..'))
 
-LOG_DIR = PROJECT_PATH + "/data"
+LOG_DIR = PROJECT_PATH + "/logs" # "/data"
 
 USE_TF = False
 

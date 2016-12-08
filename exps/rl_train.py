@@ -10,6 +10,8 @@ import random
 
 import numpy as np
 import tensorflow as tf
+import calendar
+import os.path as osp
 
 from sandbox.rocky.tf.envs.base import TfEnv
 from exps.nlc_env import NLCEnv, DataDistributor
@@ -22,6 +24,9 @@ from sandbox.rocky.tf.optimizers.first_order_optimizer import FirstOrderOptimize
 from rllab.misc.overrides import overrides
 from exps.nlc_env import build_data
 from exps.network import RewardGRUNetwork
+from exps.actor_critic import ActorCritic
+from sandbox import RLLabRunner
+from rllab.config import LOG_DIR
 
 """
 Assemble the end-to-end encoder-decoder
@@ -46,6 +51,16 @@ then train it with
 # tf.app.flags.DEFINE_string("tokenizer", "CHAR", "Set to WORD to train word level model.")
 # tf.app.flags.DEFINE_integer("print_every", 1, "How many iterations to do per print.")
 # tf.app.flags.DEFINE_string("baseline_type", 'mlp', "linear|mlp")
+
+tf.app.flags.DEFINE_string("exp_name", "actor_critic", "name unique experiment")
+tf.app.flags.DEFINE_string('tabular_log_file', 'tab.txt', "")
+tf.app.flags.DEFINE_string('text_log_file', 'text.txt', "")
+tf.app.flags.DEFINE_string('params_log_file', 'args.txt', "")
+tf.app.flags.DEFINE_string('snapshot_mode', 'all', "")
+tf.app.flags.DEFINE_string('log_tabular_only', False, "")
+tf.app.flags.DEFINE_string('log_dir', "./logs/", "")
+
+tf.app.flags.DEFINE_integer("n_itr", 5, "this pulls sentences from data")
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -74,7 +89,7 @@ def get_tokenizer(FLAGS):
 def validate(model, sess, x_dev, y_dev):
     valid_costs, valid_lengths = [], []
     for source_tokens, source_mask, target_tokens, target_mask in pair_iter(x_dev, y_dev, FLAGS.batch_size,
-                                                                            FLAGS.num_layers):
+                                                                            FLAGS.num_layers, FLAGS.max_seq_len):
         cost = model.test(sess, source_tokens, source_mask, target_tokens, target_mask)
         valid_costs.append(cost * target_mask.shape[1])
         valid_lengths.append(np.sum(target_mask[1:, :]))
@@ -109,7 +124,6 @@ class BaselineMLP(MLP, Baseline):
 
     @overrides
     def predict(self, path):
-        # X = np.column_stack((path['observations'], path['actions']))
         X = path['observations']
         return super(BaselineMLP, self).predict(X)
 
@@ -133,18 +147,16 @@ if __name__ == '__main__':
     #     FLAGS.data_dir, FLAGS.max_vocab_size,
     #     tokenizer=get_tokenizer(FLAGS))  # FLAGS.tokenizer.lower()
 
-    x_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.x"
-    y_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.y"
+    x_train = FLAGS.data_dir + "ptb_data/train.ids.x"
+    y_train = FLAGS.data_dir + "ptb_data/train.ids.y"
 
-    x_dev = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.x"
-    y_dev = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.y"
+    x_dev = FLAGS.data_dir + "ptb_data/valid.ids.x"
+    y_dev = FLAGS.data_dir + "ptb_data/valid.ids.y"
 
-    vocab_path = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/vocab.dat"
+    vocab_path = FLAGS.data_dir + "vocab.dat"
 
-    source_tokens, source_mask, target_tokens, target_mask = build_data(fnamex="/Users/Aimingnie/Documents" +
-                                                                               "/School/Stanford/AA228/nlplab/ptb_data/train.ids.x",
-                                                                        fnamey="/Users/Aimingnie/Documents" +
-                                                                               "/School/Stanford/AA228/nlplab/ptb_data/train.ids.y",
+    source_tokens, source_mask, target_tokens, target_mask = build_data(fnamex=FLAGS.data_dir + "ptb_data/train.ids.x",
+                                                                        fnamey=FLAGS.data_dir + "ptb_data/train.ids.y",
                                                                         num_layers=1, max_seq_len=200)
 
     vocab, _ = nlc_data.initialize_vocabulary(vocab_path)
@@ -227,8 +239,6 @@ if __name__ == '__main__':
 
         # ======== Actor-critic Training =========
         # note that we are still inside the TF session scope
-        # TODO: 1. Build a RewardGRU (critic)
-        # TODO: 2. Build a TargetGRU (target/slow critic)
 
             # building an enviornment
             # notice we are still in previous session!
@@ -295,37 +305,36 @@ if __name__ == '__main__':
 
             # pretrain critic (let's not pretrain it yet)
 
+            # create baseline (paper didn't have a baseline)
             baseline = BaselineMLP(name='mlp_baseline',
                                    output_dim=1,
-                                   hidden_sizes=b_hspec,
-                                   hidden_nonlinearity=nonlinearity,
+                                   hidden_sizes=config["gru_size"],  # same size as GRU..can be changed
+                                   hidden_nonlinearity=tf.nn.relu,
                                    output_nonlinearity=None,
                                    input_shape=(np.prod(env.spec.observation_space.shape),),
-                                   batch_normalization=args.batch_normalization)
+                                   batch_normalization=False)
+
+            algo = ActorCritic(config, env, policy, delayed_policy, baseline,
+                               critic, target_critic, n_itr=FLAGS.n_itr)
 
 
-        # create baseline (paper didn't have a baseline)
+            algo.train()
 
-        # if FLAGS.baseline_type == 'mlp':
-        #     baseline = BaselineMLP(name='mlp_baseline',
-        #                            output_dim=1,
-        #                            hidden_sizes=b_hspec,
-        #                            hidden_nonlinearity=nonlinearity,
-        #                            output_nonlinearity=None,
-        #                            input_shape=(np.prod(env.spec.observation_space.shape),),
-        #                            batch_normalization=args.batch_normalization)
-        #     baseline.initialize_optimizer()
-        # else:
-        #     raise NotImplementedError
+            date = calendar.datetime.date.today().strftime('%y-%m-%d')
+            if date not in os.listdir(FLAGS.data_dir + '/data'):
+                os.mkdir(FLAGS.data_dir + '/data/' + date)
+            c = 0
+            exp_name = FLAGS.exp_name + '-' + str(c)
+            while exp_name in os.listdir(FLAGS.data_dir + '/data/' + date + '/'):
+                c += 1
+                exp_name = FLAGS.exp_name + '-' + str(c)
 
-        # create reward (critic) (it's only used in algo, nowhere else)
+            exp_dir = date + '/' + exp_name
+            log_dir = osp.join(LOG_DIR, exp_dir)
+            policy.set_log_dir(log_dir)
 
+            # run the algorithm and save everything to rllab's pickle format.
+            runner = RLLabRunner(algo, FLAGS, exp_dir)
+            runner.train()
 
-        # create target network
-
-        # create policy (exactly the same as seq2seq mode)
-        # policy = CategoricalGRUPolicy(name='gru_policy', env_spec=env.spec,
-        #                               hidden_dim=model.size,
-        #                               feature_network=None,
-        #                               state_include_action=False)
 

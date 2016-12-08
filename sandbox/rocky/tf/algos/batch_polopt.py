@@ -103,7 +103,42 @@ class BatchPolopt(RLAlgorithm):
         return self.sampler.process_samples(itr, paths)
 
     def train(self):
-        with tf.Session() as sess:
+        sess_nlp = tf.get_default_session()
+        if sess_nlp is None:  # now we are using NLP's session, shouldn't break anything
+            with tf.Session() as sess:
+                sess.run(tf.initialize_all_variables())
+                if self.load_params_args is not None:
+                    self.policy.load_params(*self.load_params_args)
+                self.start_worker()
+                start_time = time.time()
+                for itr in range(self.start_itr, self.n_itr):
+                    self.policy.save_params(itr)
+                    itr_start_time = time.time()
+                    with logger.prefix('itr #%d | ' % itr):
+                        logger.log("Obtaining samples...")
+                        paths = self.obtain_samples(itr)
+                        logger.log("Processing samples...")
+                        samples_data = self.process_samples(itr, paths)
+                        logger.log("Logging diagnostics...")
+                        self.log_diagnostics(paths) # env, policy, baseline have individual log_diagnos methods for overriding
+                        logger.log("Optimizing policy...")
+                        self.optimize_policy(itr, samples_data)
+                        logger.log("Saving snapshot...")
+                        params = self.get_itr_snapshot(itr, samples_data)  # , **kwargs)
+                        if self.store_paths:
+                            params["paths"] = samples_data["paths"]
+                        logger.save_itr_params(itr, params)
+                        logger.log("Saved")
+                        logger.record_tabular('Time', time.time() - start_time)
+                        logger.record_tabular('ItrTime', time.time() - itr_start_time)
+                        logger.dump_tabular(with_prefix=False)
+                        if self.plot:
+                            self.update_plot()
+                            if self.pause_for_plot:
+                                input("Plotting evaluation run: Press Enter to "
+                                      "continue...")
+        else:
+            sess = sess_nlp
             sess.run(tf.initialize_all_variables())
             if self.load_params_args is not None:
                 self.policy.load_params(*self.load_params_args)
@@ -118,7 +153,7 @@ class BatchPolopt(RLAlgorithm):
                     logger.log("Processing samples...")
                     samples_data = self.process_samples(itr, paths)
                     logger.log("Logging diagnostics...")
-                    self.log_diagnostics(paths) # env, policy, baseline have individual log_diagnos methods for overriding
+                    self.log_diagnostics(paths)  # env, policy, baseline have individual log_diagnos methods for overriding
                     logger.log("Optimizing policy...")
                     self.optimize_policy(itr, samples_data)
                     logger.log("Saving snapshot...")
@@ -135,6 +170,7 @@ class BatchPolopt(RLAlgorithm):
                         if self.pause_for_plot:
                             input("Plotting evaluation run: Press Enter to "
                                   "continue...")
+
         self.shutdown_worker()
 
     def log_diagnostics(self, paths):
