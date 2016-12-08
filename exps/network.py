@@ -1,6 +1,7 @@
 from sandbox.rocky.tf.core.network import MLP, GRUNetwork
 import tensorflow as tf
 import sandbox.rocky.tf.core.layers as L
+from sandbox.rocky.tf.core.parameterized import Model
 from sandbox.rocky.tf.core.layers_powered import LayersPowered
 from exps.layers import AttnGRULayer, GRULayer
 from sandbox.rocky.tf.misc import tensor_utils
@@ -49,6 +50,7 @@ class RewardMLP(MLP):
 
 
 class RewardGRUNetwork(GRUNetwork, LayersPowered):
+#class RewardGRUNetwork(GRUNetwork, Model):
     """
     Hmmmm it's just a normal network,
     but with regression (affine transform) in the end
@@ -85,13 +87,15 @@ class RewardGRUNetwork(GRUNetwork, LayersPowered):
 
         # output_non_linearity is None, so it will be tf.identity
         # we are not using softmax or other nonlinearity
+        layer_args = {'regularizer': tf.nn.l2_loss}
         super(RewardGRUNetwork, self).__init__(name=name,
                                                input_shape=(input_dim,),
                                                hidden_dim=hidden_dim,
-                                               output_dim=(1,),
+                                               output_dim=1,
                                                input_layer=l_input,
                                                output_nonlinearity=tf.identity,  # this is already the default option
                                                gru_layer_cls=gru_layer_cls,
+                                               layer_args = layer_args,
                                                **kwargs)
 
         self.f_output = tensor_utils.compile_function(
@@ -163,7 +167,10 @@ class RewardGRUNetwork(GRUNetwork, LayersPowered):
 
         # squared loss, batch_size 1
         # TODO: add weight penalty?????
-        self.loss = tf.reduce_sum(tf.pow(output1d - self.y_label, 2)) / tf.to_float(batch_size)
+        reg = 0.1
+        reg_losses = filter(lambda x: x.name.split('/')[0] == 'reward_gru', tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
+        mean_reg_loss = reg * tf.reduce_sum(reg_losses) / tf.to_float(batch_size)
+        self.loss = tf.reduce_sum(tf.pow(output1d - self.y_label, 2)) / tf.to_float(batch_size) + mean_reg_loss
 
         # borrowed from NLC code, we do grad-clipping
 
@@ -202,5 +209,83 @@ class RewardGRUNetwork(GRUNetwork, LayersPowered):
         return outputs[1]  # return loss
 
 if __name__ == '__main__':
-    config = {}
+    from exps.nlc_env import build_data
+    
+    path_2_ptb_data = "/home/alex/stanford_dev/sisl/rllab/ptb_data/"
+
+    #x_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.x"
+    #y_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.y"
+
+    #x_dev = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.x"
+    #y_dev = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.y"
+
+    x_train = "{}/train.ids.x".format(path_2_ptb_data)
+    y_train = "{}/train.ids.y".format(path_2_ptb_data)
+
+    x_dev = "{}/valid.ids.x".format(path_2_ptb_data)
+    y_dev = "{}/valid.ids.y".format(path_2_ptb_data)
+
+    vocab_path = "{}/vocab.dat".format(path_2_ptb_data)
+
+    source_tokens, source_mask, target_tokens, target_mask = build_data(fnamex="{}/train.ids.x".format(path_2_ptb_data),
+                                                                        fnamey="{}/train.ids.y".format(path_2_ptb_data),
+                                                                        num_layers=1, max_seq_len=200)   
+
+    #vocab, _ = nlc_data.initialize_vocabulary(vocab_path)
+
+    #vocab_size = len(vocab)
+    #print("Vocabulary size: %d" % vocab_size)
+
+    #with tf.Session() as sess:
+        #print("Creating %d layers of %d units." % (FLAGS.num_layers, FLAGS.size))
+        #model = create_model(sess, vocab_size, False)
+
+        ##print('Initial validation cost: %f' % validate(model, sess, x_dev, y_dev))
+
+        #if False:
+            #tic = time.time()
+            #params = tf.trainable_variables()
+            #num_params = sum(map(lambda t: np.prod(tf.shape(t.value()).eval()), params))
+            #toc = time.time()
+            #print ("Number of params: %d (retreival took %f secs)" % (num_params, toc - tic))
+
+        #epoch = 0
+        #previous_losses = []
+        #exp_cost = None
+        #exp_length = None
+        #exp_norm = None
+        #while (FLAGS.epochs == 0 or epoch < FLAGS.epochs):
+            #epoch += 1
+            #current_step = 0
+
+            ### Train
+            #for source_tokens, source_mask, target_tokens, target_mask in pair_iter(x_train, y_train, FLAGS.batch_size,
+            #                                                                        FLAGS.num_layers, FLAGS.max_seq_len):
+               
+    from rl_train import create_model
+    sess = tf.Session()
+    model = create_model(sess, 100, False)
+    L_dec = model.L_dec.eval(session=sess)
+    L_enc = model.L_enc.eval(session=sess)     
+    config = {
+        "gru_size": 32,  # remember train.py for NLC must be adjusted as well
+        "source": source_tokens,
+        "target": target_tokens,
+        "source_mask": source_mask,
+        "target_mask": target_mask,
+        "model": model,
+        "L_dec": L_dec,  # vocab_size: 52, hidden_size: 50
+        "L_enc": L_enc,
+        "measure": "CER",
+        'data_dir': path_2_ptb_data,
+        "max_seq_len": 32,
+        # This is determined by data preprocessing (for decoder it's 32, cause <start>, <end>)
+        "batch_size": 64,  # batch_size must be multiples of max_seq_len (did you mix
+        # batch-size with n_env in policy code???)
+        "sess": sess,  # tf_session
+        "vocab_size": L_dec.shape[0],
+        "encoder_max_seq_length": 30
+    }
     critic = RewardGRUNetwork("reward_gru", config)
+    
+    halt= True
