@@ -21,6 +21,7 @@ from sandbox.rocky.tf.core.network import MLP, Baseline, GRUNetwork
 from sandbox.rocky.tf.optimizers.first_order_optimizer import FirstOrderOptimizer
 from rllab.misc.overrides import overrides
 from exps.nlc_env import build_data
+from exps.network import RewardGRUNetwork
 
 """
 Assemble the end-to-end encoder-decoder
@@ -221,6 +222,9 @@ if __name__ == '__main__':
             previous_losses.append(valid_cost)
             sys.stdout.flush()
 
+            # save weights to h5
+            model.save_decoder_to_h5(sess, title="NLC_weights")
+
         # ======== Actor-critic Training =========
         # note that we are still inside the TF session scope
         # TODO: 1. Build a RewardGRU (critic)
@@ -234,7 +238,7 @@ if __name__ == '__main__':
             L_enc = model.L_enc.eval(session=sess)
 
             config = {
-                "gru_size": 20,  # remember train.py for NLC must be adjusted as well
+                "gru_size": FLAGS.size,  # remember train.py for NLC must be adjusted as well
                 "source": source_tokens,
                 "target": target_tokens,
                 "source_mask": source_mask,
@@ -265,8 +269,39 @@ if __name__ == '__main__':
                                           word_embed_dim=config["gru_size"],
                                           )  # in character Seq2Seq,
                                         # word_emb and hid_size are the same
+            policy.load_params("NLC_weights", 0, [])
+
+            # create a delayed policy network
+            delayed_policy = CategoricalGRUPolicy(name="gru_delayed_policy", env_spec=env.spec,
+                                          distributor=ddist, config=config,
+                                          hidden_dim=config["gru_size"],
+                                          hidden_nonlinearity=tf.nn.relu,
+                                          word_embed_dim=config["gru_size"],
+                                          )
+
+            delayed_policy.load_params("NLC_weights", 0, [])
 
             # create a critic network
+
+            critic = RewardGRUNetwork(name="gru_critic", config=config,
+                                          hidden_dim=config["gru_size"],
+                                          hidden_nonlinearity=tf.nn.relu,)
+
+            # create a target critic (assign same weights)
+
+            target_critic = RewardGRUNetwork(name="gru_target_critic", config=config,
+                                          hidden_dim=config["gru_size"],
+                                          hidden_nonlinearity=tf.nn.relu,)
+
+            # pretrain critic (let's not pretrain it yet)
+
+            baseline = BaselineMLP(name='mlp_baseline',
+                                   output_dim=1,
+                                   hidden_sizes=b_hspec,
+                                   hidden_nonlinearity=nonlinearity,
+                                   output_nonlinearity=None,
+                                   input_shape=(np.prod(env.spec.observation_space.shape),),
+                                   batch_normalization=args.batch_normalization)
 
 
         # create baseline (paper didn't have a baseline)
