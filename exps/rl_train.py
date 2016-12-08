@@ -153,7 +153,7 @@ if __name__ == '__main__':
     x_dev = FLAGS.data_dir + "ptb_data/valid.ids.x"
     y_dev = FLAGS.data_dir + "ptb_data/valid.ids.y"
 
-    vocab_path = FLAGS.data_dir + "vocab.dat"
+    vocab_path = FLAGS.data_dir + "ptb_data/vocab.dat"
 
     source_tokens, source_mask, target_tokens, target_mask = build_data(fnamex=FLAGS.data_dir + "ptb_data/train.ids.x",
                                                                         fnamey=FLAGS.data_dir + "ptb_data/train.ids.y",
