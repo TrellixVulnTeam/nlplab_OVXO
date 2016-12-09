@@ -65,7 +65,7 @@ tf.app.flags.DEFINE_string('log_tabular_only', False, "")
 tf.app.flags.DEFINE_string('log_dir', "./logs/", "")
 _define_helper('args_data', None, "should be none", flagtype=object)
 
-tf.app.flags.DEFINE_integer("n_itr", 3, "this pulls sentences from data")
+tf.app.flags.DEFINE_integer("n_itr", 20, "this pulls sentences from data")
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -170,7 +170,7 @@ def train_seq2seq(model, sess, x_dev, y_dev, x_train, y_train):
         previous_losses.append(valid_cost)
         sys.stdout.flush()
 
-        return model
+    return model
 
 class BaselineMLP(MLP, Baseline):
     """
@@ -260,7 +260,7 @@ if __name__ == '__main__':
         print("Creating %d layers of %d units." % (FLAGS.num_layers, FLAGS.size))
         model = create_model(sess, vocab_size, False)
 
-        # model = train_seq2seq(model, sess, x_dev, y_dev, x_train, y_train)
+        model = train_seq2seq(model, sess, x_dev, y_dev, x_train, y_train)
 
         # save weights to h5
         model.save_decoder_to_h5(sess, title="NLC_weights")
@@ -288,7 +288,7 @@ if __name__ == '__main__':
             'data_dir': "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/ptb_data/",
             "max_seq_len": 32,
             # This is determined by data preprocessing (for decoder it's 32, cause <start>, <end>)
-            "batch_size": 1024,  # 512,  # batch_size must be multiples of max_seq_len (consider a MUCH BIGGER BATCH)
+            "batch_size": 1024,  # 32,  # batch_size must be multiples of max_seq_len (consider a MUCH BIGGER BATCH)
             # batch-size with n_env in policy code???)
             "sess": sess,  # tf_session
             "vocab_size": L_dec.shape[0],
@@ -346,9 +346,6 @@ if __name__ == '__main__':
         algo = ActorCritic(env, policy, baseline, delayed_policy=delayed_policy,
                            critic=critic, target_critic=target_critic, soft_target_tau=0.001, n_itr=FLAGS.n_itr,
                            config=config)
-
-
-        # algo.train()
 
         date = calendar.datetime.date.today().strftime('%y-%m-%d')
         if date not in os.listdir(FLAGS.data_dir + '/data'):

@@ -38,8 +38,8 @@ tf.app.flags.DEFINE_float("learning_rate_decay_factor", 0.95, "Learning rate dec
 tf.app.flags.DEFINE_float("max_gradient_norm", 10.0, "Clip gradients to this norm.")
 tf.app.flags.DEFINE_float("dropout", 0.15, "Fraction of units randomly dropped on non-recurrent connections.")
 tf.app.flags.DEFINE_integer("batch_size", 64, "Batch size to use during training.")  # 128
-tf.app.flags.DEFINE_integer("epochs", 1, "Number of epochs to train.")
-tf.app.flags.DEFINE_integer("size", 20, "Size of each model layer.")  # 400, also the size for word_emb
+tf.app.flags.DEFINE_integer("epochs", 30, "Number of epochs to train.")
+tf.app.flags.DEFINE_integer("size", 100, "Size of each model layer.")  # 400, also the size for word_emb
 tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers in the model.")  # 1
 tf.app.flags.DEFINE_integer("max_vocab_size", 40000, "Vocabulary size limit.")
 tf.app.flags.DEFINE_integer("max_seq_len", 32, "Maximum sequence length.")
@@ -47,7 +47,7 @@ tf.app.flags.DEFINE_string("data_dir", "/Users/Aimingnie/Documents/School/Stanfo
                            "Data directory")
 tf.app.flags.DEFINE_string("train_dir", "/tmp", "Training directory.")
 tf.app.flags.DEFINE_string("tokenizer", "CHAR", "Set to WORD to train word level model.")
-tf.app.flags.DEFINE_integer("print_every", 1, "How many iterations to do per print.")
+tf.app.flags.DEFINE_integer("print_every", 200, "How many iterations to do per print.")
 
 FLAGS = tf.app.flags.FLAGS
 

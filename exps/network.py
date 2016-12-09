@@ -51,7 +51,7 @@ class RewardMLP(MLP):
         return loss
 
 
-class RewardGRUNetwork(GRUNetwork, LayersPowered):
+class RewardGRUNetwork(GRUNetwork, Model, LayersPowered):
 #class RewardGRUNetwork(GRUNetwork, Model):
     """
     Hmmmm it's just a normal network,
