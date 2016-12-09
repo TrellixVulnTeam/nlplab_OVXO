@@ -35,20 +35,21 @@ class ActorCritic(VPG):
 
     """
 
-    def __init__(self, config,
+    def __init__(self,
                  env, policy,
-                 delayed_policy,
-                 baseline, critic,
-                 target_critic,
-                 soft_target_tau=0.001,
+                 # delayed_policy, critic, target_critic,
+                 baseline,
+                 # soft_target_tau=0.001,
                  optimizer=None, optimizer_args=None, **kwargs):
+        # __init__ signature must line up with VPG's
+        # otherwise Serialization class won't work...
 
         super(ActorCritic, self).__init__(env, policy, baseline,
                                           optimizer, optimizer_args, **kwargs)
 
-        self.critic = critic
         self.policy = policy
-        self.soft_target_tau = soft_target_tau
+        self.critic = kwargs["critic"]
+        self.soft_target_tau = kwargs["soft_target_tau"]
 
         # First, create "target" policy and Q functions
         # TODO: 1. this could be broken
@@ -56,9 +57,13 @@ class ActorCritic(VPG):
         # TODO: load twice? Initialize two policies (also policies...are mutable)
         # TODO: so the pickle would only apply
         # TODO: (create policy and critic seperately)
-        self.delayed_policy = pickle.loads(pickle.dumps(policy))  # might have to use tf.train.Saver()
-        self.target_critic = pickle.loads(pickle.dumps(critic))
+        self.delayed_policy = kwargs["delayed_policy"]  # might have to use tf.train.Saver()
+        self.target_critic = kwargs["target_critic"]
         # TODO: 3. we need to pretrain critic with a fixed actor
+
+        # so that n_envs calculation will be correct
+        self.max_path_length = kwargs["config"]['max_seq_len']
+        self.batch_size = kwargs["config"]["batch_size"]
 
     def init_opt(self):
         # ======== VPG's init_opt =======
@@ -163,13 +168,19 @@ class ActorCritic(VPG):
         # TODO: should trigger the same h0/hs. Might need to TEST this!
         self.delayed_policy.reset()
 
-        rewards = ext.extract(samples_data, "rewards")
-        observations = ext.extract(samples_data, "observations")  # dimension will work??
-        actions = ext.extract(samples_data, "actions")  # dimension will work??
+        # ext.extract will put things in a tuple, we don't need the tuple part...
+        rewards = ext.extract(samples_data, "rewards")[0]
+        observations = ext.extract(samples_data, "observations")[0]  # dimension will work??
+        actions = ext.extract(samples_data, "actions")[0]  # dimension will work??
 
         # so now it should be batched
         # we are going through the batch
         # q: (?, time_steps, )
+
+        # print "reward shape: ", rewards.shape (2, 32)
+        # print "policy output shape: ", self.delayed_policy.f_output(observations).shape  (2, 32, 52)
+        # print "Q output shape: ",  self.target_critic.compute_reward_sa(observations, actions).shape (2, 32)
+
         q = rewards + np.sum(self.delayed_policy.f_output(observations) *
                              self.target_critic.compute_reward_sa(observations, actions), axis=2)
         # sum out action_dim
@@ -186,8 +197,10 @@ class ActorCritic(VPG):
             # but still keep track of it for diagnostics.
             path['env_rewards'] = path['rewards']
 
-            # compute new rewards with discriminator network. Replace env reward in the rollouts.
-            rewards = self.critic.compute_reward(X)  # compute_reward returns (max_seq_len,) we squeezed
+            # compute_reward returns (max_seq_len,) we squeezed
+            # hope this is correct. path['actions'] is one-hot encoding
+            rewards = np.sum(self.critic.compute_reward(X) * path['actions'], axis=1)
+
             # it in critic model
             if rewards.ndim == 0:
                 rewards = rewards[np.newaxis]

@@ -273,6 +273,8 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
 
         # we use "dones" because we only load in new hs when it's DONE
         if (dones == True).sum() == dones.shape[0]:
+            # print hs.shape (30, 2, 20), which is CORRECT!
+            # print "length of done: ", len(dones) = 10, WRONG!
             self.prev_hiddens[dones] = hs[-1,:,:]
 
     # The return value is a pair. The first item is a matrix (N, A), where each

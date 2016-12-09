@@ -304,8 +304,8 @@ class NLCEnv(Env):
         # print b_padded.shape
         try:
             cer = (a_padded == b_padded).sum() / float(a_padded.shape[0])
-            print a_padded
-            print b_padded
+            # print a_padded
+            # print b_padded
         except:
             print a_padded.shape
             print "a: ", a_padded
@@ -354,6 +354,7 @@ class NLCEnv(Env):
 
     def vec_env_executor(self, n_envs, max_path_length):
         # this is a weird function....it basically construct itself
+        # print "number of envs: ", n_envs
         envs = [NLCEnv(self.distributor, self.config) for _ in range(n_envs)]
         return VecEnvExecutor(
             envs=envs,
