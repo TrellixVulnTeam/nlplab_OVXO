@@ -72,7 +72,7 @@ class DataDistributor(object):
         self.target_trackid = -1
         self.rand_inds = np.array(self.shuffle_data())
 
-        self.source_lim = self.source.shape[0]  # length of source
+        self.source_lim = self.source.shape[1]  # length of source, remember source is TRANSPOSED!!!
 
         # we keep track of how many enviornments are there
         self.n_envs = int(config["batch_size"] / config["max_seq_len"])
@@ -109,7 +109,7 @@ class DataDistributor(object):
         return encoded
 
     def shuffle_data(self):
-        inds = range(self.source.shape[0])
+        inds = range(self.source.shape[1])  # source is transposed
         np.random.shuffle(inds)
         return inds
 
@@ -325,6 +325,7 @@ class NLCEnv(Env):
         (start_token, encoder_feature)
         """
         # will be 12 envs, each is seperate
+        self.step_counter = 0
         self.curr_sent = np.zeros(self.max_seq_len, dtype="int32")
         self.target_trackid = self.distributor.next_sen()
         return self.L_dec[SOS_ID, :]  # start of sentence token

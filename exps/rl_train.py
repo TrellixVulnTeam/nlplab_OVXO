@@ -21,7 +21,8 @@ from exps.nlc.nlc_model import NLCModel
 import exps.nlc.nlc_data as nlc_data
 from exps.policy import CategoricalGRUPolicy
 from sandbox.rocky.tf.core.network import MLP, Baseline, GRUNetwork
-from exps.baseline_optimizer import FirstOrderOptimizer
+# from exps.baseline_optimizer import FirstOrderOptimizer
+from sandbox.rocky.tf.optimizers.first_order_optimizer import FirstOrderOptimizer
 from rllab.misc.overrides import overrides
 from exps.nlc_env import build_data
 from exps.network import RewardGRUNetwork
@@ -29,6 +30,7 @@ from exps.actor_critic import ActorCritic
 from sandbox import RLLabRunner
 from rllab.config import LOG_DIR
 from tensorflow.python.platform.flags import _define_helper
+import sandbox.rocky.tf.core.layers as L
 
 """
 Assemble the end-to-end encoder-decoder
@@ -63,7 +65,7 @@ tf.app.flags.DEFINE_string('log_tabular_only', False, "")
 tf.app.flags.DEFINE_string('log_dir', "./logs/", "")
 _define_helper('args_data', None, "should be none", flagtype=object)
 
-tf.app.flags.DEFINE_integer("n_itr", 5, "this pulls sentences from data")
+tf.app.flags.DEFINE_integer("n_itr", 3, "this pulls sentences from data")
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -183,6 +185,17 @@ class BaselineMLP(MLP, Baseline):
     Used in nlplab/rllab/sampler/base.py
     """
 
+    def __init__(self, name, output_dim, hidden_sizes, hidden_nonlinearity, output_nonlinearity,
+                 hidden_W_init=L.XavierUniformInitializer(), hidden_b_init=tf.zeros_initializer,
+                 output_W_init=L.XavierUniformInitializer(), output_b_init=tf.zeros_initializer, batch_size=None,
+                 input_var=None, input_layer=None, input_shape=None, batch_normalization=False,
+                 weight_normalization=False):
+        self.save_name = name
+        super(BaselineMLP, self).__init__(name, output_dim, hidden_sizes, hidden_nonlinearity, output_nonlinearity,
+                                          hidden_W_init, hidden_b_init, output_W_init, output_b_init, batch_size,
+                                          input_var, input_layer, input_shape, batch_normalization,
+                                          weight_normalization)
+
     def initialize_optimizer(self):
         self._optimizer = FirstOrderOptimizer()
 
@@ -275,7 +288,7 @@ if __name__ == '__main__':
             'data_dir': "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/ptb_data/",
             "max_seq_len": 32,
             # This is determined by data preprocessing (for decoder it's 32, cause <start>, <end>)
-            "batch_size": 64,  # batch_size must be multiples of max_seq_len (did you mix
+            "batch_size": 1024,  # 512,  # batch_size must be multiples of max_seq_len (consider a MUCH BIGGER BATCH)
             # batch-size with n_env in policy code???)
             "sess": sess,  # tf_session
             "vocab_size": L_dec.shape[0],

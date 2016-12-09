@@ -181,6 +181,8 @@ class ActorCritic(VPG):
         # print "policy output shape: ", self.delayed_policy.f_output(observations).shape  (2, 32, 52)
         # print "Q output shape: ",  self.target_critic.compute_reward_sa(observations, actions).shape (2, 32)
 
+        # print "observations shape: ", observations.shape
+
         q = rewards + np.sum(self.delayed_policy.f_output(observations) *
                              self.target_critic.compute_reward_sa(observations, actions), axis=2)
         # sum out action_dim

@@ -3,6 +3,8 @@ import tensorflow as tf
 import sandbox.rocky.tf.core.layers as L
 from sandbox.rocky.tf.core.parameterized import Model
 from sandbox.rocky.tf.core.layers_powered import LayersPowered
+from sandbox.rocky.tf.core.parameterized import Parameterized
+from rllab.core.serializable import Serializable
 from exps.layers import AttnGRULayer, GRULayer
 from sandbox.rocky.tf.misc import tensor_utils
 import numpy as np
@@ -73,6 +75,9 @@ class RewardGRUNetwork(GRUNetwork, LayersPowered):
                  max_gradient_norm=10.0,
                  gru_layer_cls=GRULayer,
                  hidden_dim=None, **kwargs):
+
+        self.save_name = "reward_gru_network"
+
         self.learning_rate = learning_rate
         self.max_gradient_norm = max_gradient_norm
 
@@ -97,7 +102,7 @@ class RewardGRUNetwork(GRUNetwork, LayersPowered):
                                                input_layer=l_input,
                                                output_nonlinearity=tf.identity,  # this is already the default option
                                                gru_layer_cls=gru_layer_cls,
-                                               layer_args = layer_args,
+                                               layer_args=layer_args,
                                                **kwargs)
 
         self.f_output = tensor_utils.compile_function(
@@ -119,6 +124,9 @@ class RewardGRUNetwork(GRUNetwork, LayersPowered):
         self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
 
         self.setup_loss()
+
+        # don't know how well this works...at least I can claim it runs...
+        LayersPowered.__init__(self, self.output_layer, input_layers=[l_input])
 
     def compute_reward(self, X):
         """

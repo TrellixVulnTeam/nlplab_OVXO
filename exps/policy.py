@@ -70,6 +70,7 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
         :param hidden_nonlinearity: nonlinearity used for each hidden layer
         :return:
         """
+        self.save_name = "policy_gru_categorical"
         self.distributor = distributor
         self.config = config
         n_envs = int(config["batch_size"] / config["max_seq_len"])
@@ -275,6 +276,7 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
         if (dones == True).sum() == dones.shape[0]:
             # print hs.shape (30, 2, 20), which is CORRECT!
             # print "length of done: ", len(dones) = 10, WRONG!
+            print "loading in encoder weights of sentences: ", self.distributor.get_seq_ids()
             self.prev_hiddens[dones] = hs[-1,:,:]
 
     # The return value is a pair. The first item is a matrix (N, A), where each

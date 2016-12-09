@@ -27,7 +27,8 @@ class Parameterized(object):
         self._cached_assign_ops = {}
         self._cached_assign_placeholders = {}
         timestr = time.strftime("%Y%m%d_%H%M%S")
-        self.save_name = 'policy_gru_categorical_' + timestr
+        self.save_name = self.save_name + timestr
+        print self.save_name
 
     def get_params_internal(self, **tags):
         """
