@@ -1,0 +1,2 @@
+model_checkpoint_path: "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/train_dir/translate.ckpt-20398"
+all_model_checkpoint_paths: "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/train_dir/translate.ckpt-20398"
