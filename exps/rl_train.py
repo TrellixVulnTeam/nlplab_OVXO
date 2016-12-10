@@ -132,19 +132,25 @@ if __name__ == '__main__':
     # x_train, y_train, x_dev, y_dev, vocab_path = nlc_data.prepare_nlc_data(
     #     FLAGS.data_dir, FLAGS.max_vocab_size,
     #     tokenizer=get_tokenizer(FLAGS))  # FLAGS.tokenizer.lower()
+    
+    path_2_ptb_data = "/home/alex/stanford_dev/sisl/rllab/ptb_data/"
 
-    x_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.x"
-    y_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.y"
+    #x_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.x"
+    #y_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.y"
 
-    x_dev = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.x"
-    y_dev = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.y"
+    #x_dev = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.x"
+    #y_dev = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.y"
 
-    vocab_path = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/vocab.dat"
+    x_train = "{}/train.ids.x".format(path_2_ptb_data)
+    y_train = "{}/train.ids.y".format(path_2_ptb_data)
 
-    source_tokens, source_mask, target_tokens, target_mask = build_data(fnamex="/Users/Aimingnie/Documents" +
-                                                                               "/School/Stanford/AA228/nlplab/ptb_data/train.ids.x",
-                                                                        fnamey="/Users/Aimingnie/Documents" +
-                                                                               "/School/Stanford/AA228/nlplab/ptb_data/train.ids.y",
+    x_dev = "{}/valid.ids.x".format(path_2_ptb_data)
+    y_dev = "{}/valid.ids.y".format(path_2_ptb_data)
+
+    vocab_path = "{}/vocab.dat".format(path_2_ptb_data)
+
+    source_tokens, source_mask, target_tokens, target_mask = build_data(fnamex="{}/train.ids.x".format(path_2_ptb_data),
+                                                                        fnamey="{}/train.ids.y".format(path_2_ptb_data),
                                                                         num_layers=1, max_seq_len=200)
 
     vocab, _ = nlc_data.initialize_vocabulary(vocab_path)
@@ -156,7 +162,7 @@ if __name__ == '__main__':
         print("Creating %d layers of %d units." % (FLAGS.num_layers, FLAGS.size))
         model = create_model(sess, vocab_size, False)
 
-        print('Initial validation cost: %f' % validate(model, sess, x_dev, y_dev))
+        #print('Initial validation cost: %f' % validate(model, sess, x_dev, y_dev))
 
         if False:
             tic = time.time()
@@ -180,7 +186,7 @@ if __name__ == '__main__':
                 # Get a batch and make a step.
                 tic = time.time()
 
-                grad_norm, cost, param_norm = model.train(sess, source_tokens, source_mask, target_tokens, target_mask)
+                #grad_norm, cost, param_norm = model.train(sess, source_tokens, source_mask, target_tokens, target_mask)
 
                 toc = time.time()
                 iter_time = toc - tic
@@ -256,6 +262,10 @@ if __name__ == '__main__':
                 "vocab_size": L_dec.shape[0],
                 "encoder_max_seq_length": 30
             }
+            target_critic = RewardGRUNetwork(name="gru_target_critic", config=config,
+                                          hidden_dim=config["gru_size"],
+                                          hidden_nonlinearity=tf.nn.relu,)
+            
             ddist = DataDistributor(config)
 
             env = TfEnv(NLCEnv(ddist, config))
