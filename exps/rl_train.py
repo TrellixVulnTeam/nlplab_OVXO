@@ -56,6 +56,8 @@ then train it with
 # tf.app.flags.DEFINE_integer("print_every", 1, "How many iterations to do per print.")
 # tf.app.flags.DEFINE_string("baseline_type", 'mlp', "linear|mlp")
 
+tf.app.flags.DEFINE_bool("rl_only", False, "flag True to only train rl portion")
+
 tf.app.flags.DEFINE_string("exp_name", "actor_critic", "name unique experiment")
 tf.app.flags.DEFINE_string('tabular_log_file', 'tab.txt', "")
 tf.app.flags.DEFINE_string('text_log_file', 'text.txt', "")
@@ -260,7 +262,8 @@ if __name__ == '__main__':
         print("Creating %d layers of %d units." % (FLAGS.num_layers, FLAGS.size))
         model = create_model(sess, vocab_size, False)
 
-        model = train_seq2seq(model, sess, x_dev, y_dev, x_train, y_train)
+        if not FLAGS.rl_only:
+            model = train_seq2seq(model, sess, x_dev, y_dev, x_train, y_train)
 
         # save weights to h5
         model.save_decoder_to_h5(sess, title="NLC_weights")
