@@ -145,6 +145,26 @@ class DataDistributor(object):
 
         return self.target_trackid
 
+def levenshtein(s1, s2):
+    if len(s1) < len(s2):
+        return levenshtein(s2, s1)
+
+    # len(s1) >= len(s2)
+    if len(s2) == 0:
+        return len(s1)
+
+    previous_row = range(len(s2) + 1)
+    for i, c1 in enumerate(s1):
+        current_row = [i + 1]
+        for j, c2 in enumerate(s2):
+            insertions = previous_row[
+                             j + 1] + 1  # j+1 instead of j since previous_row and current_row are one character longer
+            deletions = current_row[j] + 1  # than s2
+            substitutions = previous_row[j] + (c1 != c2)
+            current_row.append(min(insertions, deletions, substitutions))
+        previous_row = current_row
+
+    return previous_row[-1]
 
 class NLCEnv(Env):
     def __init__(self, distributor, config):
@@ -286,34 +306,45 @@ class NLCEnv(Env):
             self.step_counter += 1
             return Step(self.L_dec[action, :], 0, False)  # action needs to be 0-based
 
-    def count_cer(self, a, b):
-        """
-        (works with 1-dim array)
-        We pad a or b, whoever is shorter
-        """
-        if a.shape[0] > b.shape[0]:
-            b_padded = np.pad(b, (0, a.shape[0] - b.shape[0]), 'constant', constant_values=(-1))
-            a_padded = a
-        elif a.shape[0] < b.shape[0]:
-            b_padded = b
-            a_padded = np.pad(a, (0, b.shape[0] - a.shape[0]), 'constant', constant_values=(-1))
-        else:
-            a_padded = a
-            b_padded = b
-        # print a_padded.shape
-        # print b_padded.shape
-        try:
-            cer = (a_padded == b_padded).sum() / float(a_padded.shape[0])
-            # print a_padded
-            # print b_padded
-        except:
-            print a_padded.shape
-            print "a: ", a_padded
-            print b_padded.shape
-            print "b: ", b_padded
-            raise
+    # def count_cer(self, a, b):
+    #     """
+    #     (works with 1-dim array)
+    #     We pad a or b, whoever is shorter
+    #     """
+    #     if a.shape[0] > b.shape[0]:
+    #         b_padded = np.pad(b, (0, a.shape[0] - b.shape[0]), 'constant', constant_values=(-1))
+    #         a_padded = a
+    #     elif a.shape[0] < b.shape[0]:
+    #         b_padded = b
+    #         a_padded = np.pad(a, (0, b.shape[0] - a.shape[0]), 'constant', constant_values=(-1))
+    #     else:
+    #         a_padded = a
+    #         b_padded = b
+    #     # print a_padded.shape
+    #     # print b_padded.shape
+    #     try:
+    #         cer = (a_padded == b_padded).sum() / float(a_padded.shape[0])
+    #         # print a_padded
+    #         # print b_padded
+    #     except:
+    #         print a_padded.shape
+    #         print "a: ", a_padded
+    #         print b_padded.shape
+    #         print "b: ", b_padded
+    #         raise
+    #
+    #     return cer
 
-        return cer
+    def count_cer(self, a, b):
+        # need to turn a and b into string, a is ground-truth
+        # no padding since it's forcing to be same length
+        ground_truth_len = float(a.shape[0])
+        a_str = np.array_str(a)
+        b_str = np.array_str(b)
+
+        return levenshtein(a_str, b_str) / ground_truth_len
+
+
 
     def reset(self):
         """

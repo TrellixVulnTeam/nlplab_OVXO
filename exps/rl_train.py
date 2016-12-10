@@ -67,7 +67,8 @@ tf.app.flags.DEFINE_string('log_tabular_only', False, "")
 tf.app.flags.DEFINE_string('log_dir', "./logs/", "")
 _define_helper('args_data', None, "should be none", flagtype=object)
 
-tf.app.flags.DEFINE_integer("n_itr", 20, "this pulls sentences from data")
+# goes through data once!
+tf.app.flags.DEFINE_integer("n_itr", 1314, "this pulls sentences from data")
 
 FLAGS = tf.app.flags.FLAGS
 
