@@ -288,7 +288,7 @@ if __name__ == '__main__':
             "L_dec": L_dec,  # vocab_size: 52, hidden_size: 50
             "L_enc": L_enc,
             "measure": "CER",
-            'data_dir': "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/ptb_data/",
+            'data_dir': FLAGS.data_dir + "ptb_data/",
             "max_seq_len": 32,
             # This is determined by data preprocessing (for decoder it's 32, cause <start>, <end>)
             "batch_size": 1024,  # 32,  # batch_size must be multiples of max_seq_len (consider a MUCH BIGGER BATCH)
