@@ -1,7 +1,6 @@
 import tensorflow as tf
 
 from tensorflow.python.ops.rnn_cell import *
-import tensorflow.python.util.nest as nest
 
 class GRUCell(RNNCell):
     """Gated Recurrent Unit cell (cf. http://arxiv.org/abs/1406.1078)."""
