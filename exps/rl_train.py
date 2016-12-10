@@ -227,7 +227,7 @@ if __name__ == '__main__':
 
     # comment this out when running for real
     try:
-        os.remove("./weights/NLC_weights.h5")
+        os.remove(FLAGS.data_dir + "weights/NLC_weights.h5")
     except:
         pass
 
