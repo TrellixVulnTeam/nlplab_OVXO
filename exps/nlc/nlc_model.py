@@ -483,7 +483,8 @@ class NLCModel(object):
         l = _pull(var, "Logistic", tensor_name)
         L += _preface(l,path)
 
-    with h5py.File("./weights/{}.h5".format(title),"a") as hf:
+    # changed from "a" to "w", overwrite
+    with h5py.File("./weights/{}.h5".format(title),"w") as hf:
       for name, data in L:
         hf.create_dataset(name, data=data)
   

@@ -67,8 +67,12 @@ class DataDistributor(object):
         self.target_mask = config["target_mask"]
         self.model = config["model"]  # seq2seq model
         self.sess = config["sess"]
+        self.max_seq_len = config["encoder_max_seq_length"]
+        self.size = config["gru_size"]
         self.target_trackid = -1
         self.rand_inds = np.array(self.shuffle_data())
+
+        self.source_lim = self.source.shape[1]  # length of source, remember source is TRANSPOSED!!!
 
         # we keep track of how many enviornments are there
         self.n_envs = int(config["batch_size"] / config["max_seq_len"])
@@ -76,7 +80,8 @@ class DataDistributor(object):
 
         # this is the current batch
         # policy will use this to pull encoder encodings out of seq2seq model
-        self.target_list = range(self.n_envs)
+        # self.target_list = range(self.n_envs)
+        self.target_list = []
 
     def encode_source(self):
         # we return all
@@ -87,14 +92,24 @@ class DataDistributor(object):
 
         encoded = self.model.encode(self.sess, source_tokens, source_mask)
 
+        # print "target_list: ", self.target_list
+        # print "seq ids: ", self.get_seq_ids()
+
         # should know its shape: (30, 12, 100)
         # not really max_len, just time_step determined by preprocessing
         # (max_len, n_env, hidden_states)
         # this returns all encoder's hidden states
+        try:
+            assert encoded.shape == (self.max_seq_len, self.n_envs, self.size)
+        except:
+            print "shape mismatch: ", encoded.shape
+            print self.target_list
+            print self.get_seq_ids()
+
         return encoded
 
     def shuffle_data(self):
-        inds = range(self.source.shape[0])
+        inds = range(self.source.shape[1])  # source is transposed
         np.random.shuffle(inds)
         return inds
 
@@ -107,20 +122,49 @@ class DataDistributor(object):
         return self.rand_inds[target_trackid]
 
     def next_sen(self):
-        self.target_trackid += 1
-        # if len(self.target_list) != self.n_envs:
-        #     self.target_list.append(self.target_trackid)
-        # else:
-        #     # clean the storage, add the next batch
-        #     self.target_list = []
-        #     self.target_list.append(self.target_trackid)
+        # this works really strangely
+        # 12 envs will call this method, one by one
+        # so target_trackid will be 0 to 11 to them
 
-        # a better way: when 12, we start new range
-        if self.target_trackid % self.n_envs == 0:
-            self.target_list = range(self.target_trackid, self.target_trackid + self.n_envs)
+        # TODO: this is still malfunctioning
+
+        # cannot equal
+        if self.target_trackid < self.source_lim:
+            self.target_trackid += 1
+        else:
+            self.target_trackid = 0  # start from 0 again
+
+        # doing this way, when going over, like at 42068th row
+        # it appends 42068, 0, 1, 2...
+        if len(self.target_list) != self.n_envs:
+            self.target_list.append(self.target_trackid)
+        else:
+            # clean the storage, add the next batch
+            self.target_list = []
+            self.target_list.append(self.target_trackid)
 
         return self.target_trackid
 
+def levenshtein(s1, s2):
+    if len(s1) < len(s2):
+        return levenshtein(s2, s1)
+
+    # len(s1) >= len(s2)
+    if len(s2) == 0:
+        return len(s1)
+
+    previous_row = range(len(s2) + 1)
+    for i, c1 in enumerate(s1):
+        current_row = [i + 1]
+        for j, c2 in enumerate(s2):
+            insertions = previous_row[
+                             j + 1] + 1  # j+1 instead of j since previous_row and current_row are one character longer
+            deletions = current_row[j] + 1  # than s2
+            substitutions = previous_row[j] + (c1 != c2)
+            current_row.append(min(insertions, deletions, substitutions))
+        previous_row = current_row
+
+    return previous_row[-1]
 
 class NLCEnv(Env):
     def __init__(self, distributor, config):
@@ -183,6 +227,9 @@ class NLCEnv(Env):
         self.measure = config["measure"]  # "CER" (character error rate) or "BLEU"
         self.word_embed = self.L_dec.shape[1]
 
+        self.target_trackid = -100  # original value
+        self.done = False  # if this sentence is already done
+
         super(NLCEnv, self).__init__()
 
     def get_target(self):
@@ -216,7 +263,10 @@ class NLCEnv(Env):
 
         done = action == EOS_ID  # policy outputs <EOS>
 
-        self.curr_sent[self.step_counter] += action
+        if self.done:
+            self.curr_sent[self.step_counter] += PAD_ID
+        else:
+            self.curr_sent[self.step_counter] += action
 
         # Traditionally, BLEU is only generated when the entire dev set
         # is generated since BLEU is corpus-level, not really sentence-level
@@ -224,7 +274,9 @@ class NLCEnv(Env):
         # we can also compute other forms of measure,
         # like how many tokens are correctly predicted
 
-        if done or self.step_counter >= (self.max_seq_len - 1):
+        # we modified this so it really doesn't stop in the middle
+        # it will go through until reaches max_seq_len
+        if self.step_counter >= (self.max_seq_len - 1):
             # reset() will initialize new_state
             if self.measure == "BLEU":
                 # careful out of bounds with self.step_counter + 1
@@ -238,28 +290,61 @@ class NLCEnv(Env):
                 # print "current sentence: ", self.curr_sent[:self.step_counter + 1]
                 rew = self.count_cer(self.get_target(), self.curr_sent[:self.step_counter + 1])
             return Step(self.L_dec[action, :], rew, True)
+        elif done:
+            # this turn it generated done
+            self.step_counter += 1
+            self.done = done
+            # print "terminate early"
+            return Step(self.L_dec[EOS_ID, :], 0, False)
+        elif self.done:
+            # already generated done, we just keeps returning a padding token
+            self.step_counter += 1
+            # print "terminate early, padding"
+            return Step(self.L_dec[PAD_ID, :], 0, False)
         else:
             # not done, and within limit
             self.step_counter += 1
             return Step(self.L_dec[action, :], 0, False)  # action needs to be 0-based
 
+    # def count_cer(self, a, b):
+    #     """
+    #     (works with 1-dim array)
+    #     We pad a or b, whoever is shorter
+    #     """
+    #     if a.shape[0] > b.shape[0]:
+    #         b_padded = np.pad(b, (0, a.shape[0] - b.shape[0]), 'constant', constant_values=(-1))
+    #         a_padded = a
+    #     elif a.shape[0] < b.shape[0]:
+    #         b_padded = b
+    #         a_padded = np.pad(a, (0, b.shape[0] - a.shape[0]), 'constant', constant_values=(-1))
+    #     else:
+    #         a_padded = a
+    #         b_padded = b
+    #     # print a_padded.shape
+    #     # print b_padded.shape
+    #     try:
+    #         cer = (a_padded == b_padded).sum() / float(a_padded.shape[0])
+    #         # print a_padded
+    #         # print b_padded
+    #     except:
+    #         print a_padded.shape
+    #         print "a: ", a_padded
+    #         print b_padded.shape
+    #         print "b: ", b_padded
+    #         raise
+    #
+    #     return cer
+
     def count_cer(self, a, b):
-        """
-        (works with 1-dim array)
-        We pad a or b, whoever is shorter
-        """
-        if a.shape[0] > b.shape[0]:
-            b_padded = np.pad(a, (0, a.shape[0] - b.shape[0]), 'constant', constant_values=(-1))
-            a_padded = a
-        elif a.shape[0] < b.shape[0]:
-            b_padded = b
-            a_padded = np.pad(a, (0, b.shape[0] - a.shape[0]), 'constant', constant_values=(-1))
-        else:
-            a_padded = a
-            b_padded = b
-        print a_padded.shape
-        print b_padded.shape
-        return (a_padded == b_padded).sum() / float(a_padded.shape[0])
+        # need to turn a and b into string, a is ground-truth
+        # no padding since it's forcing to be same length
+        ground_truth_len = float(a.shape[0])
+        a_str = np.array_str(a)
+        b_str = np.array_str(b)
+
+        return levenshtein(a_str, b_str) / ground_truth_len
+
+
 
     def reset(self):
         """
@@ -270,7 +355,8 @@ class NLCEnv(Env):
         -------
         (start_token, encoder_feature)
         """
-        # TODO: will be 12 envs, each is seperate
+        # will be 12 envs, each is seperate
+        self.step_counter = 0
         self.curr_sent = np.zeros(self.max_seq_len, dtype="int32")
         self.target_trackid = self.distributor.next_sen()
         return self.L_dec[SOS_ID, :]  # start of sentence token
@@ -300,6 +386,7 @@ class NLCEnv(Env):
 
     def vec_env_executor(self, n_envs, max_path_length):
         # this is a weird function....it basically construct itself
+        # print "number of envs: ", n_envs
         envs = [NLCEnv(self.distributor, self.config) for _ in range(n_envs)]
         return VecEnvExecutor(
             envs=envs,
@@ -338,7 +425,8 @@ def build_data(fnamex, fnamey, num_layers, max_seq_len):
 
 
 if __name__ == '__main__':
-    path = "/home/alex/stanford_dev/sisl/rllab"
+    # path = "/home/alex/stanford_dev/sisl/rllab"
+    path = "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab"
     source_tokens, source_mask, target_tokens, target_mask = build_data(fnamex=path+"/ptb_data/valid.ids.x",
                                                                         fnamey=path+"/ptb_data/valid.ids.y",
                                                                         num_layers=1, max_seq_len=200)
@@ -380,7 +468,7 @@ if __name__ == '__main__':
 
     # test if ddist can encode batches of source sentences
     encoded = ddist.encode_source()
-    print encoded.shape  # (30, 1, 20)
+    print encoded.shape  # (30, 1, 20) or (30, 2, 20), 30 is the time_step, 2/1 is the batch-size
 
     # it appears that TFEnv is compatible with NLCEnv...for now
     # normalized() is only for continuous env, also BLEU score is between 0 and 1
@@ -438,8 +526,8 @@ if __name__ == '__main__':
     env_time = 0
     process_time = 0
 
-    print len(obses)
-    print obses[0].shape  # 50
+    print "length of observation: ", len(obses)  # 2
+    print "shape of observation: ", obses[0].shape  # 20
 
     # We first try a toy policy to just make sure NLCEnv works
     policy = CategoricalGRUPolicy(name="gru_policy", env_spec=env.spec,
@@ -453,15 +541,21 @@ if __name__ == '__main__':
     # spin up a session
     sess = tf.InteractiveSession()
     sess.run(tf.initialize_all_variables())
-    
+
     model.save_decoder_to_h5(sess,title="NLC_weights")
     policy.load_params("NLC_weights", 0, [])
 
-    # this loop is never executed twice (make sure of that)
-    # otherwise our Env will break
+    loop_count = 0
+
+    # this loop is executed 32 times (time_step)
+    # it's atomic now. Every obtain_samples() loads in n_env # of sentences
+    # ddist would reset itself when going overboard, so basically no need to ever hard-reset ddist or env
     while n_samples < config["batch_size"]:
+        loop_count += 1
+        # print loop_count
+
         t = time.time()
-        policy.reset()  # TODO: this is questionable.
+        policy.reset(dones)  # TODO: this is too questionable.
         actions, agent_infos = policy.get_actions(obses)
 
         policy_time += time.time() - t
@@ -514,6 +608,8 @@ if __name__ == '__main__':
 
         # pbar.stop()
 
+    print "loop executed: ", loop_count, " times"
+
     print "num of path: ", len(paths)
     # if we increase batch_size, double it, still works
     # we just have 2 paths instead of 1
@@ -530,86 +626,92 @@ if __name__ == '__main__':
 
     # after the processing sample, we can run VPG to test if this whole thing works
 
+    print paths[0].keys()
+    # ['agent_infos', 'rewards', 'env_infos', 'actions', 'observations']
 
 
     # ========= Test dist_info_sym for VPG init_op() method =========
-    is_recurrent = int(policy.recurrent)
-    obs_var = env.observation_space.new_tensor_variable(
-        'obs',
-        extra_dims=1 + is_recurrent,
-    )
-
-    print "obs_var: ", obs_var  # Tensor("obs:0", shape=(?, ?, 20), dtype=float32)
-
-    action_var = env.action_space.new_tensor_variable(
-        'action',
-        extra_dims=1 + is_recurrent,
-    )
-
-    print "action_var: ", action_var  # Tensor("action:0", shape=(?, ?, 52), dtype=uint8)
-    # we use these two to construct loss, meaning whatever we pass in
-    # must match their shape
-
-    state_info_vars = {
-        k: tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + list(shape), name=k)
-        for k, shape in policy.state_info_specs
-    }
-
-    advantage_var = tensor_utils.new_tensor(
-        name='advantage',
-        ndim=1 + is_recurrent,
-        dtype=tf.float32,
-    )
-
-    print "advantage_var: ", advantage_var
-    # we use this to generate loss, this is outputted by critic
-    # subtract the baseline
-
-    dist = policy.distribution
-
-    old_dist_info_vars = {
-        k: tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + list(shape), name='old_%s' % k)
-        for k, shape in dist.dist_info_specs
-        }
-    old_dist_info_vars_list = [old_dist_info_vars[k] for k in dist.dist_info_keys]
-
-    state_info_vars = {
-        k: tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + list(shape), name=k)
-        for k, shape in policy.state_info_specs
-        }
-    state_info_vars_list = [state_info_vars[k] for k in policy.state_info_keys]
-
-    dist_info_vars = policy.dist_info_sym(obs_var, state_info_vars)
-    logli = dist.log_likelihood_sym(action_var, dist_info_vars)
-    kl = dist.kl_sym(old_dist_info_vars, dist_info_vars)
-
-    valid_var = tf.placeholder(tf.float32, shape=[None, None], name="valid")
-
-    if is_recurrent:
-        surr_obj = - tf.reduce_sum(logli * advantage_var * valid_var) / tf.reduce_sum(valid_var)
-        mean_kl = tf.reduce_sum(kl * valid_var) / tf.reduce_sum(valid_var)
-        max_kl = tf.reduce_max(kl * valid_var)
-
-    # constructing optimizer
-
-    default_args = dict(
-        batch_size=None,
-        max_epochs=1,
-    )
-    optimizer = FirstOrderOptimizer(**default_args)
-
-    input_list = [obs_var, action_var, advantage_var] + state_info_vars_list
-    if is_recurrent:
-        input_list.append(valid_var)
-
-    optimizer.update_opt(loss=surr_obj, target=policy, inputs=input_list)
-
-    f_kl = tensor_utils.compile_function(
-        inputs=input_list + old_dist_info_vars_list,
-        outputs=[mean_kl, max_kl],
-    )
+    # is_recurrent = int(policy.recurrent)
+    # obs_var = env.observation_space.new_tensor_variable(
+    #     'obs',
+    #     extra_dims=1 + is_recurrent,
+    # )
+    #
+    # print "obs_var: ", obs_var  # Tensor("obs:0", shape=(?, ?, 20), dtype=float32)
+    #
+    # action_var = env.action_space.new_tensor_variable(
+    #     'action',
+    #     extra_dims=1 + is_recurrent,
+    # )
+    #
+    # print "action_var: ", action_var  # Tensor("action:0", shape=(?, ?, 52), dtype=uint8)
+    # # we use these two to construct loss, meaning whatever we pass in
+    # # must match their shape
+    #
+    # state_info_vars = {
+    #     k: tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + list(shape), name=k)
+    #     for k, shape in policy.state_info_specs
+    # }
+    #
+    # advantage_var = tensor_utils.new_tensor(
+    #     name='advantage',
+    #     ndim=1 + is_recurrent,
+    #     dtype=tf.float32,
+    # )
+    #
+    # print "advantage_var: ", advantage_var
+    # # we use this to generate loss, this is outputted by critic
+    # # subtract the baseline
+    #
+    # dist = policy.distribution
+    #
+    # old_dist_info_vars = {
+    #     k: tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + list(shape), name='old_%s' % k)
+    #     for k, shape in dist.dist_info_specs
+    #     }
+    # old_dist_info_vars_list = [old_dist_info_vars[k] for k in dist.dist_info_keys]
+    #
+    # state_info_vars = {
+    #     k: tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + list(shape), name=k)
+    #     for k, shape in policy.state_info_specs
+    #     }
+    # state_info_vars_list = [state_info_vars[k] for k in policy.state_info_keys]
+    #
+    # dist_info_vars = policy.dist_info_sym(obs_var, state_info_vars)
+    # logli = dist.log_likelihood_sym(action_var, dist_info_vars)
+    # kl = dist.kl_sym(old_dist_info_vars, dist_info_vars)
+    #
+    # valid_var = tf.placeholder(tf.float32, shape=[None, None], name="valid")
+    #
+    # if is_recurrent:
+    #     surr_obj = - tf.reduce_sum(logli * advantage_var * valid_var) / tf.reduce_sum(valid_var)
+    #     mean_kl = tf.reduce_sum(kl * valid_var) / tf.reduce_sum(valid_var)
+    #     max_kl = tf.reduce_max(kl * valid_var)
+    #
+    # # constructing optimizer
+    #
+    # default_args = dict(
+    #     batch_size=None,
+    #     max_epochs=1,
+    # )
+    # optimizer = FirstOrderOptimizer(**default_args)
+    #
+    # input_list = [obs_var, action_var, advantage_var] + state_info_vars_list
+    # if is_recurrent:
+    #     input_list.append(valid_var)
+    #
+    # optimizer.update_opt(loss=surr_obj, target=policy, inputs=input_list)
+    #
+    # f_kl = tensor_utils.compile_function(
+    #     inputs=input_list + old_dist_info_vars_list,
+    #     outputs=[mean_kl, max_kl],
+    # )
 
     # ========== Test Creating target Q =======
-    policy.get_param_values()
 
     sess.close()
+
+    import os
+    os.remove("./weights/NLC_weights.h5")
+
+

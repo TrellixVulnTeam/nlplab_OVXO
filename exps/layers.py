@@ -39,16 +39,16 @@ class GRULayer(L.Layer):
                                      regularizable=False)
 
         # Weights for the reset gate
-        self.W_xr = self.add_param(W_x_init, (input_dim, num_units), name="W_xr", regularizer= kwargs['regularizer'])
-        self.W_hr = self.add_param(W_h_init, (num_units, num_units), name="W_hr", regularizer= kwargs['regularizer'])
+        self.W_xr = self.add_param(W_x_init, (input_dim, num_units), name="W_xr", regularizer= tf.nn.l2_loss)
+        self.W_hr = self.add_param(W_h_init, (num_units, num_units), name="W_hr", regularizer= tf.nn.l2_loss)
         self.b_r = self.add_param(b_init, (num_units,), name="b_r", regularizable=False)
         # Weights for the update gate
-        self.W_xu = self.add_param(W_x_init, (input_dim, num_units), name="W_xu", regularizer= kwargs['regularizer'])
-        self.W_hu = self.add_param(W_h_init, (num_units, num_units), name="W_hu", regularizer= kwargs['regularizer'])
+        self.W_xu = self.add_param(W_x_init, (input_dim, num_units), name="W_xu", regularizer= tf.nn.l2_loss)
+        self.W_hu = self.add_param(W_h_init, (num_units, num_units), name="W_hu", regularizer= tf.nn.l2_loss)
         self.b_u = self.add_param(b_init, (num_units,), name="b_u", regularizable=False)
         # Weights for the cell gate
-        self.W_xc = self.add_param(W_x_init, (input_dim, num_units), name="W_xc", regularizer= kwargs['regularizer'])
-        self.W_hc = self.add_param(W_h_init, (num_units, num_units), name="W_hc", regularizer= kwargs['regularizer'])
+        self.W_xc = self.add_param(W_x_init, (input_dim, num_units), name="W_xc", regularizer= tf.nn.l2_loss)
+        self.W_hc = self.add_param(W_h_init, (num_units, num_units), name="W_hc", regularizer= tf.nn.l2_loss)
         self.b_c = self.add_param(b_init, (num_units,), name="b_c", regularizable=False)
 
         self.W_x_ruc = tf.concat(1, [self.W_xr, self.W_xu, self.W_xc])
@@ -134,6 +134,7 @@ class AttnGRULayer(GRULayer):
                  W_gamma_init=L.XavierUniformInitializer(),
                  W_concat_init=L.XavierUniformInitializer(),
                  b_init = tf.zeros_initializer,
+                 hidden_init=tf.zeros_initializer,
                  **kwargs):
 
         max_length, n_env, num_units = kwargs["encoder_max_seq_length"], kwargs["n_env"], kwargs["num_units"]
@@ -151,9 +152,20 @@ class AttnGRULayer(GRULayer):
             self.W_concat = self.add_param(W_concat_init, (2 * num_units, num_units), name="W_concat")
             self.b_concat = self.add_param(b_init, (num_units,), name="b_concat")
 
-        self.hs = tf.placeholder(tf.float32, shape=(max_length, n_env, num_units), name="hs")  # pass this in
-        self.h0 = self.hs[-1,:,:] # last timestep, every environment.
-        self.h0_sym = tf.placeholder(tf.float32, shape=(n_env, num_units), name="h0_sym")
+            self.hs = self.add_param(hidden_init,
+                                     (max_length, n_env, num_units), name="hs",
+                                     trainable=False,
+                                     regularizable=False)
+            # self.h0 = self.hs[-1,:,:]
+            # NOTICE: this h0's dimensionality is DIFFERENT from the normal h0 used in rllab
+            self.h0 = self.add_param(hidden_init,
+                                     (n_env, num_units), name="h0",
+                                     trainable=False,
+                                     regularizable=False)
+
+        # self.hs = tf.placeholder(tf.float32, shape=(max_length, n_env, num_units), name="hs")  # pass this in
+        # self.h0 = self.hs[-1,:,:] # last timestep, every environment.
+        # self.h0_sym = tf.placeholder(tf.float32, shape=(n_env, num_units), name="h0_sym")
         # for the get_output_for() method
 
         # print "attn hs shape: ", self.hs.get_shape()
@@ -162,6 +174,21 @@ class AttnGRULayer(GRULayer):
         hs2d = tf.reshape(self.hs, [-1, num_units])
         phi_hs2d = tf.nn.tanh(tf.nn.xw_plus_b(hs2d, self.W_hs, self.b_hs))
         self.phi_hs = tf.reshape(phi_hs2d, tf.shape(self.hs))
+
+    def assign_hs_weights(self, hs):
+        """
+        We load in hs weights and h0 weights again
+        this allows us to call from outside
+        recurrent_layer.load_hs_weights()
+        each time policy resets we call this function
+
+        Let's hope it works and changes the underlying
+        weights (it should)
+        """
+        sess = tf.get_default_session()
+        assign_op = tf.assign(self.hs, hs)
+        h0_assign_op = tf.assign(self.h0, hs[-1,:,:])
+        sess.run([assign_op, h0_assign_op])
 
 
     def step(self, hprev, x):
@@ -212,7 +239,8 @@ class AttnGRULayer(GRULayer):
             # h0s = h0s_temp.assign(self.h0)
 
             # weirdly current this works for VPG
-            h0s = self.h0_sym
+            # h0s = self.h0_sym
+            h0s = self.h0  # now that we sliced it from a tf_variable
 
         # flatten extra dimensions
         shuffled_input = tf.transpose(input, (1, 0, 2))

@@ -91,7 +91,6 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
             self.f_step_prob = tensor_utils.compile_function(
                 [
                     flat_input_var,
-                    #prob_network.step_prev_hidden_layer.input_var
                     prob_network.step_prev_state_layer.input_var
                 ],
                 L.get_output([
@@ -203,31 +202,3 @@ class CategoricalGRUPolicy(StochasticPolicy, LayersPowered, Serializable):
             ]
         else:
             return []
-        
-        
-if __name__ == '__main__':
-    from exps.nlc_env import NLCEnv
-    
-    config = {
-        "gru_size": 100,
-        "source": np.ones((20, 5)),
-        "target": np.ones((20, 5)),
-        "model": None,
-        "L_dec": np.ones((100, 50)),  # vocab_size: 100, hidden_size: 50
-        "L_enc": None,
-        "measure": "CER",
-        'data_dir': "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/ptb_data/",
-        "max_seq_len": 10,  # 200
-        "batch_size": 128
-    }
-    from exps.nlc_env import DataDistributor
-    from sandbox.rocky.tf.envs.base import TfEnv
-    ddist = DataDistributor(config)
-    
-    env = TfEnv(NLCEnv(ddist, config))
-    nn = CategoricalGRUPolicy('gru', env.spec, 
-                             state_include_action=False)
-    for p in nn.get_params():
-        print p.name
-    
-    halt= True

@@ -7,6 +7,7 @@ import numpy as np
 
 import h5py
 import os
+import time
 
 load_params = True
 
@@ -25,7 +26,9 @@ class Parameterized(object):
         self._cached_param_shapes = {}
         self._cached_assign_ops = {}
         self._cached_assign_placeholders = {}
-        self.save_name = 'policy_gail'
+        timestr = time.strftime("%Y%m%d_%H%M%S")
+        self.save_name = self.save_name + timestr
+        print self.save_name
 
     def get_params_internal(self, **tags):
         """
@@ -127,6 +130,10 @@ class Model(Parameterized):
         filename = log_dir + "/" + filename + '.h5'
         assignments = []
 
+        # create log_dir if non-existent
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+
         with h5py.File(filename,'r') as hf:
             if itr >= 0:
                 prefix = self._prefix(itr)
@@ -158,6 +165,10 @@ class Model(Parameterized):
             log_dir = self.log_dir
         filename = log_dir + "/" + self.save_name + '.h5'
         sess = tf.get_default_session()
+
+        # create log_dir if non-existent
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
 
         key = self._prefix(itr)
         with h5py.File(filename, 'a') as hf:

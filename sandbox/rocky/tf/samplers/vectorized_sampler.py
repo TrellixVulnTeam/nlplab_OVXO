@@ -44,7 +44,7 @@ class VectorizedSampler(BaseSampler):
         dones = np.asarray([True] * self.vec_env.num_envs)
         running_paths = [None] * self.vec_env.num_envs
 
-        pbar = ProgBarCounter(self.algo.batch_size)
+        # pbar = ProgBarCounter(self.algo.batch_size)
         policy_time = 0
         env_time = 0
         process_time = 0
@@ -96,10 +96,10 @@ class VectorizedSampler(BaseSampler):
                     n_samples += len(running_paths[idx]["rewards"])
                     running_paths[idx] = None
             process_time += time.time() - t
-            pbar.inc(len(obses))
+            # pbar.inc(len(obses))
             obses = next_obses
 
-        pbar.stop()
+        # pbar.stop()
 
         logger.record_tabular("PolicyExecTime", policy_time)
         logger.record_tabular("EnvExecTime", env_time)

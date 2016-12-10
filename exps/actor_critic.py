@@ -7,10 +7,23 @@ import tensorflow as tf
 from rllab.misc import ext
 
 
-# TODO 1: Construct a critic and baseline, test them (DONE)
-# TODO 2: we update policy/actor using VPG's default updating (DONE)
-# TODO 3: we use a solver to train critic (NO NEED)
-# TODO 4: update delayed Actor, critic using same way of DDPG (DONE)
+# TODO: 2. add code to pretrain critic
+
+class PreTrainer(object):
+    """
+    It seems that rllab is bad at allowing pretraining
+    we write extra code for this (by borrowing from elsewhere)
+    """
+
+    def __init__(self, config, env, policy,
+                 distributor, critic):
+        super(PreTrainer, self).__init__()
+        self.config = config
+        self.env = env
+        self.policy = policy
+        self.distributor = distributor
+        self.critic = critic
+
 
 class ActorCritic(VPG):
     """
@@ -22,22 +35,21 @@ class ActorCritic(VPG):
 
     """
 
-    def __init__(self, config,
+    def __init__(self,
                  env, policy,
-                 delayed_policy,
-                 baseline, critic,
-                 target_critic,
-                 soft_target_tau=0.001,
+                 # delayed_policy, critic, target_critic,
+                 baseline,
+                 # soft_target_tau=0.001,
                  optimizer=None, optimizer_args=None, **kwargs):
+        # __init__ signature must line up with VPG's
+        # otherwise Serialization class won't work...
 
         super(ActorCritic, self).__init__(env, policy, baseline,
                                           optimizer, optimizer_args, **kwargs)
 
-        self.paths = None  # we keep a copy of current path (will break for parallel processin)
-
-        self.critic = critic
         self.policy = policy
-        self.soft_target_tau = soft_target_tau
+        self.critic = kwargs["critic"]
+        self.soft_target_tau = kwargs["soft_target_tau"]
 
         # First, create "target" policy and Q functions
         # TODO: 1. this could be broken
@@ -45,17 +57,13 @@ class ActorCritic(VPG):
         # TODO: load twice? Initialize two policies (also policies...are mutable)
         # TODO: so the pickle would only apply
         # TODO: (create policy and critic seperately)
-        self.delayed_policy = pickle.loads(pickle.dumps(policy))  # might have to use tf.train.Saver()
-        self.target_critic = pickle.loads(pickle.dumps(critic))
+        self.delayed_policy = kwargs["delayed_policy"]  # might have to use tf.train.Saver()
+        self.target_critic = kwargs["target_critic"]
         # TODO: 3. we need to pretrain critic with a fixed actor
 
-        # self.delayed_actor.set_param_values(
-        #     policy.get_param_values() * (1.0 - self.soft_target_tau) +
-        #     self.policy.get_param_values() * self.soft_target_tau)
-        #
-        # self.target_critic.set_param_values(
-        #     self.target_critic.get_param_values() * (1.0 - self.soft_target_tau) +
-        #     self.qf.get_param_values() * self.soft_target_tau)
+        # so that n_envs calculation will be correct
+        self.max_path_length = kwargs["config"]['max_seq_len']
+        self.batch_size = kwargs["config"]["batch_size"]
 
     def init_opt(self):
         # ======== VPG's init_opt =======
@@ -137,6 +145,10 @@ class ActorCritic(VPG):
         """
         This is where we optimize actor and critic
         receives input from sampler/base.py BaseSampler's process_samples()
+        when you call optimize_policy,
+        policy is already reset() exactly once
+
+        and things should load appropriately. (make sure of this)
         """
         # all_input_values = tuple(ext.extract(
         #     samples_data,
@@ -152,23 +164,34 @@ class ActorCritic(VPG):
         # rewards = ext.extract(samples_data, "rewards")
         # # q_t =
 
-        rewards = ext.extract(samples_data, "rewards")
-        observations = ext.extract(samples_data, "observations")  # dimension will work??
-        actions = ext.extract(samples_data, "actions")  # dimension will work??
+        # TODO: if we pass in the same ddist, calling reset()
+        # TODO: should trigger the same h0/hs. Might need to TEST this!
+        self.delayed_policy.reset()
+
+        # ext.extract will put things in a tuple, we don't need the tuple part...
+        rewards = ext.extract(samples_data, "rewards")[0]
+        observations = ext.extract(samples_data, "observations")[0]  # dimension will work??
+        actions = ext.extract(samples_data, "actions")[0]  # dimension will work??
 
         # so now it should be batched
         # we are going through the batch
         # q: (?, time_steps, )
-        # TODO: 2. delayed_policy f_output, must take in hs
+
+        # print "reward shape: ", rewards.shape (2, 32)
+        # print "policy output shape: ", self.delayed_policy.f_output(observations).shape  (2, 32, 52)
+        # print "Q output shape: ",  self.target_critic.compute_reward_sa(observations, actions).shape (2, 32)
+
+        # print "observations shape: ", observations.shape
+
         q = rewards + np.sum(self.delayed_policy.f_output(observations) *
                              self.target_critic.compute_reward_sa(observations, actions), axis=2)
-                            # sum out action_dim
+        # sum out action_dim
 
         # then we update critic using the computed q
         self.critic.train(observations, actions, q)
 
         # then we process the rewards and try to get the advantage
-        paths = self.paths
+        paths = samples_data["paths"]  # this is the original paths
 
         for path in paths:
             X = np.column_stack((path['observations'], path['actions']))
@@ -176,9 +199,11 @@ class ActorCritic(VPG):
             # but still keep track of it for diagnostics.
             path['env_rewards'] = path['rewards']
 
-            # compute new rewards with discriminator network. Replace env reward in the rollouts.
-            rewards = self.critic.compute_reward(X) # compute_reward returns (max_seq_len,) we squeezed
-                                                    # it in critic model
+            # compute_reward returns (max_seq_len,) we squeezed
+            # hope this is correct. path['actions'] is one-hot encoding
+            rewards = np.sum(self.critic.compute_reward(X) * path['actions'], axis=1)
+
+            # it in critic model
             if rewards.ndim == 0:
                 rewards = rewards[np.newaxis]
             path['rewards'] = rewards
@@ -186,39 +211,53 @@ class ActorCritic(VPG):
         assert all([path['rewards'].ndim == 1 for path in paths])
 
         # so now the output of critic is baked into rewards
+        # have the sampler reprocess the sample!
         samples_data = self.sampler.process_samples(itr, paths)
 
         # this optimize the policy (actor) (in the end), we update policy
         super(ActorCritic, self).optimize_policy(itr, samples_data)
 
         # so now normal policy and critic are updated, we update delayed policy, critic
+        # you can double check if this is correct
+        self.delayed_policy.set_param_values(
+            self.delayed_policy.get_param_values() * (1.0 - self.soft_target_tau) +
+            self.policy.get_param_values() * self.soft_target_tau)
+
+        self.target_critic.set_param_values(
+            self.target_critic.get_param_values() * (1.0 - self.soft_target_tau) +
+            self.critic.get_param_values() * self.soft_target_tau)
+
+        # TODO: maybe check if this works!??
 
     @overrides
     def process_samples(self, itr, paths):
         """
-        Probably not gonna use this
-        because I need original rewards to
-
-        Returns
-        -------
+        Now this works.
         """
-        # for path in paths:
-        #     X = np.column_stack((path['observations'], path['actions']))
-        #     # if env returns some ambient reward, we want to ignore these for training.
-        #     # but still keep track of it for diagnostics.
-        #     path['env_rewards'] = path['rewards']
-        #
-        #     # compute new rewards with discriminator network. Replace env reward in the rollouts.
-        #     rewards = self.critic.compute_reward(X) # compute_reward returns (max_seq_len,) we squeezed
-        #                                             # it in critic model
-        #     if rewards.ndim == 0:
-        #         rewards = rewards[np.newaxis]
-        #     path['rewards'] = rewards
-        #
-        # assert all([path['rewards'].ndim == 1 for path in paths])
 
-        self.paths = paths  # so that we can reprocess the samples
-        return self.sampler.process_samples(itr, paths)
+        # we create the raw, batched paths here
+
+        max_path_length = max([len(path["rewards"]) for path in paths])
+
+        actions = [path["actions"] for path in paths]
+        actions = tensor_utils.pad_tensor_n(actions, max_path_length)
+
+        rewards = [path["rewards"] for path in paths]
+        rewards = tensor_utils.pad_tensor_n(rewards, max_path_length)
+
+        obs = [path["observations"] for path in paths]
+        obs = tensor_utils.pad_tensor_n(obs, max_path_length)
+
+        samples_data = dict(
+            observations=obs,
+            actions=actions,
+            rewards=rewards,
+            paths=paths,
+        )
+
+        # we still batch together actions and rewards and obs
+
+        return samples_data
 
 
 if __name__ == '__main__':

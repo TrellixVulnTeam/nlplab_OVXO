@@ -1,0 +1,146 @@
+Preparing NLC data in /afs/cs.stanford.edu/u/anie/nlplab/
+Vocabulary size: 52
+Creating 1 layers of 100 units.
+Created model with fresh parameters.
+Num params: 256952
+Initial validation cost: 4.523354
+epoch 1, iter 100, cost 2.641265, exp_cost 3.487844, grad norm 16.034365, param norm 51.898205, batch time 0.531147, length mean/std 32.000000/0.000000
+epoch 1, iter 200, cost 2.337026, exp_cost 2.829581, grad norm 11.691545, param norm 52.934937, batch time 0.524884, length mean/std 32.000000/0.000000
+epoch 1, iter 300, cost 2.236136, exp_cost 2.488507, grad norm 30.999582, param norm 53.565781, batch time 0.536100, length mean/std 32.000000/0.000000
+epoch 1, iter 400, cost 2.259188, exp_cost 2.332657, grad norm 41.453644, param norm 53.996651, batch time 0.538558, length mean/std 32.000000/0.000000
+epoch 1, iter 500, cost 2.103698, exp_cost 2.219571, grad norm 29.561937, param norm 54.550240, batch time 0.560473, length mean/std 32.000000/0.000000
+epoch 1, iter 600, cost 2.036153, exp_cost 2.106446, grad norm 115.407822, param norm 55.097794, batch time 0.546456, length mean/std 32.000000/0.000000
+Epoch 1 Validation cost: 1.837764
+epoch 2, iter 100, cost 1.778029, exp_cost 1.883295, grad norm 87.269112, param norm 55.677883, batch time 0.540289, length mean/std 32.000000/0.000000
+epoch 2, iter 200, cost 1.544252, exp_cost 1.717715, grad norm 111.899017, param norm 56.052887, batch time 0.540015, length mean/std 32.000000/0.000000
+epoch 2, iter 300, cost 1.485506, exp_cost 1.549676, grad norm 149.554703, param norm 56.444328, batch time 0.538162, length mean/std 32.000000/0.000000
+epoch 2, iter 400, cost 1.287109, exp_cost 1.415805, grad norm 232.708115, param norm 56.789700, batch time 0.535692, length mean/std 32.000000/0.000000
+epoch 2, iter 500, cost 1.189609, exp_cost 1.292341, grad norm 31.834234, param norm 57.084801, batch time 0.530803, length mean/std 32.000000/0.000000
+epoch 2, iter 600, cost 1.142386, exp_cost 1.213168, grad norm 222.237656, param norm 57.355129, batch time 0.540241, length mean/std 32.000000/0.000000
+Epoch 2 Validation cost: 1.041757
+epoch 3, iter 100, cost 1.060499, exp_cost 1.102988, grad norm 47.604053, param norm 57.768829, batch time 0.526195, length mean/std 32.000000/0.000000
+epoch 3, iter 200, cost 1.023429, exp_cost 1.034083, grad norm 991.478333, param norm 58.083076, batch time 0.525550, length mean/std 32.000000/0.000000
+epoch 3, iter 300, cost 0.942254, exp_cost 0.985432, grad norm 44.301613, param norm 58.334743, batch time 0.534683, length mean/std 32.000000/0.000000
+epoch 3, iter 400, cost 0.917785, exp_cost 0.947713, grad norm 115.867165, param norm 58.606102, batch time 0.527503, length mean/std 32.000000/0.000000
+epoch 3, iter 500, cost 0.893554, exp_cost 0.905436, grad norm 44.705826, param norm 58.860245, batch time 0.532001, length mean/std 32.000000/0.000000
+epoch 3, iter 600, cost 1.141416, exp_cost 0.901061, grad norm 969.200989, param norm 59.071323, batch time 0.551000, length mean/std 31.765625/0.423608
+Epoch 3 Validation cost: 0.817636
+epoch 4, iter 100, cost 0.857288, exp_cost 0.863750, grad norm 70.540535, param norm 59.412651, batch time 0.522074, length mean/std 31.000000/0.000000
+epoch 4, iter 200, cost 0.843975, exp_cost 0.841551, grad norm 30.410233, param norm 59.627609, batch time 0.526315, length mean/std 32.000000/0.000000
+epoch 4, iter 300, cost 0.899937, exp_cost 0.831374, grad norm 402.966644, param norm 59.845024, batch time 0.544182, length mean/std 32.000000/0.000000
+epoch 4, iter 400, cost 0.821086, exp_cost 0.824269, grad norm 41.332375, param norm 60.054878, batch time 0.550648, length mean/std 32.000000/0.000000
+epoch 4, iter 500, cost 0.740297, exp_cost 0.794908, grad norm 21.922743, param norm 60.298122, batch time 0.536328, length mean/std 31.343750/0.474959
+epoch 4, iter 600, cost 0.814179, exp_cost 0.785855, grad norm 91.024071, param norm 60.512527, batch time 0.527738, length mean/std 32.000000/0.000000
+Epoch 4 Validation cost: 0.773431
+epoch 5, iter 100, cost 0.705121, exp_cost 0.764708, grad norm 37.840691, param norm 60.850735, batch time 0.539192, length mean/std 32.000000/0.000000
+epoch 5, iter 200, cost 0.750451, exp_cost 0.753895, grad norm 31.819759, param norm 61.060993, batch time 0.534650, length mean/std 32.000000/0.000000
+epoch 5, iter 300, cost 0.763486, exp_cost 0.750414, grad norm 31.662058, param norm 61.221443, batch time 0.523238, length mean/std 31.000000/0.000000
+epoch 5, iter 400, cost 0.670652, exp_cost 0.749492, grad norm 13.179378, param norm 61.402565, batch time 0.497857, length mean/std 31.000000/0.000000
+epoch 5, iter 500, cost 0.633983, exp_cost 0.730438, grad norm 15.608363, param norm 61.584389, batch time 0.528624, length mean/std 32.000000/0.000000
+epoch 5, iter 600, cost 0.791570, exp_cost 0.726292, grad norm 199.719559, param norm 61.794685, batch time 0.519746, length mean/std 26.359375/6.760102
+Epoch 5 Validation cost: 0.689548
+epoch 6, iter 100, cost 0.685745, exp_cost 0.710159, grad norm 14.967983, param norm 62.109081, batch time 0.514208, length mean/std 25.468750/6.507133
+epoch 6, iter 200, cost 0.756000, exp_cost 0.707708, grad norm 14.278853, param norm 62.282635, batch time 0.534631, length mean/std 32.000000/0.000000
+epoch 6, iter 300, cost 0.723614, exp_cost 0.704829, grad norm 428.590973, param norm 62.450092, batch time 0.531150, length mean/std 32.000000/0.000000
+epoch 6, iter 400, cost 0.723373, exp_cost 0.708735, grad norm 32.913132, param norm 62.615040, batch time 0.534698, length mean/std 32.000000/0.000000
+epoch 6, iter 500, cost 0.618607, exp_cost 0.686866, grad norm 12.583550, param norm 62.800777, batch time 0.538446, length mean/std 32.000000/0.000000
+epoch 6, iter 600, cost 0.637363, exp_cost 0.685512, grad norm 12.477363, param norm 62.951344, batch time 0.500977, length mean/std 31.000000/0.000000
+Epoch 6 Validation cost: 0.653766
+epoch 7, iter 100, cost 0.733129, exp_cost 0.676361, grad norm 155.082001, param norm 63.218548, batch time 0.537494, length mean/std 32.000000/0.000000
+epoch 7, iter 200, cost 0.679339, exp_cost 0.669873, grad norm 11.482553, param norm 63.370029, batch time 0.518099, length mean/std 31.000000/0.000000
+epoch 7, iter 300, cost 0.668361, exp_cost 0.667805, grad norm 10.963716, param norm 63.529957, batch time 0.524447, length mean/std 32.000000/0.000000
+epoch 7, iter 400, cost 0.636455, exp_cost 0.667478, grad norm 14.725450, param norm 63.693245, batch time 0.508361, length mean/std 31.000000/0.000000
+epoch 7, iter 500, cost 0.608294, exp_cost 0.653052, grad norm 56.318508, param norm 63.856277, batch time 0.547666, length mean/std 31.343750/0.474959
+epoch 7, iter 600, cost 0.637446, exp_cost 0.654176, grad norm 14.916874, param norm 63.995884, batch time 0.537176, length mean/std 32.000000/0.000000
+Epoch 7 Validation cost: 0.632310
+epoch 8, iter 100, cost 0.611767, exp_cost 0.642762, grad norm 11.952600, param norm 64.256332, batch time 0.540743, length mean/std 32.000000/0.000000
+epoch 8, iter 200, cost 0.656759, exp_cost 0.640440, grad norm 23.802034, param norm 64.408310, batch time 0.530860, length mean/std 32.000000/0.000000
+epoch 8, iter 300, cost 0.595896, exp_cost 0.640175, grad norm 11.485856, param norm 64.547951, batch time 0.535795, length mean/std 32.000000/0.000000
+epoch 8, iter 400, cost 0.625912, exp_cost 0.640533, grad norm 306.399933, param norm 64.691933, batch time 0.544508, length mean/std 32.000000/0.000000
+epoch 8, iter 500, cost 0.599342, exp_cost 0.627141, grad norm 13.647912, param norm 64.823746, batch time 0.531196, length mean/std 32.000000/0.000000
+epoch 8, iter 600, cost 0.574247, exp_cost 0.628229, grad norm 12.100804, param norm 64.941788, batch time 0.521042, length mean/std 31.000000/0.000000
+Epoch 8 Validation cost: 0.619350
+epoch 9, iter 100, cost 0.630450, exp_cost 0.625106, grad norm 11.698605, param norm 65.138161, batch time 0.562154, length mean/std 32.000000/0.000000
+epoch 9, iter 200, cost 0.598303, exp_cost 0.621357, grad norm 14.679062, param norm 65.274956, batch time 0.536299, length mean/std 32.000000/0.000000
+epoch 9, iter 300, cost 0.592175, exp_cost 0.623816, grad norm 32.853889, param norm 65.391571, batch time 0.537582, length mean/std 32.000000/0.000000
+epoch 9, iter 400, cost 0.635319, exp_cost 0.620698, grad norm 12.080471, param norm 65.525208, batch time 0.540676, length mean/std 32.000000/0.000000
+epoch 9, iter 500, cost 0.531598, exp_cost 0.607693, grad norm 44.015026, param norm 65.655060, batch time 0.554146, length mean/std 32.000000/0.000000
+epoch 9, iter 600, cost 0.597142, exp_cost 0.607722, grad norm 15.953909, param norm 65.776306, batch time 0.534216, length mean/std 32.000000/0.000000
+Epoch 9 Validation cost: 0.593093
+epoch 10, iter 100, cost 0.579944, exp_cost 0.602280, grad norm 13.223204, param norm 65.990273, batch time 0.536297, length mean/std 32.000000/0.000000
+epoch 10, iter 200, cost 0.640774, exp_cost 0.598542, grad norm 16.021233, param norm 66.122200, batch time 0.537849, length mean/std 32.000000/0.000000
+epoch 10, iter 300, cost 0.646508, exp_cost 0.601463, grad norm 74.780556, param norm 66.243912, batch time 0.535459, length mean/std 32.000000/0.000000
+epoch 10, iter 400, cost 0.612937, exp_cost 0.603574, grad norm 28.522699, param norm 66.351639, batch time 0.527167, length mean/std 32.000000/0.000000
+epoch 10, iter 500, cost 0.567751, exp_cost 0.591925, grad norm 125.711975, param norm 66.474533, batch time 0.551626, length mean/std 32.000000/0.000000
+epoch 10, iter 600, cost 0.771991, exp_cost 0.593338, grad norm 164.591843, param norm 66.588524, batch time 0.547983, length mean/std 32.000000/0.000000
+Epoch 10 Validation cost: 0.592953
+epoch 11, iter 100, cost 0.563125, exp_cost 0.587397, grad norm 11.494672, param norm 66.764305, batch time 0.507055, length mean/std 31.000000/0.000000
+epoch 11, iter 200, cost 0.570841, exp_cost 0.585648, grad norm 14.390944, param norm 66.887230, batch time 0.508940, length mean/std 31.000000/0.000000
+epoch 11, iter 300, cost 0.594899, exp_cost 0.586139, grad norm 22.530848, param norm 66.979713, batch time 0.537667, length mean/std 32.000000/0.000000
+epoch 11, iter 400, cost 0.622554, exp_cost 0.587306, grad norm 15.799496, param norm 67.096130, batch time 0.530937, length mean/std 32.000000/0.000000
+epoch 11, iter 500, cost 0.528013, exp_cost 0.576162, grad norm 74.881729, param norm 67.207367, batch time 0.544417, length mean/std 32.000000/0.000000
+epoch 11, iter 600, cost 0.555839, exp_cost 0.577721, grad norm 46.587410, param norm 67.313736, batch time 0.511859, length mean/std 32.000000/0.000000
+Epoch 11 Validation cost: 0.564554
+epoch 12, iter 100, cost 0.555233, exp_cost 0.573037, grad norm 13.460461, param norm 67.491455, batch time 0.544186, length mean/std 32.000000/0.000000
+epoch 12, iter 200, cost 0.590614, exp_cost 0.573091, grad norm 13.228201, param norm 67.597267, batch time 0.537126, length mean/std 31.328125/0.469531
+epoch 12, iter 300, cost 0.567520, exp_cost 0.579963, grad norm 11.153866, param norm 67.675476, batch time 0.526653, length mean/std 26.765625/6.613769
+epoch 12, iter 400, cost 0.587278, exp_cost 0.574949, grad norm 13.292017, param norm 67.795242, batch time 0.547280, length mean/std 32.000000/0.000000
+epoch 12, iter 500, cost 0.548511, exp_cost 0.563345, grad norm 13.177848, param norm 67.911842, batch time 0.521477, length mean/std 32.000000/0.000000
+epoch 12, iter 600, cost 0.618844, exp_cost 0.562985, grad norm 23.348513, param norm 68.027779, batch time 0.528970, length mean/std 32.000000/0.000000
+Epoch 12 Validation cost: 0.565450
+epoch 13, iter 100, cost 0.530621, exp_cost 0.559998, grad norm 12.545148, param norm 68.189621, batch time 0.514281, length mean/std 31.000000/0.000000
+epoch 13, iter 200, cost 0.577659, exp_cost 0.558332, grad norm 18.126883, param norm 68.293777, batch time 0.525697, length mean/std 32.000000/0.000000
+epoch 13, iter 300, cost 0.593627, exp_cost 0.562217, grad norm 49.809174, param norm 68.381126, batch time 0.538232, length mean/std 32.000000/0.000000
+epoch 13, iter 400, cost 0.627913, exp_cost 0.569171, grad norm 72.021179, param norm 68.464500, batch time 0.536733, length mean/std 32.000000/0.000000
+epoch 13, iter 500, cost 0.542410, exp_cost 0.555691, grad norm 15.497307, param norm 68.568359, batch time 0.519148, length mean/std 31.000000/0.000000
+epoch 13, iter 600, cost 0.658151, exp_cost 0.554854, grad norm 22.544699, param norm 68.664345, batch time 0.539412, length mean/std 32.000000/0.000000
+Epoch 13 Validation cost: 0.548493
+epoch 14, iter 100, cost 0.526641, exp_cost 0.547547, grad norm 13.245954, param norm 68.820221, batch time 0.532131, length mean/std 32.000000/0.000000
+epoch 14, iter 200, cost 0.539451, exp_cost 0.545264, grad norm 16.690319, param norm 68.937958, batch time 0.526022, length mean/std 31.000000/0.000000
+epoch 14, iter 300, cost 0.546584, exp_cost 0.549240, grad norm 26.093882, param norm 69.033234, batch time 0.531546, length mean/std 31.796875/0.402325
+epoch 14, iter 400, cost 0.607145, exp_cost 0.550711, grad norm 28.920727, param norm 69.126251, batch time 0.536552, length mean/std 32.000000/0.000000
+epoch 14, iter 500, cost 0.586016, exp_cost 0.540114, grad norm 11.075946, param norm 69.234787, batch time 0.516287, length mean/std 23.031250/7.654592
+epoch 14, iter 600, cost 0.548878, exp_cost 0.543140, grad norm 32.729900, param norm 69.324303, batch time 0.538393, length mean/std 32.000000/0.000000
+Epoch 14 Validation cost: 0.538274
+epoch 15, iter 100, cost 0.571956, exp_cost 0.537389, grad norm 14.270823, param norm 69.473747, batch time 0.526541, length mean/std 32.000000/0.000000
+epoch 15, iter 200, cost 0.503451, exp_cost 0.537431, grad norm 47.708649, param norm 69.575951, batch time 0.527704, length mean/std 32.000000/0.000000
+epoch 15, iter 300, cost 0.587775, exp_cost 0.541805, grad norm 80.421539, param norm 69.661469, batch time 0.535861, length mean/std 32.000000/0.000000
+epoch 15, iter 400, cost 0.474744, exp_cost 0.540925, grad norm 14.121544, param norm 69.763252, batch time 0.545460, length mean/std 32.000000/0.000000
+epoch 15, iter 500, cost 0.514334, exp_cost 0.530664, grad norm 13.884996, param norm 69.866585, batch time 0.510785, length mean/std 31.000000/0.000000
+epoch 15, iter 600, cost 0.511445, exp_cost 0.534482, grad norm 19.206205, param norm 69.951355, batch time 0.537197, length mean/std 32.000000/0.000000
+Epoch 15 Validation cost: 0.529334
+epoch 16, iter 100, cost 0.556211, exp_cost 0.526993, grad norm 23.009134, param norm 70.113991, batch time 0.539144, length mean/std 32.000000/0.000000
+epoch 16, iter 200, cost 0.526612, exp_cost 0.526707, grad norm 14.221568, param norm 70.208458, batch time 0.526832, length mean/std 32.000000/0.000000
+epoch 16, iter 300, cost 0.502626, exp_cost 0.529834, grad norm 14.790802, param norm 70.294685, batch time 0.535095, length mean/std 32.000000/0.000000
+epoch 16, iter 400, cost 0.556004, exp_cost 0.530612, grad norm 13.257236, param norm 70.378738, batch time 0.538714, length mean/std 32.000000/0.000000
+epoch 16, iter 500, cost 0.489950, exp_cost 0.521330, grad norm 12.659600, param norm 70.473320, batch time 0.508835, length mean/std 31.000000/0.000000
+epoch 16, iter 600, cost 0.551453, exp_cost 0.526324, grad norm 13.991896, param norm 70.556389, batch time 0.512146, length mean/std 31.000000/0.000000
+Epoch 16 Validation cost: 0.521928
+epoch 17, iter 100, cost 0.574042, exp_cost 0.520639, grad norm 45.671329, param norm 70.684341, batch time 0.548471, length mean/std 32.000000/0.000000
+epoch 17, iter 200, cost 0.555275, exp_cost 0.518406, grad norm 15.258160, param norm 70.777397, batch time 0.532384, length mean/std 32.000000/0.000000
+epoch 17, iter 300, cost 0.500579, exp_cost 0.519605, grad norm 18.980072, param norm 70.877472, batch time 0.540733, length mean/std 32.000000/0.000000
+epoch 17, iter 400, cost 0.506763, exp_cost 0.519638, grad norm 26.627991, param norm 70.979507, batch time 0.526456, length mean/std 32.000000/0.000000
+epoch 17, iter 500, cost 0.468532, exp_cost 0.514744, grad norm 24.985502, param norm 71.055428, batch time 0.529298, length mean/std 31.343750/0.474959
+epoch 17, iter 600, cost 0.473302, exp_cost 0.515903, grad norm 12.306495, param norm 71.127335, batch time 0.547424, length mean/std 31.765625/0.423608
+Epoch 17 Validation cost: 0.514366
+epoch 18, iter 100, cost 0.560624, exp_cost 0.511115, grad norm 14.110140, param norm 71.275383, batch time 0.550171, length mean/std 31.500000/0.500000
+epoch 18, iter 200, cost 0.583821, exp_cost 0.508507, grad norm 35.858112, param norm 71.376801, batch time 0.537173, length mean/std 32.000000/0.000000
+epoch 18, iter 300, cost 0.550392, exp_cost 0.514929, grad norm 17.019064, param norm 71.452873, batch time 0.512252, length mean/std 31.000000/0.000000
+epoch 18, iter 400, cost 0.547416, exp_cost 0.514417, grad norm 144.194122, param norm 71.538261, batch time 0.518670, length mean/std 32.000000/0.000000
+epoch 18, iter 500, cost 0.484793, exp_cost 0.508127, grad norm 12.939579, param norm 71.613655, batch time 0.510042, length mean/std 31.000000/0.000000
+epoch 18, iter 600, cost 0.502356, exp_cost 0.506293, grad norm 12.254858, param norm 71.703804, batch time 0.501504, length mean/std 26.359375/6.760102
+Epoch 18 Validation cost: 0.505523
+epoch 19, iter 100, cost 0.544065, exp_cost 0.502751, grad norm 12.778537, param norm 71.833069, batch time 0.535751, length mean/std 31.500000/0.500000
+epoch 19, iter 200, cost 0.519583, exp_cost 0.501906, grad norm 17.824810, param norm 71.925217, batch time 0.510333, length mean/std 31.000000/0.000000
+epoch 19, iter 300, cost 0.518046, exp_cost 0.504303, grad norm 16.160549, param norm 72.011253, batch time 0.541374, length mean/std 32.000000/0.000000
+epoch 19, iter 400, cost 0.502943, exp_cost 0.505022, grad norm 14.294981, param norm 72.088882, batch time 0.555052, length mean/std 32.000000/0.000000
+epoch 19, iter 500, cost 0.443774, exp_cost 0.496585, grad norm 16.649683, param norm 72.180428, batch time 0.549087, length mean/std 32.000000/0.000000
+epoch 19, iter 600, cost 0.513464, exp_cost 0.500661, grad norm 17.182682, param norm 72.251869, batch time 0.530221, length mean/std 32.000000/0.000000
+Epoch 19 Validation cost: 0.510204
+epoch 20, iter 100, cost 0.456801, exp_cost 0.499139, grad norm 14.032262, param norm 72.363274, batch time 0.522463, length mean/std 25.468750/6.507133
+epoch 20, iter 200, cost 0.508776, exp_cost 0.494407, grad norm 29.095440, param norm 72.458145, batch time 0.523166, length mean/std 21.359375/9.260749
+epoch 20, iter 300, cost 0.479462, exp_cost 0.498291, grad norm 12.708422, param norm 72.537598, batch time 0.514119, length mean/std 26.765625/6.613769
+epoch 20, iter 400, cost 0.488697, exp_cost 0.496862, grad norm 13.730829, param norm 72.625870, batch time 0.547101, length mean/std 32.000000/0.000000
+epoch 20, iter 500, cost 0.461238, exp_cost 0.490018, grad norm 69.886986, param norm 72.709450, batch time 0.540963, length mean/std 32.000000/0.000000
+epoch 20, iter 600, cost 0.482240, exp_cost 0.491633, grad norm 15.304235, param norm 72.781837, batch time 0.536915, length mean/std 32.000000/0.000000
+Epoch 20 Validation cost: 0.499222

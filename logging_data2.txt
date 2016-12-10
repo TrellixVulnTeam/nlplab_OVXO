@@ -1,0 +1,1106 @@
+Preparing NLC data in /Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/
+Vocabulary size: 52
+Creating 1 layers of 100 units.
+Reading model parameters from /tmp/translate.ckpt-658
+Initial validation cost: 2.090239
+epoch 1, iter 100, cost 2.068490, exp_cost 2.050188, grad norm 15.170518, param norm 56.125439, batch time 0.666167, length mean/std 32.000000/0.000000
+epoch 1, iter 200, cost 1.832277, exp_cost 1.990201, grad norm 40.043724, param norm 56.743282, batch time 0.580809, length mean/std 32.000000/0.000000
+epoch 1, iter 300, cost 1.597695, exp_cost 1.814044, grad norm 189.922592, param norm 57.169876, batch time 0.557547, length mean/std 32.000000/0.000000
+epoch 1, iter 400, cost 1.436681, exp_cost 1.614323, grad norm 104.912514, param norm 57.557976, batch time 0.617994, length mean/std 32.000000/0.000000
+epoch 1, iter 500, cost 1.232687, exp_cost 1.428728, grad norm 84.514557, param norm 57.919704, batch time 0.573413, length mean/std 32.000000/0.000000
+epoch 1, iter 600, cost 1.183909, exp_cost 1.285641, grad norm 55.789333, param norm 58.253426, batch time 0.523167, length mean/std 32.000000/0.000000
+Epoch 1 Validation cost: 1.032965
+epoch 2, iter 100, cost 1.089254, exp_cost 1.088736, grad norm 230.522659, param norm 58.777210, batch time 0.546063, length mean/std 32.000000/0.000000
+epoch 2, iter 200, cost 0.962296, exp_cost 1.011568, grad norm 63.161030, param norm 59.071239, batch time 0.545395, length mean/std 32.000000/0.000000
+epoch 2, iter 300, cost 0.926350, exp_cost 0.958664, grad norm 57.428680, param norm 59.310467, batch time 0.603291, length mean/std 32.000000/0.000000
+epoch 2, iter 400, cost 0.851515, exp_cost 0.915396, grad norm 30.497873, param norm 59.582787, batch time 0.550422, length mean/std 32.000000/0.000000
+epoch 2, iter 500, cost 0.859991, exp_cost 0.872426, grad norm 73.244987, param norm 59.807316, batch time 0.543234, length mean/std 32.000000/0.000000
+epoch 2, iter 600, cost 0.789623, exp_cost 0.854580, grad norm 41.678253, param norm 60.033627, batch time 0.564644, length mean/std 32.000000/0.000000
+Epoch 2 Validation cost: 0.789738
+epoch 3, iter 100, cost 0.839071, exp_cost 0.818624, grad norm 18.342413, param norm 60.358261, batch time 0.597197, length mean/std 32.000000/0.000000
+epoch 3, iter 200, cost 0.791599, exp_cost 0.797443, grad norm 15.456852, param norm 60.568947, batch time 0.555688, length mean/std 32.000000/0.000000
+epoch 3, iter 300, cost 0.810620, exp_cost 0.793927, grad norm 175.282761, param norm 60.776123, batch time 0.625606, length mean/std 32.000000/0.000000
+epoch 3, iter 400, cost 0.768307, exp_cost 0.779691, grad norm 816.393799, param norm 60.957409, batch time 0.571371, length mean/std 32.000000/0.000000
+epoch 3, iter 500, cost 0.736836, exp_cost 0.755928, grad norm 321.386353, param norm 61.179459, batch time 0.610475, length mean/std 32.000000/0.000000
+epoch 3, iter 600, cost 0.729541, exp_cost 0.752385, grad norm 15.685049, param norm 61.365829, batch time 0.515062, length mean/std 31.765625/0.423608
+Epoch 3 Validation cost: 0.707555
+epoch 4, iter 100, cost 0.727956, exp_cost 0.731483, grad norm 13.605651, param norm 61.669979, batch time 0.650651, length mean/std 31.000000/0.000000
+epoch 4, iter 200, cost 0.762960, exp_cost 0.724253, grad norm 16.505312, param norm 61.842579, batch time 0.501724, length mean/std 32.000000/0.000000
+epoch 4, iter 300, cost 0.693125, exp_cost 0.719998, grad norm 25.239183, param norm 62.011909, batch time 0.560147, length mean/std 32.000000/0.000000
+epoch 4, iter 400, cost 0.718804, exp_cost 0.715044, grad norm 11.701345, param norm 62.180908, batch time 0.661086, length mean/std 32.000000/0.000000
+epoch 4, iter 500, cost 0.643281, exp_cost 0.700022, grad norm 47.352379, param norm 62.355896, batch time 0.602891, length mean/std 31.343750/0.474959
+epoch 4, iter 600, cost 0.699658, exp_cost 0.698304, grad norm 3301.608887, param norm 62.524849, batch time 0.571745, length mean/std 32.000000/0.000000
+Epoch 4 Validation cost: 0.673983
+epoch 5, iter 100, cost 0.653508, exp_cost 0.683615, grad norm 18.453022, param norm 62.818413, batch time 0.578103, length mean/std 32.000000/0.000000
+epoch 5, iter 200, cost 0.698066, exp_cost 0.679473, grad norm 11.352803, param norm 62.990215, batch time 0.503587, length mean/std 32.000000/0.000000
+epoch 5, iter 300, cost 0.714650, exp_cost 0.679452, grad norm 19.413563, param norm 63.131020, batch time 0.559025, length mean/std 31.000000/0.000000
+epoch 5, iter 400, cost 0.611420, exp_cost 0.676257, grad norm 11.509654, param norm 63.300697, batch time 0.578246, length mean/std 31.000000/0.000000
+epoch 5, iter 500, cost 0.566225, exp_cost 0.662658, grad norm 38.801498, param norm 63.476357, batch time 0.626094, length mean/std 32.000000/0.000000
+epoch 5, iter 600, cost 0.673162, exp_cost 0.661946, grad norm 14.124848, param norm 63.627583, batch time 0.559041, length mean/std 26.359375/6.760102
+Epoch 5 Validation cost: 0.640072
+epoch 6, iter 100, cost 0.636443, exp_cost 0.651924, grad norm 12.851520, param norm 63.883274, batch time 0.572786, length mean/std 25.468750/6.507133
+epoch 6, iter 200, cost 0.729728, exp_cost 0.650626, grad norm 309.483246, param norm 64.037094, batch time 0.541956, length mean/std 32.000000/0.000000
+epoch 6, iter 300, cost 0.655088, exp_cost 0.648872, grad norm 29.053213, param norm 64.188416, batch time 0.637928, length mean/std 32.000000/0.000000
+epoch 6, iter 400, cost 0.638562, exp_cost 0.645029, grad norm 15.464440, param norm 64.344635, batch time 0.585005, length mean/std 32.000000/0.000000
+epoch 6, iter 500, cost 0.607343, exp_cost 0.634264, grad norm 18.945580, param norm 64.497177, batch time 0.598747, length mean/std 32.000000/0.000000
+epoch 6, iter 600, cost 0.583613, exp_cost 0.634880, grad norm 14.938451, param norm 64.652420, batch time 0.557359, length mean/std 31.000000/0.000000
+Epoch 6 Validation cost: 0.620180
+epoch 7, iter 100, cost 0.694874, exp_cost 0.630049, grad norm 55.415462, param norm 64.863220, batch time 0.599647, length mean/std 32.000000/0.000000
+epoch 7, iter 200, cost 0.627317, exp_cost 0.625012, grad norm 26.197737, param norm 65.008484, batch time 0.574219, length mean/std 31.000000/0.000000
+epoch 7, iter 300, cost 0.637156, exp_cost 0.624693, grad norm 13.826918, param norm 65.152428, batch time 0.580541, length mean/std 32.000000/0.000000
+epoch 7, iter 400, cost 0.603269, exp_cost 0.621171, grad norm 24.214027, param norm 65.298615, batch time 0.590590, length mean/std 31.000000/0.000000
+epoch 7, iter 500, cost 0.583373, exp_cost 0.609998, grad norm 20.658638, param norm 65.447479, batch time 0.608919, length mean/std 31.343750/0.474959
+epoch 7, iter 600, cost 0.607123, exp_cost 0.609547, grad norm 10.475132, param norm 65.596535, batch time 0.566998, length mean/std 32.000000/0.000000
+Epoch 7 Validation cost: 0.593365
+epoch 8, iter 100, cost 0.579124, exp_cost 0.605066, grad norm 15.328808, param norm 65.813789, batch time 0.490727, length mean/std 32.000000/0.000000
+epoch 8, iter 200, cost 0.621608, exp_cost 0.601984, grad norm 13.097492, param norm 65.935463, batch time 0.556575, length mean/std 32.000000/0.000000
+epoch 8, iter 300, cost 0.576780, exp_cost 0.608341, grad norm 31.349054, param norm 66.058212, batch time 0.610622, length mean/std 32.000000/0.000000
+epoch 8, iter 400, cost 0.551370, exp_cost 0.606610, grad norm 45.174622, param norm 66.186272, batch time 0.578563, length mean/std 32.000000/0.000000
+epoch 8, iter 500, cost 0.587280, exp_cost 0.594493, grad norm 46.793022, param norm 66.309631, batch time 0.522035, length mean/std 32.000000/0.000000
+epoch 8, iter 600, cost 0.561211, exp_cost 0.594607, grad norm 29.180405, param norm 66.441528, batch time 0.602436, length mean/std 31.000000/0.000000
+Epoch 8 Validation cost: 0.574702
+epoch 9, iter 100, cost 0.592760, exp_cost 0.585734, grad norm 13.427391, param norm 66.655174, batch time 0.605260, length mean/std 32.000000/0.000000
+epoch 9, iter 200, cost 0.557271, exp_cost 0.584061, grad norm 52.538517, param norm 66.790359, batch time 0.635411, length mean/std 32.000000/0.000000
+epoch 9, iter 300, cost 0.577837, exp_cost 0.586741, grad norm 38.098946, param norm 66.906715, batch time 0.592468, length mean/std 32.000000/0.000000
+epoch 9, iter 400, cost 0.589290, exp_cost 0.590065, grad norm 12.477667, param norm 67.020020, batch time 0.648107, length mean/std 32.000000/0.000000
+epoch 9, iter 500, cost 0.509531, exp_cost 0.578978, grad norm 12.893276, param norm 67.129311, batch time 0.656915, length mean/std 32.000000/0.000000
+epoch 9, iter 600, cost 0.575326, exp_cost 0.577012, grad norm 11.645220, param norm 67.255768, batch time 0.611852, length mean/std 32.000000/0.000000
+Epoch 9 Validation cost: 0.560425
+epoch 10, iter 100, cost 0.565591, exp_cost 0.570796, grad norm 22.235367, param norm 67.472946, batch time 0.619500, length mean/std 32.000000/0.000000
+epoch 10, iter 200, cost 0.627737, exp_cost 0.567936, grad norm 17.863157, param norm 67.595978, batch time 0.637191, length mean/std 32.000000/0.000000
+epoch 10, iter 300, cost 0.550015, exp_cost 0.571218, grad norm 35.249016, param norm 67.701485, batch time 0.646967, length mean/std 32.000000/0.000000
+epoch 10, iter 400, cost 0.608336, exp_cost 0.573107, grad norm 55.075684, param norm 67.817841, batch time 1.004665, length mean/std 32.000000/0.000000
+epoch 10, iter 500, cost 0.513636, exp_cost 0.562056, grad norm 31.222012, param norm 67.925583, batch time 0.569451, length mean/std 32.000000/0.000000
+epoch 10, iter 600, cost 0.579530, exp_cost 0.562977, grad norm 16.324104, param norm 68.046104, batch time 0.578514, length mean/std 32.000000/0.000000
+Epoch 10 Validation cost: 0.550856
+epoch 11, iter 100, cost 0.537078, exp_cost 0.558319, grad norm 13.770486, param norm 68.231888, batch time 0.560755, length mean/std 31.000000/0.000000
+epoch 11, iter 200, cost 0.541242, exp_cost 0.557941, grad norm 12.383315, param norm 68.337479, batch time 0.571529, length mean/std 31.000000/0.000000
+epoch 11, iter 300, cost 0.577734, exp_cost 0.558464, grad norm 17.482929, param norm 68.445908, batch time 0.556589, length mean/std 32.000000/0.000000
+epoch 11, iter 400, cost 0.562796, exp_cost 0.559565, grad norm 14.724814, param norm 68.558372, batch time 0.619613, length mean/std 32.000000/0.000000
+epoch 11, iter 500, cost 0.487870, exp_cost 0.549948, grad norm 14.982558, param norm 68.668015, batch time 0.604632, length mean/std 32.000000/0.000000
+epoch 11, iter 600, cost 0.511122, exp_cost 0.552718, grad norm 12.934643, param norm 68.760117, batch time 0.601697, length mean/std 32.000000/0.000000
+Epoch 11 Validation cost: 0.546030
+epoch 12, iter 100, cost 0.538289, exp_cost 0.546344, grad norm 26.471647, param norm 68.934311, batch time 0.602657, length mean/std 32.000000/0.000000
+epoch 12, iter 200, cost 0.545760, exp_cost 0.548519, grad norm 14.471996, param norm 69.035172, batch time 0.592175, length mean/std 31.328125/0.469531
+epoch 12, iter 300, cost 0.554981, exp_cost 0.548599, grad norm 15.574791, param norm 69.142448, batch time 0.580403, length mean/std 26.765625/6.613769
+epoch 12, iter 400, cost 0.561906, exp_cost 0.546856, grad norm 14.827432, param norm 69.249710, batch time 0.579217, length mean/std 32.000000/0.000000
+epoch 12, iter 500, cost 0.522676, exp_cost 0.539739, grad norm 17.380707, param norm 69.348602, batch time 0.608212, length mean/std 32.000000/0.000000
+epoch 12, iter 600, cost 0.579802, exp_cost 0.539752, grad norm 13.584106, param norm 69.465927, batch time 0.593625, length mean/std 32.000000/0.000000
+Epoch 12 Validation cost: 0.538109
+epoch 13, iter 100, cost 0.515904, exp_cost 0.533610, grad norm 13.588573, param norm 69.641319, batch time 0.512437, length mean/std 31.000000/0.000000
+epoch 13, iter 200, cost 0.535895, exp_cost 0.532821, grad norm 16.303350, param norm 69.747986, batch time 0.613205, length mean/std 32.000000/0.000000
+epoch 13, iter 300, cost 0.560384, exp_cost 0.534618, grad norm 30.745834, param norm 69.843277, batch time 0.580072, length mean/std 32.000000/0.000000
+epoch 13, iter 400, cost 0.548640, exp_cost 0.535287, grad norm 15.650093, param norm 69.936455, batch time 0.577705, length mean/std 32.000000/0.000000
+epoch 13, iter 500, cost 0.514307, exp_cost 0.526448, grad norm 13.421964, param norm 70.041313, batch time 0.571663, length mean/std 31.000000/0.000000
+epoch 13, iter 600, cost 0.594813, exp_cost 0.529421, grad norm 49.973221, param norm 70.136108, batch time 0.543177, length mean/std 32.000000/0.000000
+Epoch 13 Validation cost: 0.519208
+epoch 14, iter 100, cost 0.563439, exp_cost 0.522677, grad norm 39.436062, param norm 70.313065, batch time 0.640437, length mean/std 32.000000/0.000000
+epoch 14, iter 200, cost 0.510367, exp_cost 0.521814, grad norm 22.082741, param norm 70.420273, batch time 0.512684, length mean/std 31.000000/0.000000
+epoch 14, iter 300, cost 0.499774, exp_cost 0.524290, grad norm 13.005329, param norm 70.510185, batch time 0.518436, length mean/std 31.796875/0.402325
+epoch 14, iter 400, cost 0.570457, exp_cost 0.526599, grad norm 17.767601, param norm 70.604851, batch time 0.613121, length mean/std 32.000000/0.000000
+epoch 14, iter 500, cost 0.544013, exp_cost 0.518325, grad norm 11.344658, param norm 70.699432, batch time 0.498553, length mean/std 23.031250/7.654592
+epoch 14, iter 600, cost 0.527307, exp_cost 0.517818, grad norm 15.610909, param norm 70.809425, batch time 0.600304, length mean/std 32.000000/0.000000
+Epoch 14 Validation cost: 0.516623
+epoch 15, iter 100, cost 0.587909, exp_cost 0.515218, grad norm 64.134789, param norm 70.971245, batch time 0.756533, length mean/std 32.000000/0.000000
+epoch 15, iter 200, cost 0.466295, exp_cost 0.511973, grad norm 12.768559, param norm 71.072441, batch time 0.597146, length mean/std 32.000000/0.000000
+epoch 15, iter 300, cost 0.523882, exp_cost 0.512805, grad norm 13.130407, param norm 71.165840, batch time 0.641290, length mean/std 32.000000/0.000000
+epoch 15, iter 400, cost 0.463409, exp_cost 0.516748, grad norm 23.548447, param norm 71.248352, batch time 0.615235, length mean/std 32.000000/0.000000
+epoch 15, iter 500, cost 0.483914, exp_cost 0.507430, grad norm 12.250920, param norm 71.334511, batch time 0.603245, length mean/std 31.000000/0.000000
+epoch 15, iter 600, cost 0.472859, exp_cost 0.508051, grad norm 13.915803, param norm 71.433502, batch time 0.614237, length mean/std 32.000000/0.000000
+Epoch 15 Validation cost: 0.505712
+epoch 16, iter 100, cost 0.510446, exp_cost 0.506338, grad norm 14.661000, param norm 71.582794, batch time 0.618280, length mean/std 32.000000/0.000000
+epoch 16, iter 200, cost 0.517636, exp_cost 0.506543, grad norm 20.823742, param norm 71.674896, batch time 0.641029, length mean/std 32.000000/0.000000
+epoch 16, iter 300, cost 0.472799, exp_cost 0.505745, grad norm 15.617565, param norm 71.770615, batch time 0.609889, length mean/std 32.000000/0.000000
+epoch 16, iter 400, cost 0.540990, exp_cost 0.507730, grad norm 15.012793, param norm 71.860832, batch time 0.595176, length mean/std 32.000000/0.000000
+epoch 16, iter 500, cost 0.472445, exp_cost 0.498354, grad norm 12.782902, param norm 71.949448, batch time 0.586794, length mean/std 31.000000/0.000000
+epoch 16, iter 600, cost 0.517422, exp_cost 0.499582, grad norm 12.619715, param norm 72.046371, batch time 0.562882, length mean/std 31.000000/0.000000
+Epoch 16 Validation cost: 0.499066
+epoch 17, iter 100, cost 0.514934, exp_cost 0.497766, grad norm 19.392252, param norm 72.179199, batch time 0.612280, length mean/std 32.000000/0.000000
+epoch 17, iter 200, cost 0.544122, exp_cost 0.497505, grad norm 17.308901, param norm 72.265327, batch time 0.628532, length mean/std 32.000000/0.000000
+epoch 17, iter 300, cost 0.463385, exp_cost 0.498536, grad norm 14.074751, param norm 72.350418, batch time 0.615452, length mean/std 32.000000/0.000000
+epoch 17, iter 400, cost 0.481341, exp_cost 0.498413, grad norm 15.643477, param norm 72.446030, batch time 0.653243, length mean/std 32.000000/0.000000
+epoch 17, iter 500, cost 0.485391, exp_cost 0.491157, grad norm 86.230804, param norm 72.529747, batch time 0.592643, length mean/std 31.343750/0.474959
+epoch 17, iter 600, cost 0.463666, exp_cost 0.491853, grad norm 12.714146, param norm 72.618637, batch time 0.617375, length mean/std 31.765625/0.423608
+Epoch 17 Validation cost: 0.492242
+epoch 18, iter 100, cost 0.520874, exp_cost 0.487080, grad norm 13.792259, param norm 72.763268, batch time 0.598684, length mean/std 31.500000/0.500000
+epoch 18, iter 200, cost 0.542290, exp_cost 0.487899, grad norm 238.774643, param norm 72.851463, batch time 0.671608, length mean/std 32.000000/0.000000
+epoch 18, iter 300, cost 0.515750, exp_cost 0.489167, grad norm 17.948864, param norm 72.933456, batch time 0.606951, length mean/std 31.000000/0.000000
+epoch 18, iter 400, cost 0.506068, exp_cost 0.490855, grad norm 17.546003, param norm 73.023323, batch time 0.629222, length mean/std 32.000000/0.000000
+epoch 18, iter 500, cost 0.448975, exp_cost 0.483245, grad norm 13.132289, param norm 73.100952, batch time 0.595483, length mean/std 31.000000/0.000000
+epoch 18, iter 600, cost 0.468806, exp_cost 0.485376, grad norm 11.610021, param norm 73.180908, batch time 0.601647, length mean/std 26.359375/6.760102
+Epoch 18 Validation cost: 0.489346
+epoch 19, iter 100, cost 0.535871, exp_cost 0.482653, grad norm 110.256348, param norm 73.323341, batch time 0.592750, length mean/std 31.500000/0.500000
+epoch 19, iter 200, cost 0.463234, exp_cost 0.483003, grad norm 13.716590, param norm 73.409027, batch time 0.597363, length mean/std 31.000000/0.000000
+epoch 19, iter 300, cost 0.492396, exp_cost 0.483395, grad norm 13.943092, param norm 73.480370, batch time 0.634295, length mean/std 32.000000/0.000000
+epoch 19, iter 400, cost 0.475920, exp_cost 0.482176, grad norm 15.497026, param norm 73.576569, batch time 0.608446, length mean/std 32.000000/0.000000
+epoch 19, iter 500, cost 0.435508, exp_cost 0.476932, grad norm 14.847142, param norm 73.646133, batch time 0.575356, length mean/std 32.000000/0.000000
+epoch 19, iter 600, cost 0.487248, exp_cost 0.479711, grad norm 15.755237, param norm 73.727669, batch time 0.604022, length mean/std 32.000000/0.000000
+Epoch 19 Validation cost: 0.478956
+epoch 20, iter 100, cost 0.431950, exp_cost 0.474888, grad norm 12.121717, param norm 73.861816, batch time 0.590605, length mean/std 25.468750/6.507133
+epoch 20, iter 200, cost 0.488802, exp_cost 0.475049, grad norm 10.073937, param norm 73.942863, batch time 0.588570, length mean/std 21.359375/9.260749
+epoch 20, iter 300, cost 0.480103, exp_cost 0.478196, grad norm 14.115893, param norm 74.000252, batch time 0.620341, length mean/std 26.765625/6.613769
+epoch 20, iter 400, cost 0.465831, exp_cost 0.478408, grad norm 14.601034, param norm 74.086998, batch time 0.606244, length mean/std 32.000000/0.000000
+epoch 20, iter 500, cost 0.433408, exp_cost 0.471345, grad norm 14.638021, param norm 74.160118, batch time 0.547498, length mean/std 32.000000/0.000000
+epoch 20, iter 600, cost 0.471593, exp_cost 0.472356, grad norm 39.184826, param norm 74.244911, batch time 0.645110, length mean/std 32.000000/0.000000
+Epoch 20 Validation cost: 0.475860
+epoch 21, iter 100, cost 0.444325, exp_cost 0.468818, grad norm 13.822844, param norm 74.386497, batch time 0.568095, length mean/std 31.000000/0.000000
+epoch 21, iter 200, cost 0.450998, exp_cost 0.468765, grad norm 17.576717, param norm 74.467232, batch time 0.571335, length mean/std 32.000000/0.000000
+epoch 21, iter 300, cost 0.490888, exp_cost 0.471837, grad norm 22.184166, param norm 74.543587, batch time 0.616524, length mean/std 32.000000/0.000000
+epoch 21, iter 400, cost 0.524580, exp_cost 0.474678, grad norm 16.480944, param norm 74.607216, batch time 0.599152, length mean/std 32.000000/0.000000
+epoch 21, iter 500, cost 0.418273, exp_cost 0.468393, grad norm 59.314514, param norm 74.677330, batch time 0.676016, length mean/std 32.000000/0.000000
+epoch 21, iter 600, cost 0.509638, exp_cost 0.467918, grad norm 133.207520, param norm 74.750183, batch time 0.608564, length mean/std 31.000000/0.000000
+Epoch 21 Validation cost: 0.475946
+epoch 22, iter 100, cost 0.450404, exp_cost 0.461379, grad norm 17.282246, param norm 74.884422, batch time 0.623201, length mean/std 32.000000/0.000000
+epoch 22, iter 200, cost 0.468604, exp_cost 0.462862, grad norm 15.379643, param norm 74.963966, batch time 0.650973, length mean/std 31.328125/0.469531
+epoch 22, iter 300, cost 0.413302, exp_cost 0.463684, grad norm 14.589979, param norm 75.031479, batch time 0.579412, length mean/std 32.000000/0.000000
+epoch 22, iter 400, cost 0.439821, exp_cost 0.465711, grad norm 34.351669, param norm 75.108559, batch time 0.542868, length mean/std 31.000000/0.000000
+epoch 22, iter 500, cost 0.450412, exp_cost 0.461759, grad norm 37.906746, param norm 75.167603, batch time 0.637121, length mean/std 32.000000/0.000000
+epoch 22, iter 600, cost 0.423862, exp_cost 0.460916, grad norm 14.988775, param norm 75.248154, batch time 0.623507, length mean/std 32.000000/0.000000
+Epoch 22 Validation cost: 0.466080
+epoch 23, iter 100, cost 0.435663, exp_cost 0.456791, grad norm 18.862083, param norm 75.377975, batch time 0.630953, length mean/std 32.000000/0.000000
+epoch 23, iter 200, cost 0.494434, exp_cost 0.460847, grad norm 17.502510, param norm 75.443810, batch time 0.543576, length mean/std 32.000000/0.000000
+epoch 23, iter 300, cost 0.420094, exp_cost 0.460207, grad norm 14.386320, param norm 75.504753, batch time 0.694134, length mean/std 32.000000/0.000000
+epoch 23, iter 400, cost 0.451579, exp_cost 0.459866, grad norm 14.301702, param norm 75.579285, batch time 0.621134, length mean/std 32.000000/0.000000
+epoch 23, iter 500, cost 0.433930, exp_cost 0.453742, grad norm 34.459469, param norm 75.641685, batch time 0.633882, length mean/std 32.000000/0.000000
+epoch 23, iter 600, cost 0.456326, exp_cost 0.455424, grad norm 14.580291, param norm 75.720795, batch time 0.606277, length mean/std 32.000000/0.000000
+Epoch 23 Validation cost: 0.469801
+epoch 24, iter 100, cost 0.453044, exp_cost 0.454245, grad norm 16.218235, param norm 75.838890, batch time 0.580675, length mean/std 32.000000/0.000000
+epoch 24, iter 200, cost 0.404297, exp_cost 0.450583, grad norm 14.867890, param norm 75.915413, batch time 0.603487, length mean/std 32.000000/0.000000
+epoch 24, iter 300, cost 0.456132, exp_cost 0.453995, grad norm 15.014728, param norm 75.990005, batch time 0.596964, length mean/std 31.000000/0.000000
+epoch 24, iter 400, cost 0.399341, exp_cost 0.456006, grad norm 13.784974, param norm 76.063454, batch time 0.564679, length mean/std 31.000000/0.000000
+epoch 24, iter 500, cost 0.476347, exp_cost 0.450034, grad norm 56.964497, param norm 76.116562, batch time 0.574514, length mean/std 32.000000/0.000000
+epoch 24, iter 600, cost 0.510784, exp_cost 0.451376, grad norm 14.078427, param norm 76.186195, batch time 0.674466, length mean/std 32.000000/0.000000
+Epoch 24 Validation cost: 0.466955
+epoch 25, iter 100, cost 0.424850, exp_cost 0.445034, grad norm 16.975569, param norm 76.320305, batch time 0.601677, length mean/std 32.000000/0.000000
+epoch 25, iter 200, cost 0.406344, exp_cost 0.445764, grad norm 21.619596, param norm 76.388382, batch time 0.591820, length mean/std 32.000000/0.000000
+epoch 25, iter 300, cost 0.469464, exp_cost 0.449252, grad norm 14.565232, param norm 76.460640, batch time 0.613747, length mean/std 31.000000/0.000000
+epoch 25, iter 400, cost 0.466092, exp_cost 0.451771, grad norm 21.181826, param norm 76.533127, batch time 0.611098, length mean/std 32.000000/0.000000
+epoch 25, iter 500, cost 0.416179, exp_cost 0.444952, grad norm 15.170589, param norm 76.596161, batch time 0.518456, length mean/std 31.000000/0.000000
+epoch 25, iter 600, cost 0.435941, exp_cost 0.448977, grad norm 19.669046, param norm 76.669090, batch time 0.650418, length mean/std 32.000000/0.000000
+Epoch 25 Validation cost: 0.457080
+epoch 26, iter 100, cost 0.413577, exp_cost 0.440875, grad norm 16.479900, param norm 76.783424, batch time 0.664562, length mean/std 32.000000/0.000000
+epoch 26, iter 200, cost 0.446188, exp_cost 0.441760, grad norm 10.634295, param norm 76.852188, batch time 0.580630, length mean/std 21.359375/9.260749
+epoch 26, iter 300, cost 0.414198, exp_cost 0.443032, grad norm 14.312675, param norm 76.921806, batch time 0.569334, length mean/std 31.796875/0.402325
+epoch 26, iter 400, cost 0.516453, exp_cost 0.444145, grad norm 76.398788, param norm 77.000015, batch time 0.633825, length mean/std 32.000000/0.000000
+epoch 26, iter 500, cost 0.399363, exp_cost 0.438723, grad norm 13.852485, param norm 77.058426, batch time 0.586977, length mean/std 31.000000/0.000000
+epoch 26, iter 600, cost 0.496745, exp_cost 0.440887, grad norm 14.923212, param norm 77.132408, batch time 0.578478, length mean/std 32.000000/0.000000
+Epoch 26 Validation cost: 0.457210
+epoch 27, iter 100, cost 0.411332, exp_cost 0.437203, grad norm 17.039860, param norm 77.245422, batch time 0.606353, length mean/std 32.000000/0.000000
+epoch 27, iter 200, cost 0.407337, exp_cost 0.437575, grad norm 14.030359, param norm 77.313469, batch time 0.591281, length mean/std 31.000000/0.000000
+epoch 27, iter 300, cost 0.444842, exp_cost 0.438925, grad norm 14.527754, param norm 77.376953, batch time 0.548829, length mean/std 31.000000/0.000000
+epoch 27, iter 400, cost 0.385187, exp_cost 0.440961, grad norm 48.866276, param norm 77.443901, batch time 0.612874, length mean/std 32.000000/0.000000
+epoch 27, iter 500, cost 0.386125, exp_cost 0.435292, grad norm 16.910282, param norm 77.500252, batch time 0.574505, length mean/std 32.000000/0.000000
+epoch 27, iter 600, cost 0.489490, exp_cost 0.439895, grad norm 22.884121, param norm 77.567978, batch time 0.607768, length mean/std 32.000000/0.000000
+Epoch 27 Validation cost: 0.452509
+epoch 28, iter 100, cost 0.450667, exp_cost 0.434149, grad norm 18.019176, param norm 77.688545, batch time 0.634754, length mean/std 32.000000/0.000000
+epoch 28, iter 200, cost 0.406217, exp_cost 0.432365, grad norm 18.917561, param norm 77.751480, batch time 0.671036, length mean/std 32.000000/0.000000
+epoch 28, iter 300, cost 0.489435, exp_cost 0.437181, grad norm 17.542908, param norm 77.815063, batch time 0.610695, length mean/std 32.000000/0.000000
+epoch 28, iter 400, cost 0.435168, exp_cost 0.437987, grad norm 41.097843, param norm 77.877907, batch time 0.565884, length mean/std 32.000000/0.000000
+epoch 28, iter 500, cost 0.425736, exp_cost 0.432866, grad norm 17.312479, param norm 77.931396, batch time 0.670457, length mean/std 31.343750/0.474959
+epoch 28, iter 600, cost 0.440864, exp_cost 0.433505, grad norm 16.495153, param norm 78.004295, batch time 0.570035, length mean/std 32.000000/0.000000
+Epoch 28 Validation cost: 0.449235
+epoch 29, iter 100, cost 0.457424, exp_cost 0.429634, grad norm 30.053631, param norm 78.118088, batch time 0.590478, length mean/std 32.000000/0.000000
+epoch 29, iter 200, cost 0.478334, exp_cost 0.430909, grad norm 134.795990, param norm 78.180588, batch time 0.624597, length mean/std 31.328125/0.469531
+epoch 29, iter 300, cost 0.410883, exp_cost 0.434060, grad norm 14.703588, param norm 78.231224, batch time 0.597392, length mean/std 31.796875/0.402325
+epoch 29, iter 400, cost 0.431220, exp_cost 0.435104, grad norm 17.339052, param norm 78.285950, batch time 0.611241, length mean/std 32.000000/0.000000
+epoch 29, iter 500, cost 0.375017, exp_cost 0.427704, grad norm 16.761913, param norm 78.346672, batch time 0.609463, length mean/std 32.000000/0.000000
+epoch 29, iter 600, cost 0.415491, exp_cost 0.428876, grad norm 18.024858, param norm 78.414444, batch time 0.610000, length mean/std 32.000000/0.000000
+Epoch 29 Validation cost: 0.446373
+epoch 30, iter 100, cost 0.471386, exp_cost 0.425882, grad norm 17.640184, param norm 78.527702, batch time 0.629714, length mean/std 32.000000/0.000000
+epoch 30, iter 200, cost 0.470455, exp_cost 0.426931, grad norm 80.390129, param norm 78.590271, batch time 0.585527, length mean/std 32.000000/0.000000
+epoch 30, iter 300, cost 0.441257, exp_cost 0.428680, grad norm 15.798945, param norm 78.654716, batch time 0.601080, length mean/std 32.000000/0.000000
+epoch 30, iter 400, cost 0.475903, exp_cost 0.429875, grad norm 16.886919, param norm 78.716698, batch time 0.644160, length mean/std 32.000000/0.000000
+epoch 30, iter 500, cost 0.416984, exp_cost 0.423611, grad norm 16.400475, param norm 78.771156, batch time 0.616394, length mean/std 32.000000/0.000000
+epoch 30, iter 600, cost 0.458264, exp_cost 0.424369, grad norm 17.250317, param norm 78.831787, batch time 0.591515, length mean/std 32.000000/0.000000
+Epoch 30 Validation cost: 0.440464
+policy_gru_categorical20161210_035211
+policy_gru_categorical20161210_03521120161210_035211
+loading policy params...
+done.
+policy_gru_categorical20161210_035212
+policy_gru_categorical20161210_03521220161210_035212
+loading policy params...
+done.
+reward_gru_network20161210_035213
+reward_gru_network20161210_035214
+mlp_baseline20161210_035214
+saving model...
+done.
+2016-12-10 03:52:17.284183 PST | [16-12-10/actor_critic-0] itr #0 | Obtaining samples...
+2016-12-10 03:52:17.285816 PST | [16-12-10/actor_critic-0] itr #0 | Obtaining samples for iteration 0...
+loading in encoder weights of sentences:  [28681  1911  1305 25336 26918 27592 38695 15833  2132 36009 21615 25661
+ 21156  4112 27220  7072 40192 14660 16048  8282 15769  1086  5129 19641
+ 14687 18133 29926 40487  4367 33391 17143 13105]
+2016-12-10 03:52:24.367564 PST | [16-12-10/actor_critic-0] itr #0 | Processing samples...
+2016-12-10 03:52:24.368076 PST | [16-12-10/actor_critic-0] itr #0 | Logging diagnostics...
+2016-12-10 03:52:24.368140 PST | [16-12-10/actor_critic-0] itr #0 | Optimizing policy...
+loading in encoder weights of sentences:  [12503 31627 31009 41874 33968 30226 28414   562  6314 34758 20778 24765
+ 34567  1228 40825 22679 38203 32640 10781 26750 30088 19912 23809 20404
+ 20184 25903 24754 23268 36499 37723 11750 11997]
+2016-12-10 03:52:25.290372 PST | [16-12-10/actor_critic-0] itr #0 | fitting baseline...
+2016-12-10 03:52:34.204594 PST | [16-12-10/actor_critic-0] itr #0 | fitted
+2016-12-10 03:52:34.205181 PST | [16-12-10/actor_critic-0] itr #0 | optimizing policy
+2016-12-10 03:52:35.557948 PST | [16-12-10/actor_critic-0] itr #0 | Saving snapshot...
+2016-12-10 03:52:35.558083 PST | [16-12-10/actor_critic-0] itr #0 | Saved
+2016-12-10 03:52:35.559291 PST | --------------------------  ------------
+2016-12-10 03:52:35.559347 PST | PolicyExecTime               7.06118
+2016-12-10 03:52:35.559393 PST | EnvExecTime                  0.0128067
+2016-12-10 03:52:35.559436 PST | ProcessExecTime              0.00589943
+2016-12-10 03:52:35.559500 PST | Iteration                    0
+2016-12-10 03:52:35.559544 PST | AverageDiscountedReturn      0.649436
+2016-12-10 03:52:35.559585 PST | AverageDiscountedEnvReturn   0.010012
+2016-12-10 03:52:35.559626 PST | AverageReturn                0.750749
+2016-12-10 03:52:35.559667 PST | AverageEnvReturn             0.0136719
+2016-12-10 03:52:35.559708 PST | ExplainedVariance           -0.059401
+2016-12-10 03:52:35.559748 PST | NumTrajs                    32
+2016-12-10 03:52:35.559789 PST | Entropy                      3.94814
+2016-12-10 03:52:35.559830 PST | Perplexity                  51.839
+2016-12-10 03:52:35.559870 PST | StdReturn                    0.833005
+2016-12-10 03:52:35.559911 PST | MaxReturn                    3.36626
+2016-12-10 03:52:35.559951 PST | MinReturn                   -0.821899
+2016-12-10 03:52:35.559992 PST | StdEnvReturn                 0.0205774
+2016-12-10 03:52:35.560032 PST | MaxEnvReturn                 0.0625
+2016-12-10 03:52:35.560073 PST | MinEnvReturn                 0
+2016-12-10 03:52:35.560113 PST | LossBefore                  -0.0017549
+2016-12-10 03:52:35.560154 PST | LossAfter                   -0.00889748
+2016-12-10 03:52:35.560194 PST | MeanKL                       7.5721e-05
+2016-12-10 03:52:35.560235 PST | MaxKL                        0.000254296
+2016-12-10 03:52:35.560275 PST | Time                        18.3138
+2016-12-10 03:52:35.560316 PST | ItrTime                     18.274
+2016-12-10 03:52:35.560356 PST | --------------------------  ------------
+saving model...
+done.
+2016-12-10 03:52:35.569238 PST | [16-12-10/actor_critic-0] itr #1 | Obtaining samples...
+2016-12-10 03:52:35.569383 PST | [16-12-10/actor_critic-0] itr #1 | Obtaining samples for iteration 1...
+loading in encoder weights of sentences:  [15997 30249 15048 18380 36559 16854 11874 10939 19381 34292  8836 17580
+ 19526   898 12730 36611  5868  6905 11099 20306 21323  3637 21507 20728
+ 22998 15881  7115 39397 22838  3074  2117 11647]
+2016-12-10 03:52:43.297784 PST | [16-12-10/actor_critic-0] itr #1 | Processing samples...
+2016-12-10 03:52:43.303296 PST | [16-12-10/actor_critic-0] itr #1 | Logging diagnostics...
+2016-12-10 03:52:43.303399 PST | [16-12-10/actor_critic-0] itr #1 | Optimizing policy...
+loading in encoder weights of sentences:  [20339 10268 19235 38477  5598 20108  2244   178 27295 38854 13526 17597
+ 19000  6874 21781 31219 38628  8677 39060 29246 20382 36366 14099  5688
+ 14387 24211 11910 10314  5590 32742 37362 21889]
+2016-12-10 03:52:44.026054 PST | [16-12-10/actor_critic-0] itr #1 | fitting baseline...
+2016-12-10 03:52:48.104815 PST | [16-12-10/actor_critic-0] itr #1 | fitted
+2016-12-10 03:52:48.105382 PST | [16-12-10/actor_critic-0] itr #1 | optimizing policy
+2016-12-10 03:52:48.842555 PST | [16-12-10/actor_critic-0] itr #1 | Saving snapshot...
+2016-12-10 03:52:48.842685 PST | [16-12-10/actor_critic-0] itr #1 | Saved
+2016-12-10 03:52:48.843862 PST | --------------------------  ------------
+2016-12-10 03:52:48.843917 PST | PolicyExecTime               7.70869
+2016-12-10 03:52:48.843962 PST | EnvExecTime                  0.0130041
+2016-12-10 03:52:48.844004 PST | ProcessExecTime              0.00616932
+2016-12-10 03:52:48.844045 PST | Iteration                    1
+2016-12-10 03:52:48.844086 PST | AverageDiscountedReturn      0.225938
+2016-12-10 03:52:48.844127 PST | AverageDiscountedEnvReturn   0.0278905
+2016-12-10 03:52:48.844167 PST | AverageReturn                0.269428
+2016-12-10 03:52:48.844207 PST | AverageEnvReturn             0.0380859
+2016-12-10 03:52:48.844248 PST | ExplainedVariance           -0.288782
+2016-12-10 03:52:48.844306 PST | NumTrajs                    32
+2016-12-10 03:52:48.844348 PST | Entropy                      3.94875
+2016-12-10 03:52:48.844399 PST | Perplexity                  51.8705
+2016-12-10 03:52:48.844440 PST | StdReturn                    0.551879
+2016-12-10 03:52:48.844480 PST | MaxReturn                    1.13626
+2016-12-10 03:52:48.844521 PST | MinReturn                   -1.03995
+2016-12-10 03:52:48.844561 PST | StdEnvReturn                 0.129257
+2016-12-10 03:52:48.844601 PST | MaxEnvReturn                 0.75
+2016-12-10 03:52:48.844641 PST | MinEnvReturn                 0
+2016-12-10 03:52:48.844682 PST | LossBefore                  -0.000648277
+2016-12-10 03:52:48.844723 PST | LossAfter                   -0.0051832
+2016-12-10 03:52:48.844762 PST | MeanKL                       4.23034e-05
+2016-12-10 03:52:48.844803 PST | MaxKL                        0.000165182
+2016-12-10 03:52:48.844843 PST | Time                        31.5984
+2016-12-10 03:52:48.844903 PST | ItrTime                     13.2735
+2016-12-10 03:52:48.844945 PST | --------------------------  ------------
+saving model...
+done.
+2016-12-10 03:52:48.852935 PST | [16-12-10/actor_critic-0] itr #2 | Obtaining samples...
+2016-12-10 03:52:48.853098 PST | [16-12-10/actor_critic-0] itr #2 | Obtaining samples for iteration 2...
+loading in encoder weights of sentences:  [16903 37137 18869  9350  2071 40748 18910  9621 24266 22266 34840 28599
+ 26150 37709  4750 40294  7682 12363    64 34511 39460 28838  2967  8274
+  2749 17480 39757 15542  2257 33354 41626 28239]
+2016-12-10 03:52:57.347084 PST | [16-12-10/actor_critic-0] itr #2 | Processing samples...
+2016-12-10 03:52:57.352625 PST | [16-12-10/actor_critic-0] itr #2 | Logging diagnostics...
+2016-12-10 03:52:57.352721 PST | [16-12-10/actor_critic-0] itr #2 | Optimizing policy...
+loading in encoder weights of sentences:  [10372  9006   706 24415 37865 29458 28083 20292 33967  8206  5484  3788
+  7918 37717 30112  8865 30379  3218 41819 35722 17554 11581 24352  9306
+ 41698 12118 38541 28084 10529 18668 20158 29291]
+2016-12-10 03:52:58.106083 PST | [16-12-10/actor_critic-0] itr #2 | fitting baseline...
+2016-12-10 03:53:04.141234 PST | [16-12-10/actor_critic-0] itr #2 | fitted
+2016-12-10 03:53:04.141768 PST | [16-12-10/actor_critic-0] itr #2 | optimizing policy
+2016-12-10 03:53:04.741051 PST | [16-12-10/actor_critic-0] itr #2 | Saving snapshot...
+2016-12-10 03:53:04.741164 PST | [16-12-10/actor_critic-0] itr #2 | Saved
+2016-12-10 03:53:04.742390 PST | --------------------------  ------------
+2016-12-10 03:53:04.742446 PST | PolicyExecTime               8.47424
+2016-12-10 03:53:04.742492 PST | EnvExecTime                  0.0129521
+2016-12-10 03:53:04.742535 PST | ProcessExecTime              0.0062418
+2016-12-10 03:53:04.742578 PST | Iteration                    2
+2016-12-10 03:53:04.742620 PST | AverageDiscountedReturn     -0.0189193
+2016-12-10 03:53:04.742662 PST | AverageDiscountedEnvReturn   0.0071514
+2016-12-10 03:53:04.742704 PST | AverageReturn               -0.0193609
+2016-12-10 03:53:04.742745 PST | AverageEnvReturn             0.00976562
+2016-12-10 03:53:04.742787 PST | ExplainedVariance           -0.0663052
+2016-12-10 03:53:04.742829 PST | NumTrajs                    32
+2016-12-10 03:53:04.742871 PST | Entropy                      3.94883
+2016-12-10 03:53:04.742912 PST | Perplexity                  51.8747
+2016-12-10 03:53:04.742953 PST | StdReturn                    0.628021
+2016-12-10 03:53:04.742995 PST | MaxReturn                    1.43132
+2016-12-10 03:53:04.743037 PST | MinReturn                   -1.8161
+2016-12-10 03:53:04.743078 PST | StdEnvReturn                 0.0252399
+2016-12-10 03:53:04.743119 PST | MaxEnvReturn                 0.09375
+2016-12-10 03:53:04.743161 PST | MinEnvReturn                 0
+2016-12-10 03:53:04.743203 PST | LossBefore                  -0.00215238
+2016-12-10 03:53:04.743244 PST | LossAfter                   -0.00565707
+2016-12-10 03:53:04.743285 PST | MeanKL                       3.56499e-05
+2016-12-10 03:53:04.743327 PST | MaxKL                        0.000154904
+2016-12-10 03:53:04.743368 PST | Time                        47.4969
+2016-12-10 03:53:04.743409 PST | ItrTime                     15.8883
+2016-12-10 03:53:04.743451 PST | --------------------------  ------------
+saving model...
+done.
+2016-12-10 03:53:04.756764 PST | [16-12-10/actor_critic-0] itr #3 | Obtaining samples...
+2016-12-10 03:53:04.756947 PST | [16-12-10/actor_critic-0] itr #3 | Obtaining samples for iteration 3...
+loading in encoder weights of sentences:  [13120  3175 29808 24680 24530 36904 11389 36435 12873 13616  8317 26656
+ 13256 24138 26613 22034 15712 21298 20272 19097 30049 29863 31115 14710
+ 21648 20772  4898 11161 26358 14012  1102  1444]
+2016-12-10 03:53:14.051445 PST | [16-12-10/actor_critic-0] itr #3 | Processing samples...
+2016-12-10 03:53:14.052275 PST | [16-12-10/actor_critic-0] itr #3 | Logging diagnostics...
+2016-12-10 03:53:14.052349 PST | [16-12-10/actor_critic-0] itr #3 | Optimizing policy...
+loading in encoder weights of sentences:  [39618 18553 24688 35088 10360  7841 19134 35024 39945 15468 18507 37533
+ 16126  5242 31352   973 30905 18327  1139 25018 34517 21752 29471  1270
+ 37576 25944 29349 39949 32881 19126 10969 27690]
+2016-12-10 03:53:14.871764 PST | [16-12-10/actor_critic-0] itr #3 | fitting baseline...
+2016-12-10 03:53:16.515334 PST | [16-12-10/actor_critic-0] itr #3 | fitted
+2016-12-10 03:53:16.515871 PST | [16-12-10/actor_critic-0] itr #3 | optimizing policy
+2016-12-10 03:53:17.181958 PST | [16-12-10/actor_critic-0] itr #3 | Saving snapshot...
+2016-12-10 03:53:17.182078 PST | [16-12-10/actor_critic-0] itr #3 | Saved
+2016-12-10 03:53:17.183286 PST | --------------------------  ------------
+2016-12-10 03:53:17.183340 PST | PolicyExecTime               9.2743
+2016-12-10 03:53:17.183386 PST | EnvExecTime                  0.0130651
+2016-12-10 03:53:17.183429 PST | ProcessExecTime              0.0065577
+2016-12-10 03:53:17.183469 PST | Iteration                    3
+2016-12-10 03:53:17.183511 PST | AverageDiscountedReturn      0.0966154
+2016-12-10 03:53:17.183570 PST | AverageDiscountedEnvReturn   0.010012
+2016-12-10 03:53:17.183612 PST | AverageReturn                0.107721
+2016-12-10 03:53:17.183652 PST | AverageEnvReturn             0.0136719
+2016-12-10 03:53:17.183693 PST | ExplainedVariance           -0.107299
+2016-12-10 03:53:17.183733 PST | NumTrajs                    32
+2016-12-10 03:53:17.183773 PST | Entropy                      3.94902
+2016-12-10 03:53:17.183814 PST | Perplexity                  51.8843
+2016-12-10 03:53:17.183858 PST | StdReturn                    0.519239
+2016-12-10 03:53:17.183899 PST | MaxReturn                    1.01679
+2016-12-10 03:53:17.183939 PST | MinReturn                   -1.21774
+2016-12-10 03:53:17.183979 PST | StdEnvReturn                 0.0397882
+2016-12-10 03:53:17.184019 PST | MaxEnvReturn                 0.21875
+2016-12-10 03:53:17.184059 PST | MinEnvReturn                 0
+2016-12-10 03:53:17.184100 PST | LossBefore                  -0.00268599
+2016-12-10 03:53:17.184140 PST | LossAfter                   -0.00531198
+2016-12-10 03:53:17.184180 PST | MeanKL                       3.53909e-05
+2016-12-10 03:53:17.184220 PST | MaxKL                        0.000144317
+2016-12-10 03:53:17.184260 PST | Time                        59.9378
+2016-12-10 03:53:17.184300 PST | ItrTime                     12.4254
+2016-12-10 03:53:17.184340 PST | --------------------------  ------------
+saving model...
+done.
+2016-12-10 03:53:17.196399 PST | [16-12-10/actor_critic-0] itr #4 | Obtaining samples...
+2016-12-10 03:53:17.196519 PST | [16-12-10/actor_critic-0] itr #4 | Obtaining samples for iteration 4...
+loading in encoder weights of sentences:  [16860 33031 24462 33390 20230 20784  9474  4416  3176  3631 10702 29290
+ 29552 38971 13929  4323 35952 22733 21828  5040 30552 41419 33222 22835
+ 29931  7041 10497 22454  8586 36982 22192 36069]
+2016-12-10 03:53:27.382222 PST | [16-12-10/actor_critic-0] itr #4 | Processing samples...
+2016-12-10 03:53:27.387929 PST | [16-12-10/actor_critic-0] itr #4 | Logging diagnostics...
+2016-12-10 03:53:27.388006 PST | [16-12-10/actor_critic-0] itr #4 | Optimizing policy...
+loading in encoder weights of sentences:  [35694   810 41565 19372 29400 23356 41289 25906  9851 35365 39610 24252
+ 10995 39450   832 18662 22379 29299  5277 30972 34705 22300 30925  5549
+  2573 42022  8507 10931 16702  9268 15942 31151]
+2016-12-10 03:53:28.199043 PST | [16-12-10/actor_critic-0] itr #4 | fitting baseline...
+2016-12-10 03:53:29.273684 PST | [16-12-10/actor_critic-0] itr #4 | fitted
+2016-12-10 03:53:29.274205 PST | [16-12-10/actor_critic-0] itr #4 | optimizing policy
+2016-12-10 03:53:29.868494 PST | [16-12-10/actor_critic-0] itr #4 | Saving snapshot...
+2016-12-10 03:53:29.868609 PST | [16-12-10/actor_critic-0] itr #4 | Saved
+2016-12-10 03:53:29.869828 PST | --------------------------  ------------
+2016-12-10 03:53:29.869889 PST | PolicyExecTime              10.1651
+2016-12-10 03:53:29.869935 PST | EnvExecTime                  0.0134287
+2016-12-10 03:53:29.869980 PST | ProcessExecTime              0.00667238
+2016-12-10 03:53:29.870023 PST | Iteration                    4
+2016-12-10 03:53:29.870065 PST | AverageDiscountedReturn      0.0863645
+2016-12-10 03:53:29.870108 PST | AverageDiscountedEnvReturn   0.00429084
+2016-12-10 03:53:29.870149 PST | AverageReturn                0.0933345
+2016-12-10 03:53:29.870192 PST | AverageEnvReturn             0.00585938
+2016-12-10 03:53:29.870233 PST | ExplainedVariance           -0.0788314
+2016-12-10 03:53:29.870275 PST | NumTrajs                    32
+2016-12-10 03:53:29.870317 PST | Entropy                      3.94887
+2016-12-10 03:53:29.870359 PST | Perplexity                  51.8768
+2016-12-10 03:53:29.870401 PST | StdReturn                    0.502114
+2016-12-10 03:53:29.870443 PST | MaxReturn                    1.34994
+2016-12-10 03:53:29.870485 PST | MinReturn                   -0.813164
+2016-12-10 03:53:29.870527 PST | StdEnvReturn                 0.0121973
+2016-12-10 03:53:29.870569 PST | MaxEnvReturn                 0.03125
+2016-12-10 03:53:29.870611 PST | MinEnvReturn                 0
+2016-12-10 03:53:29.870653 PST | LossBefore                  -0.00411028
+2016-12-10 03:53:29.870694 PST | LossAfter                   -0.00674169
+2016-12-10 03:53:29.870736 PST | MeanKL                       4.41636e-05
+2016-12-10 03:53:29.870778 PST | MaxKL                        0.000105259
+2016-12-10 03:53:29.870820 PST | Time                        72.6243
+2016-12-10 03:53:29.870862 PST | ItrTime                     12.6723
+2016-12-10 03:53:29.870927 PST | --------------------------  ------------
+saving model...
+done.
+2016-12-10 03:53:29.884023 PST | [16-12-10/actor_critic-0] itr #5 | Obtaining samples...
+2016-12-10 03:53:29.884184 PST | [16-12-10/actor_critic-0] itr #5 | Obtaining samples for iteration 5...
+loading in encoder weights of sentences:  [  355 19184 15722 34430 13214  3324 34686 41960 10855 33850 38942 31936
+ 15139 24527  8528 13014 41510  1073 30717   887 15168 28132 26761 21742
+ 14462 23481 28504 11589  1686 35316 22856  2678]
+2016-12-10 03:53:40.792683 PST | [16-12-10/actor_critic-0] itr #5 | Processing samples...
+2016-12-10 03:53:40.793950 PST | [16-12-10/actor_critic-0] itr #5 | Logging diagnostics...
+2016-12-10 03:53:40.794034 PST | [16-12-10/actor_critic-0] itr #5 | Optimizing policy...
+loading in encoder weights of sentences:  [14292 12136 41957 13622  7263  6707 36179 27148  6654 39073 31285 13323
+  7231  9942 41301 13358 27283 31153 38666   638 24396 19620  4666  1505
+ 38509 40395 14135 36432 13868 19300 34424 20419]
+2016-12-10 03:53:41.623218 PST | [16-12-10/actor_critic-0] itr #5 | fitting baseline...
+2016-12-10 03:53:43.099658 PST | [16-12-10/actor_critic-0] itr #5 | fitted
+2016-12-10 03:53:43.100226 PST | [16-12-10/actor_critic-0] itr #5 | optimizing policy
+2016-12-10 03:53:43.726465 PST | [16-12-10/actor_critic-0] itr #5 | Saving snapshot...
+2016-12-10 03:53:43.726600 PST | [16-12-10/actor_critic-0] itr #5 | Saved
+2016-12-10 03:53:43.727815 PST | --------------------------  ------------
+2016-12-10 03:53:43.727872 PST | PolicyExecTime              10.8864
+2016-12-10 03:53:43.727919 PST | EnvExecTime                  0.013489
+2016-12-10 03:53:43.727963 PST | ProcessExecTime              0.00792742
+2016-12-10 03:53:43.728006 PST | Iteration                    5
+2016-12-10 03:53:43.728049 PST | AverageDiscountedReturn     -0.0441212
+2016-12-10 03:53:43.728091 PST | AverageDiscountedEnvReturn   0.00786654
+2016-12-10 03:53:43.728133 PST | AverageReturn               -0.0430768
+2016-12-10 03:53:43.728175 PST | AverageEnvReturn             0.0107422
+2016-12-10 03:53:43.728217 PST | ExplainedVariance           -0.0504034
+2016-12-10 03:53:43.728259 PST | NumTrajs                    32
+2016-12-10 03:53:43.728301 PST | Entropy                      3.94843
+2016-12-10 03:53:43.728343 PST | Perplexity                  51.8536
+2016-12-10 03:53:43.728385 PST | StdReturn                    0.490035
+2016-12-10 03:53:43.728427 PST | MaxReturn                    1.08074
+2016-12-10 03:53:43.728469 PST | MinReturn                   -1.20321
+2016-12-10 03:53:43.728511 PST | StdEnvReturn                 0.028821
+2016-12-10 03:53:43.728553 PST | MaxEnvReturn                 0.15625
+2016-12-10 03:53:43.728594 PST | MinEnvReturn                 0
+2016-12-10 03:53:43.728636 PST | LossBefore                  -0.00824426
+2016-12-10 03:53:43.728678 PST | LossAfter                   -0.0113151
+2016-12-10 03:53:43.728720 PST | MeanKL                       5.51562e-05
+2016-12-10 03:53:43.728762 PST | MaxKL                        0.000138033
+2016-12-10 03:53:43.728804 PST | Time                        86.4823
+2016-12-10 03:53:43.728846 PST | ItrTime                     13.8427
+2016-12-10 03:53:43.728888 PST | --------------------------  ------------
+saving model...
+done.
+2016-12-10 03:53:43.737598 PST | [16-12-10/actor_critic-0] itr #6 | Obtaining samples...
+2016-12-10 03:53:43.737727 PST | [16-12-10/actor_critic-0] itr #6 | Obtaining samples for iteration 6...
+loading in encoder weights of sentences:  [10228 19351 28483 41573 27115 13517 12621  7153 34271 22709 12596  4630
+ 38730 16716  4850 30157 14445  8835 34425 14704 21842 29587 12490 31031
+  2181 27717 36280 25969  4139 38673 32473 39389]
+2016-12-10 03:53:55.191657 PST | [16-12-10/actor_critic-0] itr #6 | Processing samples...
+2016-12-10 03:53:55.192515 PST | [16-12-10/actor_critic-0] itr #6 | Logging diagnostics...
+2016-12-10 03:53:55.192585 PST | [16-12-10/actor_critic-0] itr #6 | Optimizing policy...
+loading in encoder weights of sentences:  [10789  6472  4653 34995 28459  3019 22734 11405 16283 40444  8924 22215
+ 33686 37260 19023 20912 30223 10827 13418 32088 20861 29065 38042 32937
+ 37207 22967 14172 23319 23895  7909 22285 40897]
+2016-12-10 03:53:56.014727 PST | [16-12-10/actor_critic-0] itr #6 | fitting baseline...
+2016-12-10 03:53:56.724122 PST | [16-12-10/actor_critic-0] itr #6 | fitted
+2016-12-10 03:53:56.724761 PST | [16-12-10/actor_critic-0] itr #6 | optimizing policy
+2016-12-10 03:53:57.348179 PST | [16-12-10/actor_critic-0] itr #6 | Saving snapshot...
+2016-12-10 03:53:57.348310 PST | [16-12-10/actor_critic-0] itr #6 | Saved
+2016-12-10 03:53:57.349522 PST | --------------------------  -------------
+2016-12-10 03:53:57.349579 PST | PolicyExecTime               11.4339
+2016-12-10 03:53:57.349627 PST | EnvExecTime                   0.0130816
+2016-12-10 03:53:57.349670 PST | ProcessExecTime               0.00645947
+2016-12-10 03:53:57.349714 PST | Iteration                     6
+2016-12-10 03:53:57.349756 PST | AverageDiscountedReturn       0.0166291
+2016-12-10 03:53:57.349813 PST | AverageDiscountedEnvReturn    0.0128725
+2016-12-10 03:53:57.349857 PST | AverageReturn                 0.0114648
+2016-12-10 03:53:57.349908 PST | AverageEnvReturn              0.0175781
+2016-12-10 03:53:57.349949 PST | ExplainedVariance             0.0503528
+2016-12-10 03:53:57.349990 PST | NumTrajs                     32
+2016-12-10 03:53:57.350031 PST | Entropy                       3.94807
+2016-12-10 03:53:57.350071 PST | Perplexity                   51.8353
+2016-12-10 03:53:57.350112 PST | StdReturn                     0.328768
+2016-12-10 03:53:57.350152 PST | MaxReturn                     0.556579
+2016-12-10 03:53:57.350193 PST | MinReturn                    -0.738858
+2016-12-10 03:53:57.350233 PST | StdEnvReturn                  0.0412937
+2016-12-10 03:53:57.350273 PST | MaxEnvReturn                  0.21875
+2016-12-10 03:53:57.350314 PST | MinEnvReturn                  0
+2016-12-10 03:53:57.350354 PST | LossBefore                   -0.00910316
+2016-12-10 03:53:57.350394 PST | LossAfter                    -0.0117535
+2016-12-10 03:53:57.350434 PST | MeanKL                        6.9366e-05
+2016-12-10 03:53:57.350475 PST | MaxKL                         0.000107335
+2016-12-10 03:53:57.350515 PST | Time                        100.104
+2016-12-10 03:53:57.350555 PST | ItrTime                      13.6108
+2016-12-10 03:53:57.350595 PST | --------------------------  -------------
+saving model...
+done.
+2016-12-10 03:53:57.358466 PST | [16-12-10/actor_critic-0] itr #7 | Obtaining samples...
+2016-12-10 03:53:57.358589 PST | [16-12-10/actor_critic-0] itr #7 | Obtaining samples for iteration 7...
+loading in encoder weights of sentences:  [20351 19619 40633 28116 14716 11268 21763  2839 27047 11661 37850 26816
+ 24568 34757 12776 19423 27045 40333 38147 25012  3679 20875  5022 11277
+ 17764 33471 17276 41760 36010 23032 13663 35949]
+2016-12-10 03:54:09.399525 PST | [16-12-10/actor_critic-0] itr #7 | Processing samples...
+2016-12-10 03:54:09.401170 PST | [16-12-10/actor_critic-0] itr #7 | Logging diagnostics...
+2016-12-10 03:54:09.401284 PST | [16-12-10/actor_critic-0] itr #7 | Optimizing policy...
+loading in encoder weights of sentences:  [29423  2118 19630 25244 40817 12421  3429 11468 34550 37214 30438 13524
+ 37855 38751 40468  6171 41222 19304 31913   951 17664 17917 22932 24236
+ 30767 40498 29659 25814 37188 32951 35124 23834]
+2016-12-10 03:54:10.295355 PST | [16-12-10/actor_critic-0] itr #7 | fitting baseline...
+2016-12-10 03:54:10.655924 PST | [16-12-10/actor_critic-0] itr #7 | fitted
+2016-12-10 03:54:10.656486 PST | [16-12-10/actor_critic-0] itr #7 | optimizing policy
+2016-12-10 03:54:11.260762 PST | [16-12-10/actor_critic-0] itr #7 | Saving snapshot...
+2016-12-10 03:54:11.260876 PST | [16-12-10/actor_critic-0] itr #7 | Saved
+2016-12-10 03:54:11.262075 PST | --------------------------  -------------
+2016-12-10 03:54:11.262130 PST | PolicyExecTime               12.0207
+2016-12-10 03:54:11.262177 PST | EnvExecTime                   0.0131502
+2016-12-10 03:54:11.262220 PST | ProcessExecTime               0.00653672
+2016-12-10 03:54:11.262262 PST | Iteration                     7
+2016-12-10 03:54:11.262324 PST | AverageDiscountedReturn       0.0564478
+2016-12-10 03:54:11.262368 PST | AverageDiscountedEnvReturn    0.0278905
+2016-12-10 03:54:11.262409 PST | AverageReturn                 0.0525917
+2016-12-10 03:54:11.262451 PST | AverageEnvReturn              0.0380859
+2016-12-10 03:54:11.262493 PST | ExplainedVariance             0.00258329
+2016-12-10 03:54:11.262534 PST | NumTrajs                     32
+2016-12-10 03:54:11.262576 PST | Entropy                       3.94745
+2016-12-10 03:54:11.262617 PST | Perplexity                   51.8029
+2016-12-10 03:54:11.262659 PST | StdReturn                     0.456235
+2016-12-10 03:54:11.262700 PST | MaxReturn                     1.00325
+2016-12-10 03:54:11.262741 PST | MinReturn                    -0.661768
+2016-12-10 03:54:11.262783 PST | StdEnvReturn                  0.128784
+2016-12-10 03:54:11.262824 PST | MaxEnvReturn                  0.6875
+2016-12-10 03:54:11.262866 PST | MinEnvReturn                  0
+2016-12-10 03:54:11.262907 PST | LossBefore                   -0.00706312
+2016-12-10 03:54:11.262948 PST | LossAfter                    -0.00965797
+2016-12-10 03:54:11.262990 PST | MeanKL                        7.69973e-05
+2016-12-10 03:54:11.263031 PST | MaxKL                         9.79229e-05
+2016-12-10 03:54:11.263072 PST | Time                        114.017
+2016-12-10 03:54:11.263114 PST | ItrTime                      13.9025
+2016-12-10 03:54:11.263163 PST | --------------------------  -------------
+saving model...
+done.
+2016-12-10 03:54:11.276777 PST | [16-12-10/actor_critic-0] itr #8 | Obtaining samples...
+2016-12-10 03:54:11.276933 PST | [16-12-10/actor_critic-0] itr #8 | Obtaining samples for iteration 8...
+loading in encoder weights of sentences:  [33618 10273 12830  1824 31567 34873 13198 15313 35970 39356 34158 10567
+ 39632  2448 40008 17757 35438 35230 33671 38152 21257 10030 31255 38548
+ 40939  8146  2891 22389 24070  3149 12987 29920]
+2016-12-10 03:54:24.130857 PST | [16-12-10/actor_critic-0] itr #8 | Processing samples...
+2016-12-10 03:54:24.132452 PST | [16-12-10/actor_critic-0] itr #8 | Logging diagnostics...
+2016-12-10 03:54:24.132538 PST | [16-12-10/actor_critic-0] itr #8 | Optimizing policy...
+loading in encoder weights of sentences:  [40218 38745  6261 18329 27390  2754 37986 28501 26114  7988 16848 28237
+ 10058 12349  5124 27988 34311  2771  2324 19170 11614 10856 19936 32320
+  8400 30971 25518 34882 37963  8327 10596 29641]
+2016-12-10 03:54:25.012205 PST | [16-12-10/actor_critic-0] itr #8 | fitting baseline...
+2016-12-10 03:54:25.852267 PST | [16-12-10/actor_critic-0] itr #8 | fitted
+2016-12-10 03:54:25.852831 PST | [16-12-10/actor_critic-0] itr #8 | optimizing policy
+2016-12-10 03:54:26.540304 PST | [16-12-10/actor_critic-0] itr #8 | Saving snapshot...
+2016-12-10 03:54:26.540437 PST | [16-12-10/actor_critic-0] itr #8 | Saved
+2016-12-10 03:54:26.541654 PST | --------------------------  -------------
+2016-12-10 03:54:26.541711 PST | PolicyExecTime               12.8337
+2016-12-10 03:54:26.541757 PST | EnvExecTime                   0.0132492
+2016-12-10 03:54:26.541801 PST | ProcessExecTime               0.00648236
+2016-12-10 03:54:26.541844 PST | Iteration                     8
+2016-12-10 03:54:26.541886 PST | AverageDiscountedReturn      -0.0901237
+2016-12-10 03:54:26.541929 PST | AverageDiscountedEnvReturn    0.00643626
+2016-12-10 03:54:26.541970 PST | AverageReturn                -0.110087
+2016-12-10 03:54:26.542012 PST | AverageEnvReturn              0.00878906
+2016-12-10 03:54:26.542064 PST | ExplainedVariance            -0.014944
+2016-12-10 03:54:26.542105 PST | NumTrajs                     32
+2016-12-10 03:54:26.542146 PST | Entropy                       3.9465
+2016-12-10 03:54:26.542186 PST | Perplexity                   51.7537
+2016-12-10 03:54:26.542227 PST | StdReturn                     0.34176
+2016-12-10 03:54:26.542278 PST | MaxReturn                     0.697579
+2016-12-10 03:54:26.542321 PST | MinReturn                    -0.924785
+2016-12-10 03:54:26.542362 PST | StdEnvReturn                  0.0284212
+2016-12-10 03:54:26.542426 PST | MaxEnvReturn                  0.15625
+2016-12-10 03:54:26.542470 PST | MinEnvReturn                  0
+2016-12-10 03:54:26.542512 PST | LossBefore                   -0.0096647
+2016-12-10 03:54:26.542563 PST | LossAfter                    -0.0124726
+2016-12-10 03:54:26.542604 PST | MeanKL                        9.32567e-05
+2016-12-10 03:54:26.542644 PST | MaxKL                         0.000117259
+2016-12-10 03:54:26.542684 PST | Time                        129.296
+2016-12-10 03:54:26.542724 PST | ItrTime                      15.2638
+2016-12-10 03:54:26.542765 PST | --------------------------  -------------
+saving model...
+done.
+2016-12-10 03:54:26.552602 PST | [16-12-10/actor_critic-0] itr #9 | Obtaining samples...
+2016-12-10 03:54:26.552756 PST | [16-12-10/actor_critic-0] itr #9 | Obtaining samples for iteration 9...
+loading in encoder weights of sentences:  [29756 35283 27996 13009 34389 10329 24166 29711 39960 34400  6371  1620
+  2105 37218  3557 41784  2768 33563   533 26406 10817  8545 33527  1857
+ 31208 14853 31197  2398 32650 19257 16601 22712]
+2016-12-10 03:54:40.252477 PST | [16-12-10/actor_critic-0] itr #9 | Processing samples...
+2016-12-10 03:54:40.253850 PST | [16-12-10/actor_critic-0] itr #9 | Logging diagnostics...
+2016-12-10 03:54:40.253926 PST | [16-12-10/actor_critic-0] itr #9 | Optimizing policy...
+loading in encoder weights of sentences:  [26612 27641 37275  7323 39099 32715 15788 21925 32927 36397 24434 33183
+  5935  8638 19647 10151 41112  1474 14307 18258 19207  8800 28373 24429
+ 31743 32668 34943 34120 13031 39636  4100 32267]
+2016-12-10 03:54:41.179192 PST | [16-12-10/actor_critic-0] itr #9 | fitting baseline...
+2016-12-10 03:54:41.472917 PST | [16-12-10/actor_critic-0] itr #9 | fitted
+2016-12-10 03:54:41.473452 PST | [16-12-10/actor_critic-0] itr #9 | optimizing policy
+2016-12-10 03:54:42.125524 PST | [16-12-10/actor_critic-0] itr #9 | Saving snapshot...
+2016-12-10 03:54:42.125638 PST | [16-12-10/actor_critic-0] itr #9 | Saved
+2016-12-10 03:54:42.126833 PST | --------------------------  -------------
+2016-12-10 03:54:42.126889 PST | PolicyExecTime               13.6795
+2016-12-10 03:54:42.126935 PST | EnvExecTime                   0.0132515
+2016-12-10 03:54:42.126979 PST | ProcessExecTime               0.00642157
+2016-12-10 03:54:42.127022 PST | Iteration                     9
+2016-12-10 03:54:42.127064 PST | AverageDiscountedReturn      -0.044932
+2016-12-10 03:54:42.127121 PST | AverageDiscountedEnvReturn    0.00286056
+2016-12-10 03:54:42.127165 PST | AverageReturn                -0.0531796
+2016-12-10 03:54:42.127206 PST | AverageEnvReturn              0.00390625
+2016-12-10 03:54:42.127248 PST | ExplainedVariance            -0.00161371
+2016-12-10 03:54:42.127290 PST | NumTrajs                     32
+2016-12-10 03:54:42.127332 PST | Entropy                       3.94509
+2016-12-10 03:54:42.127383 PST | Perplexity                   51.681
+2016-12-10 03:54:42.127423 PST | StdReturn                     0.295343
+2016-12-10 03:54:42.127464 PST | MaxReturn                     0.643295
+2016-12-10 03:54:42.127504 PST | MinReturn                    -0.601147
+2016-12-10 03:54:42.127544 PST | StdEnvReturn                  0.010335
+2016-12-10 03:54:42.127584 PST | MaxEnvReturn                  0.03125
+2016-12-10 03:54:42.127625 PST | MinEnvReturn                  0
+2016-12-10 03:54:42.127665 PST | LossBefore                   -0.0132586
+2016-12-10 03:54:42.127705 PST | LossAfter                    -0.0163416
+2016-12-10 03:54:42.127745 PST | MeanKL                        0.000112637
+2016-12-10 03:54:42.127785 PST | MaxKL                         0.000143112
+2016-12-10 03:54:42.127825 PST | Time                        144.881
+2016-12-10 03:54:42.127865 PST | ItrTime                      15.5731
+2016-12-10 03:54:42.127906 PST | --------------------------  -------------
+saving model...
+done.
+2016-12-10 03:54:42.141894 PST | [16-12-10/actor_critic-0] itr #10 | Obtaining samples...
+2016-12-10 03:54:42.142018 PST | [16-12-10/actor_critic-0] itr #10 | Obtaining samples for iteration 10...
+loading in encoder weights of sentences:  [20740 31424 10140 11879 22973  9536  4280 10354 18567 22180 15224 28081
+ 36814 27577 29091  8772 32921 24413  3453 22556 17607 23932   401 18423
+ 22236 29043 18821 32195 36046  7071 14824  6334]
+2016-12-10 03:54:56.592427 PST | [16-12-10/actor_critic-0] itr #10 | Processing samples...
+2016-12-10 03:54:56.598170 PST | [16-12-10/actor_critic-0] itr #10 | Logging diagnostics...
+2016-12-10 03:54:56.598277 PST | [16-12-10/actor_critic-0] itr #10 | Optimizing policy...
+loading in encoder weights of sentences:  [29107 11399  7762  2732 14543 34035 41131  6035 28999 40227 21074  8005
+ 22314   715 30124 19911 19459 14090 24756 12615 11785 36986 34020 23884
+ 20508 28021 21482 39014 15259 39645 30596 31707]
+2016-12-10 03:54:57.523251 PST | [16-12-10/actor_critic-0] itr #10 | fitting baseline...
+2016-12-10 03:54:57.875802 PST | [16-12-10/actor_critic-0] itr #10 | fitted
+2016-12-10 03:54:57.876345 PST | [16-12-10/actor_critic-0] itr #10 | optimizing policy
+2016-12-10 03:54:58.487088 PST | [16-12-10/actor_critic-0] itr #10 | Saving snapshot...
+2016-12-10 03:54:58.487202 PST | [16-12-10/actor_critic-0] itr #10 | Saved
+2016-12-10 03:54:58.488409 PST | --------------------------  -------------
+2016-12-10 03:54:58.488465 PST | PolicyExecTime               14.4302
+2016-12-10 03:54:58.488511 PST | EnvExecTime                   0.0133369
+2016-12-10 03:54:58.488554 PST | ProcessExecTime               0.006356
+2016-12-10 03:54:58.488596 PST | Iteration                    10
+2016-12-10 03:54:58.488638 PST | AverageDiscountedReturn      -0.152798
+2016-12-10 03:54:58.488680 PST | AverageDiscountedEnvReturn    0.00429084
+2016-12-10 03:54:58.488722 PST | AverageReturn                -0.180177
+2016-12-10 03:54:58.488782 PST | AverageEnvReturn              0.00585938
+2016-12-10 03:54:58.488823 PST | ExplainedVariance             0.00138984
+2016-12-10 03:54:58.488863 PST | NumTrajs                     32
+2016-12-10 03:54:58.488904 PST | Entropy                       3.94364
+2016-12-10 03:54:58.488945 PST | Perplexity                   51.606
+2016-12-10 03:54:58.488985 PST | StdReturn                     0.325771
+2016-12-10 03:54:58.489026 PST | MaxReturn                     0.621318
+2016-12-10 03:54:58.489066 PST | MinReturn                    -0.919961
+2016-12-10 03:54:58.489106 PST | StdEnvReturn                  0.0121973
+2016-12-10 03:54:58.489146 PST | MaxEnvReturn                  0.03125
+2016-12-10 03:54:58.489186 PST | MinEnvReturn                  0
+2016-12-10 03:54:58.489227 PST | LossBefore                   -0.0218433
+2016-12-10 03:54:58.489267 PST | LossAfter                    -0.0257799
+2016-12-10 03:54:58.489308 PST | MeanKL                        0.000152964
+2016-12-10 03:54:58.489348 PST | MaxKL                         0.000202244
+2016-12-10 03:54:58.489388 PST | Time                        161.243
+2016-12-10 03:54:58.489428 PST | ItrTime                      16.3454
+2016-12-10 03:54:58.489487 PST | --------------------------  -------------
+saving model...
+done.
+2016-12-10 03:54:58.498998 PST | [16-12-10/actor_critic-0] itr #11 | Obtaining samples...
+2016-12-10 03:54:58.499161 PST | [16-12-10/actor_critic-0] itr #11 | Obtaining samples for iteration 11...
+loading in encoder weights of sentences:  [37167  9920 12852   928 10075 26492  3872 28925 12003 27125  1374  7659
+ 27898  1137 30618  9599  3113 39771 20137 27876 36941 32594 18616 18493
+ 39682 30515 14400 25990 28452 21797  3545 29914]
+2016-12-10 03:55:13.878350 PST | [16-12-10/actor_critic-0] itr #11 | Processing samples...
+2016-12-10 03:55:13.879771 PST | [16-12-10/actor_critic-0] itr #11 | Logging diagnostics...
+2016-12-10 03:55:13.879853 PST | [16-12-10/actor_critic-0] itr #11 | Optimizing policy...
+loading in encoder weights of sentences:  [13083 35567  2888  7419 33080 38526  3320 20398  5679 41356 34895 14450
+ 14717 10284  7563 29858 37072 33909  2225 30108 26266 16576 24913 38273
+ 17907 24567 30853 30367 13237 25678 35661  9373]
+2016-12-10 03:55:14.867308 PST | [16-12-10/actor_critic-0] itr #11 | fitting baseline...
+2016-12-10 03:55:15.759761 PST | [16-12-10/actor_critic-0] itr #11 | fitted
+2016-12-10 03:55:15.760351 PST | [16-12-10/actor_critic-0] itr #11 | optimizing policy
+2016-12-10 03:55:16.441831 PST | [16-12-10/actor_critic-0] itr #11 | Saving snapshot...
+2016-12-10 03:55:16.441963 PST | [16-12-10/actor_critic-0] itr #11 | Saved
+2016-12-10 03:55:16.443186 PST | --------------------------  -------------
+2016-12-10 03:55:16.443241 PST | PolicyExecTime               15.3587
+2016-12-10 03:55:16.443287 PST | EnvExecTime                   0.0134585
+2016-12-10 03:55:16.443329 PST | ProcessExecTime               0.00647712
+2016-12-10 03:55:16.443370 PST | Iteration                    11
+2016-12-10 03:55:16.443411 PST | AverageDiscountedReturn      -0.118452
+2016-12-10 03:55:16.443452 PST | AverageDiscountedEnvReturn    0.0150179
+2016-12-10 03:55:16.443492 PST | AverageReturn                -0.136888
+2016-12-10 03:55:16.443533 PST | AverageEnvReturn              0.0205078
+2016-12-10 03:55:16.443573 PST | ExplainedVariance             0.00148222
+2016-12-10 03:55:16.443614 PST | NumTrajs                     32
+2016-12-10 03:55:16.443654 PST | Entropy                       3.94142
+2016-12-10 03:55:16.443695 PST | Perplexity                   51.4914
+2016-12-10 03:55:16.443735 PST | StdReturn                     0.2922
+2016-12-10 03:55:16.443775 PST | MaxReturn                     0.579862
+2016-12-10 03:55:16.443815 PST | MinReturn                    -0.641181
+2016-12-10 03:55:16.443856 PST | StdEnvReturn                  0.0503948
+2016-12-10 03:55:16.443896 PST | MaxEnvReturn                  0.25
+2016-12-10 03:55:16.443936 PST | MinEnvReturn                  0
+2016-12-10 03:55:16.443977 PST | LossBefore                   -0.0225031
+2016-12-10 03:55:16.444017 PST | LossAfter                    -0.0267881
+2016-12-10 03:55:16.444058 PST | MeanKL                        0.000215849
+2016-12-10 03:55:16.444099 PST | MaxKL                         0.000263731
+2016-12-10 03:55:16.444139 PST | Time                        179.198
+2016-12-10 03:55:16.444179 PST | ItrTime                      17.9431
+2016-12-10 03:55:16.444220 PST | --------------------------  -------------
+saving model...
+done.
+2016-12-10 03:55:16.453700 PST | [16-12-10/actor_critic-0] itr #12 | Obtaining samples...
+2016-12-10 03:55:16.453837 PST | [16-12-10/actor_critic-0] itr #12 | Obtaining samples for iteration 12...
+loading in encoder weights of sentences:  [17286 25025 23260   718  8489 18126 25485 20935 31251 35690 39902 25640
+ 14294 39828 12677 25858 41517  3392 26855  7701 27307 31011 37662 28006
+  4431 41830 31131  5528  7932 15653 33290 23186]
+2016-12-10 03:55:32.770198 PST | [16-12-10/actor_critic-0] itr #12 | Processing samples...
+2016-12-10 03:55:32.775923 PST | [16-12-10/actor_critic-0] itr #12 | Logging diagnostics...
+2016-12-10 03:55:32.776008 PST | [16-12-10/actor_critic-0] itr #12 | Optimizing policy...
+loading in encoder weights of sentences:  [10398 23425 19856 39734 14298 22608 40734 39113  3277 33905 39718 24467
+ 26353  2942 41724  7373 25470 20063 37056 41153 21526 17622 30576 34214
+ 36664 24742 15815 35214   785 21661 38719 27017]
+2016-12-10 03:55:33.703556 PST | [16-12-10/actor_critic-0] itr #12 | fitting baseline...
+2016-12-10 03:55:33.882018 PST | [16-12-10/actor_critic-0] itr #12 | fitted
+2016-12-10 03:55:33.882601 PST | [16-12-10/actor_critic-0] itr #12 | optimizing policy
+2016-12-10 03:55:34.509849 PST | [16-12-10/actor_critic-0] itr #12 | Saving snapshot...
+2016-12-10 03:55:34.509984 PST | [16-12-10/actor_critic-0] itr #12 | Saved
+2016-12-10 03:55:34.511199 PST | --------------------------  -------------
+2016-12-10 03:55:34.511255 PST | PolicyExecTime               16.2957
+2016-12-10 03:55:34.511301 PST | EnvExecTime                   0.0134783
+2016-12-10 03:55:34.511345 PST | ProcessExecTime               0.00659251
+2016-12-10 03:55:34.511388 PST | Iteration                    12
+2016-12-10 03:55:34.512170 PST | AverageDiscountedReturn      -0.167809
+2016-12-10 03:55:34.512216 PST | AverageDiscountedEnvReturn    0.010012
+2016-12-10 03:55:34.512262 PST | AverageReturn                -0.203302
+2016-12-10 03:55:34.512304 PST | AverageEnvReturn              0.0136719
+2016-12-10 03:55:34.512345 PST | ExplainedVariance            -0.0113884
+2016-12-10 03:55:34.512386 PST | NumTrajs                     32
+2016-12-10 03:55:34.512426 PST | Entropy                       3.93842
+2016-12-10 03:55:34.512466 PST | Perplexity                   51.3375
+2016-12-10 03:55:34.512507 PST | StdReturn                     0.31209
+2016-12-10 03:55:34.512547 PST | MaxReturn                     0.399146
+2016-12-10 03:55:34.512587 PST | MinReturn                    -0.943374
+2016-12-10 03:55:34.512628 PST | StdEnvReturn                  0.044151
+2016-12-10 03:55:34.512668 PST | MaxEnvReturn                  0.25
+2016-12-10 03:55:34.512708 PST | MinEnvReturn                  0
+2016-12-10 03:55:34.512749 PST | LossBefore                   -0.0219719
+2016-12-10 03:55:34.512789 PST | LossAfter                    -0.0262131
+2016-12-10 03:55:34.512829 PST | MeanKL                        0.000288767
+2016-12-10 03:55:34.512869 PST | MaxKL                         0.000370035
+2016-12-10 03:55:34.512909 PST | Time                        197.266
+2016-12-10 03:55:34.512950 PST | ItrTime                      18.0564
+2016-12-10 03:55:34.512990 PST | --------------------------  -------------
+saving model...
+done.
+2016-12-10 03:55:34.526541 PST | [16-12-10/actor_critic-0] itr #13 | Obtaining samples...
+2016-12-10 03:55:34.526695 PST | [16-12-10/actor_critic-0] itr #13 | Obtaining samples for iteration 13...
+loading in encoder weights of sentences:  [18696   923 19631 28552 19765 36448 17702  3895  9843  2160 29627 34920
+ 24892 12354 24174  6927 29377 39813 35871 17748 17825  1371 34960   386
+  6916 36228 27723  8008  9279 32330 31252 28670]
+2016-12-10 03:55:51.148163 PST | [16-12-10/actor_critic-0] itr #13 | Processing samples...
+2016-12-10 03:55:51.149168 PST | [16-12-10/actor_critic-0] itr #13 | Logging diagnostics...
+2016-12-10 03:55:51.149281 PST | [16-12-10/actor_critic-0] itr #13 | Optimizing policy...
+loading in encoder weights of sentences:  [35902 11644 31342 30014  7366 35550 28035 13702 38976 16313 33066  2018
+  2029  3978 12926   803 24153 30793 17134 26306  7400  5734 38914 10626
+  6528 24218 33620 40372  3512 35072 24200 23239]
+2016-12-10 03:55:52.126891 PST | [16-12-10/actor_critic-0] itr #13 | fitting baseline...
+2016-12-10 03:55:52.535593 PST | [16-12-10/actor_critic-0] itr #13 | fitted
+2016-12-10 03:55:52.536145 PST | [16-12-10/actor_critic-0] itr #13 | optimizing policy
+2016-12-10 03:55:53.130089 PST | [16-12-10/actor_critic-0] itr #13 | Saving snapshot...
+2016-12-10 03:55:53.130214 PST | [16-12-10/actor_critic-0] itr #13 | Saved
+2016-12-10 03:55:53.131420 PST | --------------------------  -------------
+2016-12-10 03:55:53.131476 PST | PolicyExecTime               16.601
+2016-12-10 03:55:53.131522 PST | EnvExecTime                   0.0134773
+2016-12-10 03:55:53.131565 PST | ProcessExecTime               0.00645328
+2016-12-10 03:55:53.131607 PST | Iteration                    13
+2016-12-10 03:55:53.131649 PST | AverageDiscountedReturn      -0.151697
+2016-12-10 03:55:53.131691 PST | AverageDiscountedEnvReturn    0.0250299
+2016-12-10 03:55:53.131733 PST | AverageReturn                -0.171923
+2016-12-10 03:55:53.131774 PST | AverageEnvReturn              0.0341797
+2016-12-10 03:55:53.131816 PST | ExplainedVariance             0.00834578
+2016-12-10 03:55:53.131858 PST | NumTrajs                     32
+2016-12-10 03:55:53.131899 PST | Entropy                       3.93455
+2016-12-10 03:55:53.131941 PST | Perplexity                   51.1391
+2016-12-10 03:55:53.131983 PST | StdReturn                     0.232871
+2016-12-10 03:55:53.132024 PST | MaxReturn                     0.36304
+2016-12-10 03:55:53.132065 PST | MinReturn                    -0.659133
+2016-12-10 03:55:53.132107 PST | StdEnvReturn                  0.0932144
+2016-12-10 03:55:53.132157 PST | MaxEnvReturn                  0.46875
+2016-12-10 03:55:53.132199 PST | MinEnvReturn                  0
+2016-12-10 03:55:53.132253 PST | LossBefore                   -0.028972
+2016-12-10 03:55:53.132295 PST | LossAfter                    -0.0347674
+2016-12-10 03:55:53.132335 PST | MeanKL                        0.000424521
+2016-12-10 03:55:53.132376 PST | MaxKL                         0.00054911
+2016-12-10 03:55:53.132416 PST | Time                        215.886
+2016-12-10 03:55:53.132460 PST | ItrTime                      18.6038
+2016-12-10 03:55:53.132502 PST | --------------------------  -------------
+saving model...
+done.
+2016-12-10 03:55:53.144589 PST | [16-12-10/actor_critic-0] itr #14 | Obtaining samples...
+2016-12-10 03:55:53.144709 PST | [16-12-10/actor_critic-0] itr #14 | Obtaining samples for iteration 14...
+loading in encoder weights of sentences:  [27814 29339  2104 17563 27174 23597 17564 32076   719 30965 31358 14894
+ 41200 12054 12365 16321  2060 12990 15055 10757 37689 26885 31700 31242
+  2296 16791 40173 21817 31708   711 30155 23919]
+2016-12-10 03:56:11.866957 PST | [16-12-10/actor_critic-0] itr #14 | Processing samples...
+2016-12-10 03:56:11.869898 PST | [16-12-10/actor_critic-0] itr #14 | Logging diagnostics...
+2016-12-10 03:56:11.869989 PST | [16-12-10/actor_critic-0] itr #14 | Optimizing policy...
+loading in encoder weights of sentences:  [40154 14929 41846  4172 10884  4647 14683 31060 34138 21177 25889 29729
+ 14111   205 16784 41345 14484 40909  5306 39352 34919  3388 29588 40983
+ 13467  5137 36512  1800  2027  9659 29391 14402]
+2016-12-10 03:56:12.882173 PST | [16-12-10/actor_critic-0] itr #14 | fitting baseline...
+2016-12-10 03:56:13.241618 PST | [16-12-10/actor_critic-0] itr #14 | fitted
+2016-12-10 03:56:13.242139 PST | [16-12-10/actor_critic-0] itr #14 | optimizing policy
+2016-12-10 03:56:13.850194 PST | [16-12-10/actor_critic-0] itr #14 | Saving snapshot...
+2016-12-10 03:56:13.850316 PST | [16-12-10/actor_critic-0] itr #14 | Saved
+2016-12-10 03:56:13.851573 PST | --------------------------  -------------
+2016-12-10 03:56:13.851630 PST | PolicyExecTime               18.7
+2016-12-10 03:56:13.851686 PST | EnvExecTime                   0.0148747
+2016-12-10 03:56:13.851731 PST | ProcessExecTime               0.00686884
+2016-12-10 03:56:13.851774 PST | Iteration                    14
+2016-12-10 03:56:13.851817 PST | AverageDiscountedReturn      -0.111737
+2016-12-10 03:56:13.851865 PST | AverageDiscountedEnvReturn    0.0214542
+2016-12-10 03:56:13.851910 PST | AverageReturn                -0.137021
+2016-12-10 03:56:13.851952 PST | AverageEnvReturn              0.0292969
+2016-12-10 03:56:13.851994 PST | ExplainedVariance            -0.0027827
+2016-12-10 03:56:13.852042 PST | NumTrajs                     32
+2016-12-10 03:56:13.852085 PST | Entropy                       3.92845
+2016-12-10 03:56:13.852127 PST | Perplexity                   50.8281
+2016-12-10 03:56:13.852169 PST | StdReturn                     0.288894
+2016-12-10 03:56:13.852217 PST | MaxReturn                     0.547458
+2016-12-10 03:56:13.852261 PST | MinReturn                    -0.598853
+2016-12-10 03:56:13.852303 PST | StdEnvReturn                  0.121518
+2016-12-10 03:56:13.852344 PST | MaxEnvReturn                  0.6875
+2016-12-10 03:56:13.852386 PST | MinEnvReturn                  0
+2016-12-10 03:56:13.852436 PST | LossBefore                   -0.0348784
+2016-12-10 03:56:13.852477 PST | LossAfter                    -0.0419422
+2016-12-10 03:56:13.852519 PST | MeanKL                        0.000679472
+2016-12-10 03:56:13.852561 PST | MaxKL                         0.000891711
+2016-12-10 03:56:13.852626 PST | Time                        236.606
+2016-12-10 03:56:13.852669 PST | ItrTime                      20.7058
+2016-12-10 03:56:13.852712 PST | --------------------------  -------------
+saving model...
+done.
+2016-12-10 03:56:13.861854 PST | [16-12-10/actor_critic-0] itr #15 | Obtaining samples...
+2016-12-10 03:56:13.861975 PST | [16-12-10/actor_critic-0] itr #15 | Obtaining samples for iteration 15...
+loading in encoder weights of sentences:  [21537 36738 15046 34612 38900  9001 15325 23183  9419  4366 16011 11158
+ 36505 12381 33680 29360 12712  6879 36605  2335 23341 18239 30867 28571
+ 38381 10303 41352 34915 39263 38456  3499 39865]
+2016-12-10 03:56:31.647509 PST | [16-12-10/actor_critic-0] itr #15 | Processing samples...
+2016-12-10 03:56:31.649040 PST | [16-12-10/actor_critic-0] itr #15 | Logging diagnostics...
+2016-12-10 03:56:31.649116 PST | [16-12-10/actor_critic-0] itr #15 | Optimizing policy...
+loading in encoder weights of sentences:  [32329 19873 24578 34656 27559 39666  6139 34192 36145 23206 13635 30817
+ 41421 33661 22333 30892 16438 21690  7206 31166  7728 28088 26968   931
+ 19269  1608 10142 31032  3863  1403 10148  4501]
+2016-12-10 03:56:32.684782 PST | [16-12-10/actor_critic-0] itr #15 | fitting baseline...
+2016-12-10 03:56:33.104467 PST | [16-12-10/actor_critic-0] itr #15 | fitted
+2016-12-10 03:56:33.104983 PST | [16-12-10/actor_critic-0] itr #15 | optimizing policy
+2016-12-10 03:56:33.746753 PST | [16-12-10/actor_critic-0] itr #15 | Saving snapshot...
+2016-12-10 03:56:33.746879 PST | [16-12-10/actor_critic-0] itr #15 | Saved
+2016-12-10 03:56:33.748088 PST | --------------------------  ------------
+2016-12-10 03:56:33.748159 PST | PolicyExecTime               17.7651
+2016-12-10 03:56:33.748205 PST | EnvExecTime                   0.0131946
+2016-12-10 03:56:33.748248 PST | ProcessExecTime               0.00665331
+2016-12-10 03:56:33.748289 PST | Iteration                    15
+2016-12-10 03:56:33.748348 PST | AverageDiscountedReturn      -0.134114
+2016-12-10 03:56:33.748391 PST | AverageDiscountedEnvReturn    0.0035757
+2016-12-10 03:56:33.748432 PST | AverageReturn                -0.157224
+2016-12-10 03:56:33.748474 PST | AverageEnvReturn              0.00488281
+2016-12-10 03:56:33.748515 PST | ExplainedVariance             0.00137208
+2016-12-10 03:56:33.748555 PST | NumTrajs                     32
+2016-12-10 03:56:33.748595 PST | Entropy                       3.91949
+2016-12-10 03:56:33.748637 PST | Perplexity                   50.3748
+2016-12-10 03:56:33.748678 PST | StdReturn                     0.269802
+2016-12-10 03:56:33.748718 PST | MaxReturn                     0.32882
+2016-12-10 03:56:33.748758 PST | MinReturn                    -0.708013
+2016-12-10 03:56:33.748799 PST | StdEnvReturn                  0.0113466
+2016-12-10 03:56:33.748839 PST | MaxEnvReturn                  0.03125
+2016-12-10 03:56:33.748880 PST | MinEnvReturn                  0
+2016-12-10 03:56:33.748920 PST | LossBefore                   -0.0480112
+2016-12-10 03:56:33.748960 PST | LossAfter                    -0.0575328
+2016-12-10 03:56:33.749001 PST | MeanKL                        0.00111315
+2016-12-10 03:56:33.749041 PST | MaxKL                         0.00144334
+2016-12-10 03:56:33.749081 PST | Time                        256.503
+2016-12-10 03:56:33.749121 PST | ItrTime                      19.8851
+2016-12-10 03:56:33.749161 PST | --------------------------  ------------
+saving model...
+done.
+2016-12-10 03:56:33.757202 PST | [16-12-10/actor_critic-0] itr #16 | Obtaining samples...
+2016-12-10 03:56:33.757310 PST | [16-12-10/actor_critic-0] itr #16 | Obtaining samples for iteration 16...
+loading in encoder weights of sentences:  [36783 26499 36908 40873 15350   613  6989 32768 34038  4757 28403 29368
+ 17503   151  3853  1623 16170 34510  9447 24748 26501 15563 25205 36470
+ 16117  3812 28866  4510 40313 27284 33627  5819]
+2016-12-10 03:56:52.864052 PST | [16-12-10/actor_critic-0] itr #16 | Processing samples...
+2016-12-10 03:56:52.866941 PST | [16-12-10/actor_critic-0] itr #16 | Logging diagnostics...
+2016-12-10 03:56:52.867056 PST | [16-12-10/actor_critic-0] itr #16 | Optimizing policy...
+loading in encoder weights of sentences:  [17356  1508 31392 14749 36472 18152  3351  4591 19289 16356 41457 12350
+ 12332  9970 10317 39191 36735 14857 19749 21180 38710 39448 37228  9357
+ 18685  5884  4378 12611 14139 13204  9462 30312]
+2016-12-10 03:56:53.904249 PST | [16-12-10/actor_critic-0] itr #16 | fitting baseline...
+2016-12-10 03:56:54.185240 PST | [16-12-10/actor_critic-0] itr #16 | fitted
+2016-12-10 03:56:54.185815 PST | [16-12-10/actor_critic-0] itr #16 | optimizing policy
+2016-12-10 03:56:54.801613 PST | [16-12-10/actor_critic-0] itr #16 | Saving snapshot...
+2016-12-10 03:56:54.801748 PST | [16-12-10/actor_critic-0] itr #16 | Saved
+2016-12-10 03:56:54.802967 PST | --------------------------  ------------
+2016-12-10 03:56:54.803025 PST | PolicyExecTime               19.0662
+2016-12-10 03:56:54.803073 PST | EnvExecTime                   0.0333276
+2016-12-10 03:56:54.803117 PST | ProcessExecTime               0.0066731
+2016-12-10 03:56:54.803161 PST | Iteration                    16
+2016-12-10 03:56:54.803204 PST | AverageDiscountedReturn      -0.088423
+2016-12-10 03:56:54.803248 PST | AverageDiscountedEnvReturn    0.0185936
+2016-12-10 03:56:54.803291 PST | AverageReturn                -0.112481
+2016-12-10 03:56:54.803333 PST | AverageEnvReturn              0.0253906
+2016-12-10 03:56:54.803376 PST | ExplainedVariance            -0.00573542
+2016-12-10 03:56:54.803419 PST | NumTrajs                     32
+2016-12-10 03:56:54.803461 PST | Entropy                       3.90753
+2016-12-10 03:56:54.803503 PST | Perplexity                   49.7757
+2016-12-10 03:56:54.803546 PST | StdReturn                     0.237142
+2016-12-10 03:56:54.803588 PST | MaxReturn                     0.375895
+2016-12-10 03:56:54.803631 PST | MinReturn                    -0.802663
+2016-12-10 03:56:54.803674 PST | StdEnvReturn                  0.0794564
+2016-12-10 03:56:54.803716 PST | MaxEnvReturn                  0.34375
+2016-12-10 03:56:54.803760 PST | MinEnvReturn                  0
+2016-12-10 03:56:54.803803 PST | LossBefore                   -0.06579
+2016-12-10 03:56:54.803846 PST | LossAfter                    -0.0786809
+2016-12-10 03:56:54.803889 PST | MeanKL                        0.00188494
+2016-12-10 03:56:54.803945 PST | MaxKL                         0.00238634
+2016-12-10 03:56:54.803987 PST | Time                        277.557
+2016-12-10 03:56:54.804054 PST | ItrTime                      21.0446
+2016-12-10 03:56:54.804100 PST | --------------------------  ------------
+saving model...
+done.
+2016-12-10 03:56:54.817965 PST | [16-12-10/actor_critic-0] itr #17 | Obtaining samples...
+2016-12-10 03:56:54.818130 PST | [16-12-10/actor_critic-0] itr #17 | Obtaining samples for iteration 17...
+loading in encoder weights of sentences:  [25668 21921 39846 18084 11512 28090 37189  2193  8857 26756  6923 10728
+ 31154 36165 13306 20025 19841 11016 16536 22622 10247 40977 39943 41416
+  9909 27799 39231  1465 10846  1220 34530 14593]
+2016-12-10 03:57:14.553879 PST | [16-12-10/actor_critic-0] itr #17 | Processing samples...
+2016-12-10 03:57:14.554625 PST | [16-12-10/actor_critic-0] itr #17 | Logging diagnostics...
+2016-12-10 03:57:14.554692 PST | [16-12-10/actor_critic-0] itr #17 | Optimizing policy...
+loading in encoder weights of sentences:  [ 5208 39451 11226  6892 22962 19070 31849 21493  9953 16739 21937 15829
+  3015 37318  9073 24453 24173 16095 32487  4717 14428 35658 33630 31710
+ 39646 26500  5885  2995  1142 39444 38863 18381]
+2016-12-10 03:57:15.653978 PST | [16-12-10/actor_critic-0] itr #17 | fitting baseline...
+2016-12-10 03:57:15.775578 PST | [16-12-10/actor_critic-0] itr #17 | fitted
+2016-12-10 03:57:15.776122 PST | [16-12-10/actor_critic-0] itr #17 | optimizing policy
+2016-12-10 03:57:16.415738 PST | [16-12-10/actor_critic-0] itr #17 | Saving snapshot...
+2016-12-10 03:57:16.415886 PST | [16-12-10/actor_critic-0] itr #17 | Saved
+2016-12-10 03:57:16.417121 PST | --------------------------  ------------
+2016-12-10 03:57:16.417178 PST | PolicyExecTime               19.7094
+2016-12-10 03:57:16.417223 PST | EnvExecTime                   0.0193756
+2016-12-10 03:57:16.417267 PST | ProcessExecTime               0.0063889
+2016-12-10 03:57:16.417325 PST | Iteration                    17
+2016-12-10 03:57:16.417368 PST | AverageDiscountedReturn      -0.106552
+2016-12-10 03:57:16.417410 PST | AverageDiscountedEnvReturn    0.00572112
+2016-12-10 03:57:16.417453 PST | AverageReturn                -0.130213
+2016-12-10 03:57:16.417495 PST | AverageEnvReturn              0.0078125
+2016-12-10 03:57:16.417537 PST | ExplainedVariance             0.00176706
+2016-12-10 03:57:16.417597 PST | NumTrajs                     32
+2016-12-10 03:57:16.417641 PST | Entropy                       3.88711
+2016-12-10 03:57:16.417683 PST | Perplexity                   48.7697
+2016-12-10 03:57:16.417725 PST | StdReturn                     0.235308
+2016-12-10 03:57:16.417767 PST | MaxReturn                     0.364898
+2016-12-10 03:57:16.417809 PST | MinReturn                    -0.504742
+2016-12-10 03:57:16.417851 PST | StdEnvReturn                  0.0135316
+2016-12-10 03:57:16.417893 PST | MaxEnvReturn                  0.03125
+2016-12-10 03:57:16.417935 PST | MinEnvReturn                  0
+2016-12-10 03:57:16.417977 PST | LossBefore                   -0.0474697
+2016-12-10 03:57:16.418019 PST | LossAfter                    -0.057874
+2016-12-10 03:57:16.418061 PST | MeanKL                        0.00336109
+2016-12-10 03:57:16.418103 PST | MaxKL                         0.00500491
+2016-12-10 03:57:16.418144 PST | Time                        299.172
+2016-12-10 03:57:16.418186 PST | ItrTime                      21.598
+2016-12-10 03:57:16.418228 PST | --------------------------  ------------
+saving model...
+done.
+2016-12-10 03:57:16.430520 PST | [16-12-10/actor_critic-0] itr #18 | Obtaining samples...
+2016-12-10 03:57:16.430675 PST | [16-12-10/actor_critic-0] itr #18 | Obtaining samples for iteration 18...
+loading in encoder weights of sentences:  [34501 22799 17117 19009 10328 37397  9440  2436  2520 29575  7671  9146
+ 23811   555  7354  4158 13852 18885 41933 34199 38077 29170 40712 15681
+ 31661 16461 10168 27394  9519 23427  2322 15362]
+2016-12-10 03:57:36.808270 PST | [16-12-10/actor_critic-0] itr #18 | Processing samples...
+2016-12-10 03:57:36.809162 PST | [16-12-10/actor_critic-0] itr #18 | Logging diagnostics...
+2016-12-10 03:57:36.809238 PST | [16-12-10/actor_critic-0] itr #18 | Optimizing policy...
+loading in encoder weights of sentences:  [41953  5727 20931   550 30949  1083  3064 23047  3907 42027 11498  6045
+  4315 13912 14345 12499 41833 38416  2692 19827 24441 13927 16403 30542
+ 23763 39093 11195 25034   498 38099 31324 32686]
+2016-12-10 03:57:38.005229 PST | [16-12-10/actor_critic-0] itr #18 | fitting baseline...
+2016-12-10 03:57:38.472036 PST | [16-12-10/actor_critic-0] itr #18 | fitted
+2016-12-10 03:57:38.472567 PST | [16-12-10/actor_critic-0] itr #18 | optimizing policy
+2016-12-10 03:57:39.135496 PST | [16-12-10/actor_critic-0] itr #18 | Saving snapshot...
+2016-12-10 03:57:39.135607 PST | [16-12-10/actor_critic-0] itr #18 | Saved
+2016-12-10 03:57:39.136794 PST | --------------------------  ------------
+2016-12-10 03:57:39.136849 PST | PolicyExecTime               20.3567
+2016-12-10 03:57:39.136894 PST | EnvExecTime                   0.0133243
+2016-12-10 03:57:39.136936 PST | ProcessExecTime               0.00689721
+2016-12-10 03:57:39.136997 PST | Iteration                    18
+2016-12-10 03:57:39.137040 PST | AverageDiscountedReturn      -0.155434
+2016-12-10 03:57:39.137082 PST | AverageDiscountedEnvReturn    0.00643626
+2016-12-10 03:57:39.137122 PST | AverageReturn                -0.184823
+2016-12-10 03:57:39.137163 PST | AverageEnvReturn              0.00878906
+2016-12-10 03:57:39.137203 PST | ExplainedVariance             0.00323291
+2016-12-10 03:57:39.137243 PST | NumTrajs                     32
+2016-12-10 03:57:39.137284 PST | Entropy                       3.85024
+2016-12-10 03:57:39.137324 PST | Perplexity                   47.0043
+2016-12-10 03:57:39.137364 PST | StdReturn                     0.239366
+2016-12-10 03:57:39.137405 PST | MaxReturn                     0.30667
+2016-12-10 03:57:39.137445 PST | MinReturn                    -0.570459
+2016-12-10 03:57:39.137485 PST | StdEnvReturn                  0.0160762
+2016-12-10 03:57:39.137525 PST | MaxEnvReturn                  0.0625
+2016-12-10 03:57:39.137565 PST | MinEnvReturn                  0
+2016-12-10 03:57:39.137606 PST | LossBefore                   -0.0788332
+2016-12-10 03:57:39.137646 PST | LossAfter                    -0.0960808
+2016-12-10 03:57:39.137686 PST | MeanKL                        0.00737708
+2016-12-10 03:57:39.137734 PST | MaxKL                         0.0117026
+2016-12-10 03:57:39.137776 PST | Time                        321.891
+2016-12-10 03:57:39.137817 PST | ItrTime                      22.7052
+2016-12-10 03:57:39.137857 PST | --------------------------  ------------
+saving model...
+done.
+2016-12-10 03:57:39.147335 PST | [16-12-10/actor_critic-0] itr #19 | Obtaining samples...
+2016-12-10 03:57:39.147505 PST | [16-12-10/actor_critic-0] itr #19 | Obtaining samples for iteration 19...
+loading in encoder weights of sentences:  [ 2084 40109 32907  3244 21495 24474 32209  6513   262 21324 11041 19860
+ 26322 13276  9974 19678 36955 15395 21241  5889  6699 21421 40896  1019
+  3595 24690 15047   591 26523 41746 33570 13005]
+2016-12-10 03:58:00.693762 PST | [16-12-10/actor_critic-0] itr #19 | Processing samples...
+2016-12-10 03:58:00.695245 PST | [16-12-10/actor_critic-0] itr #19 | Logging diagnostics...
+2016-12-10 03:58:00.695336 PST | [16-12-10/actor_critic-0] itr #19 | Optimizing policy...
+loading in encoder weights of sentences:  [21395 27605 16975 28178  2165 34238  2124 30350 29369  4406  9165 26696
+ 15779 41216 14777  5359 15343 22859  3905 33517  2428 16093  4711 22164
+ 37555 38765    57  4985 22694 32282 38038 37442]
+2016-12-10 03:58:01.853642 PST | [16-12-10/actor_critic-0] itr #19 | fitting baseline...
+2016-12-10 03:58:02.254839 PST | [16-12-10/actor_critic-0] itr #19 | fitted
+2016-12-10 03:58:02.255375 PST | [16-12-10/actor_critic-0] itr #19 | optimizing policy
+2016-12-10 03:58:02.874564 PST | [16-12-10/actor_critic-0] itr #19 | Saving snapshot...
+2016-12-10 03:58:02.874677 PST | [16-12-10/actor_critic-0] itr #19 | Saved
+2016-12-10 03:58:02.875878 PST | --------------------------  ------------
+2016-12-10 03:58:02.875933 PST | PolicyExecTime               21.4764
+2016-12-10 03:58:02.875989 PST | EnvExecTime                   0.0625811
+2016-12-10 03:58:02.876030 PST | ProcessExecTime               0.00663018
+2016-12-10 03:58:02.876072 PST | Iteration                    19
+2016-12-10 03:58:02.876113 PST | AverageDiscountedReturn      -0.113393
+2016-12-10 03:58:02.876153 PST | AverageDiscountedEnvReturn    0.0264602
+2016-12-10 03:58:02.876194 PST | AverageReturn                -0.135259
+2016-12-10 03:58:02.876234 PST | AverageEnvReturn              0.0361328
+2016-12-10 03:58:02.876274 PST | ExplainedVariance            -0.00190301
+2016-12-10 03:58:02.876315 PST | NumTrajs                     32
+2016-12-10 03:58:02.876355 PST | Entropy                       3.78907
+2016-12-10 03:58:02.876395 PST | Perplexity                   44.2153
+2016-12-10 03:58:02.876436 PST | StdReturn                     0.241664
+2016-12-10 03:58:02.876476 PST | MaxReturn                     0.289499
+2016-12-10 03:58:02.876516 PST | MinReturn                    -0.670903
+2016-12-10 03:58:02.876556 PST | StdEnvReturn                  0.0924748
+2016-12-10 03:58:02.876596 PST | MaxEnvReturn                  0.4375
+2016-12-10 03:58:02.876636 PST | MinEnvReturn                  0
+2016-12-10 03:58:02.876676 PST | LossBefore                   -0.0788903
+2016-12-10 03:58:02.876716 PST | LossAfter                    -0.0983905
+2016-12-10 03:58:02.876756 PST | MeanKL                        0.0185415
+2016-12-10 03:58:02.876796 PST | MaxKL                         0.0339215
+2016-12-10 03:58:02.876836 PST | Time                        345.63
+2016-12-10 03:58:02.877538 PST | ItrTime                      23.7275
+2016-12-10 03:58:02.877583 PST | --------------------------  ------------

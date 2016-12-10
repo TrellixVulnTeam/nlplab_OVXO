@@ -616,7 +616,7 @@ class GRUNetwork(object):
         return self._l_step_output
 
     @property
-    def hid_init_param(self):
+    def hid_init_param(self): # assign this value
         return self._hid_init_param
 
     @property

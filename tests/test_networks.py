@@ -128,6 +128,9 @@ def test_tf_gru_network():
     # print f_step_prob(np.zeros((12, 3)), batched_h0, hs)[0].shape == (12, 5)
 
     # ============== test: derivative of test 2, test 1 batch logit generation =====
+    # we assign weights in them
+
+    # 1st: assign weights 0
 
     prob_network = GRUNetwork(
         name="prob_network",
@@ -144,11 +147,13 @@ def test_tf_gru_network():
     # rec_state['recurrent_state'] = {}
     # rec_state['recurrent_state'][prob_network.recurrent_layer] = np.ones([12, 4])
 
+    prob_network.recurrent_layer.assign_hs_weights(np.zeros([30, 1, 4]))
+
     f_output = tensor_utils.compile_function(
         inputs=[
             prob_network.input_layer.input_var,
-            prob_network.recurrent_layer.hs,
-            prob_network.recurrent_layer.h0_sym
+            # prob_network.recurrent_layer.hs,
+            # prob_network.recurrent_layer.h0_sym
         ],
         outputs=L.get_output(
             prob_network.output_layer,
@@ -162,10 +167,19 @@ def test_tf_gru_network():
     # hs should be (encoder_max_length, n_env, num_units)
     # n_env is also the "batch_size", which is VERY important for the policy (actor)
     # but for the critic (Q-approx), since we always pass in paths[i], it's always batch_size 1
-    print f_output(np.zeros((1, 32, 3), dtype="float32"), np.zeros([30, 1, 4]), np.ones([1, 4], dtype="float32")).shape
+    print f_output(np.zeros((1, 32, 3), dtype="float32")).shape
+    print f_output(np.zeros((1, 32, 3), dtype="float32"))
 
-    assert f_output(np.zeros((1, 32, 3), dtype="float32"), np.zeros([30, 1, 4]), np.ones([1, 4], dtype="float32")).shape == (1, 32, 1)
+    # assert f_output(np.zeros((1, 32, 3), dtype="float32"), np.zeros([30, 1, 4]), np.ones([1, 4], dtype="float32")).shape == (1, 32, 1)
     # test passed!
+
+    # 2nd: assign weights 1
+
+    prob_network.recurrent_layer.assign_hs_weights(np.ones([30, 1, 4]))
+    print f_output(np.zeros((1, 32, 3), dtype="float32")).shape
+    print f_output(np.zeros((1, 32, 3), dtype="float32"))
+
+    # Test passed!
 
 
 if __name__ == '__main__':

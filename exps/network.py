@@ -3,6 +3,8 @@ import tensorflow as tf
 import sandbox.rocky.tf.core.layers as L
 from sandbox.rocky.tf.core.parameterized import Model
 from sandbox.rocky.tf.core.layers_powered import LayersPowered
+from sandbox.rocky.tf.core.parameterized import Parameterized
+from rllab.core.serializable import Serializable
 from exps.layers import AttnGRULayer, GRULayer
 from sandbox.rocky.tf.misc import tensor_utils
 import numpy as np
@@ -49,7 +51,7 @@ class RewardMLP(MLP):
         return loss
 
 
-class RewardGRUNetwork(GRUNetwork, LayersPowered):
+class RewardGRUNetwork(GRUNetwork, Model, LayersPowered):
 #class RewardGRUNetwork(GRUNetwork, Model):
     """
     Hmmmm it's just a normal network,
@@ -73,8 +75,13 @@ class RewardGRUNetwork(GRUNetwork, LayersPowered):
                  max_gradient_norm=10.0,
                  gru_layer_cls=GRULayer,
                  hidden_dim=None, **kwargs):
+
+        self.save_name = "reward_gru_network"
+
         self.learning_rate = learning_rate
         self.max_gradient_norm = max_gradient_norm
+
+        action_dim = config["vocab_size"]
 
         input_dim = config["vocab_size"] + config["gru_size"]
 
@@ -91,11 +98,11 @@ class RewardGRUNetwork(GRUNetwork, LayersPowered):
         super(RewardGRUNetwork, self).__init__(name=name,
                                                input_shape=(input_dim,),
                                                hidden_dim=hidden_dim,
-                                               output_dim=1,
+                                               output_dim=action_dim,
                                                input_layer=l_input,
                                                output_nonlinearity=tf.identity,  # this is already the default option
                                                gru_layer_cls=gru_layer_cls,
-                                               layer_args = layer_args,
+                                               layer_args=layer_args,
                                                **kwargs)
 
         self.f_output = tensor_utils.compile_function(
@@ -107,12 +114,19 @@ class RewardGRUNetwork(GRUNetwork, LayersPowered):
             )
         )
 
-        self.y_label = tf.placeholder(tf.int32, shape=[None, None])  # batch_size, time_step
+        # problem with tensorflow, must use tf.float32, even though the data is int32
+        self.y_label = tf.placeholder(tf.float32, shape=[None, None])  # batch_size, time_step
+
+        # also we need action input of the time step to calculate loss
+        self.action_input = tf.placeholder(tf.float32, shape=[None, None, action_dim]) # should be one-hot encoding
 
         self.global_step = tf.Variable(0, trainable=False)  # hmmm from NLC
         self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
 
         self.setup_loss()
+
+        # don't know how well this works...at least I can claim it runs...
+        LayersPowered.__init__(self, self.output_layer, input_layers=[l_input])
 
     def compute_reward(self, X):
         """
@@ -151,7 +165,7 @@ class RewardGRUNetwork(GRUNetwork, LayersPowered):
         Returns
         -------
         """
-        X = np.column_stack((obs_var, actions_var))
+        X = np.concatenate((obs_var, actions_var),axis=2)
         rewards = self.f_output(X)  # output_layer is a DenseLayer in GRUNetwork
         rewards = np.squeeze(rewards)
         return rewards
@@ -160,23 +174,30 @@ class RewardGRUNetwork(GRUNetwork, LayersPowered):
         # construct symbolic output
         output = L.get_output(self.output_layer)
 
-        doshape = tf.shape(output)
-        batch_size, T = doshape[0], doshape[1]  # output from GRUNetwork is reshaped!!!! so it's normal...
+        # doshape = tf.shape(output)
+        # batch_size, T = doshape[0], doshape[1]  # output from GRUNetwork is reshaped!!!! so it's normal...
 
-        output1d = tf.squeeze(output)
+        output2d = tf.squeeze(output)
 
         # squared loss, batch_size 1
-        # TODO: add weight penalty?????
+        # weight penalty is hard-coded by Alex
         reg = 0.1
         reg_losses = filter(lambda x: x.name.split('/')[0] == 'reward_gru', tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
-        mean_reg_loss = reg * tf.reduce_sum(reg_losses) / tf.to_float(batch_size)
-        self.loss = tf.reduce_sum(tf.pow(output1d - self.y_label, 2)) / tf.to_float(batch_size) + mean_reg_loss
+        mean_reg_loss = reg * tf.reduce_mean(reg_losses) # / tf.to_float(batch_size)
+
+        # self.action_input: [batch_size, seq_len, action_dim]
+        # output2d: [batch_size, seq_len, action_dim]
+
+        Q_action = tf.reduce_sum(tf.mul(output2d, self.action_input), reduction_indices=2)
+        self.loss = tf.reduce_mean(tf.square(self.y_label - Q_action)) + mean_reg_loss
 
         # borrowed from NLC code, we do grad-clipping
 
         params = tf.trainable_variables()  # TODO: eh, THIS MIGHT NOT WORK :( considering how many models we have
 
-        gradients = tf.gradients(self.loss, params)
+        # ERROR: tensorflow.python.framework.errors.InvalidArgumentError: Incompatible shapes: [2,32,52] vs. [2,32]
+
+        gradients = tf.gradients(self.loss, params)  # hopefully this picks out params that are really used
         clipped_gradients, _ = tf.clip_by_global_norm(gradients, self.max_gradient_norm)
         #      self.gradient_norm = tf.global_norm(clipped_gradients)
         self.gradient_norm = tf.global_norm(gradients)
@@ -196,12 +217,13 @@ class RewardGRUNetwork(GRUNetwork, LayersPowered):
         # we get default session
         session = tf.get_default_session()
 
-        X = np.column_stack((obs_var, actions_var))
+        X = np.concatenate((obs_var, actions_var),axis=2)
         assert len(X.shape) == 3
 
         input_feed = {}
         input_feed[self.input_layer.input_var] = X
         input_feed[self.y_label] = y_label
+        input_feed[self.action_input] = actions_var
 
         output_feed = [self.updates, self.loss, self.gradient_norm, self.param_norm]
 
@@ -211,7 +233,8 @@ class RewardGRUNetwork(GRUNetwork, LayersPowered):
 if __name__ == '__main__':
     from exps.nlc_env import build_data
     
-    path_2_ptb_data = "/home/alex/stanford_dev/sisl/rllab/ptb_data/"
+    # path_2_ptb_data = "/home/alex/stanford_dev/sisl/rllab/ptb_data/"
+    path_2_ptb_data = "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/ptb_data/"
 
     #x_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.x"
     #y_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.y"
@@ -231,40 +254,9 @@ if __name__ == '__main__':
                                                                         fnamey="{}/train.ids.y".format(path_2_ptb_data),
                                                                         num_layers=1, max_seq_len=200)   
 
-    #vocab, _ = nlc_data.initialize_vocabulary(vocab_path)
-
-    #vocab_size = len(vocab)
-    #print("Vocabulary size: %d" % vocab_size)
-
-    #with tf.Session() as sess:
-        #print("Creating %d layers of %d units." % (FLAGS.num_layers, FLAGS.size))
-        #model = create_model(sess, vocab_size, False)
-
-        ##print('Initial validation cost: %f' % validate(model, sess, x_dev, y_dev))
-
-        #if False:
-            #tic = time.time()
-            #params = tf.trainable_variables()
-            #num_params = sum(map(lambda t: np.prod(tf.shape(t.value()).eval()), params))
-            #toc = time.time()
-            #print ("Number of params: %d (retreival took %f secs)" % (num_params, toc - tic))
-
-        #epoch = 0
-        #previous_losses = []
-        #exp_cost = None
-        #exp_length = None
-        #exp_norm = None
-        #while (FLAGS.epochs == 0 or epoch < FLAGS.epochs):
-            #epoch += 1
-            #current_step = 0
-
-            ### Train
-            #for source_tokens, source_mask, target_tokens, target_mask in pair_iter(x_train, y_train, FLAGS.batch_size,
-            #                                                                        FLAGS.num_layers, FLAGS.max_seq_len):
-               
     from rl_train import create_model
     sess = tf.Session()
-    model = create_model(sess, 100, False)
+    model = create_model(sess, 52, False)
     L_dec = model.L_dec.eval(session=sess)
     L_enc = model.L_enc.eval(session=sess)     
     config = {
