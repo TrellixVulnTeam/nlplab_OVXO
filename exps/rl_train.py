@@ -365,7 +365,8 @@ if __name__ == '__main__':
         policy.set_log_dir(log_dir)
 
         # run the algorithm and save everything to rllab's pickle format.
-        runner = RLLabRunner(algo, FLAGS, exp_dir)
-        runner.train()
+
+        # runner = RLLabRunner(algo, FLAGS, exp_dir)
+        # runner.train()
 
 
