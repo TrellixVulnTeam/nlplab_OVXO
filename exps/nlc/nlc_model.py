@@ -173,17 +173,6 @@ class NLCModel(object):
 
     return decoder_output, decoder_state_output
 
-  def setup_beam(self):
-    time_0 = tf.constant(0)
-    beam_seqs_0 = tf.constant([[nlc_data.SOS_ID]])
-    beam_probs_0 = tf.constant([0.])
-
-    cand_seqs_0 = tf.constant([[nlc_data.EOS_ID]])
-    cand_probs_0 = tf.constant([-3e38])
-
-    state_0 = tf.zeros([1, self.size])
-    states_0 = [state_0] * self.num_layers
-
     def beam_cond(time, beam_probs, beam_seqs, cand_probs, cand_seqs, *states):
       return tf.reduce_max(beam_probs) >= tf.reduce_min(cand_probs)
 
@@ -195,7 +184,7 @@ class NLCModel(object):
 
       with vs.variable_scope("Logistic", reuse=True):
         do2d = tf.reshape(decoder_output, [-1, self.size])
-        logits2d = tf_linear(do2d, self.vocab_size, True, 1.0)
+        logits2d = rnn_cell._linear(do2d, self.vocab_size, True, 1.0)
         logprobs2d = tf.nn.log_softmax(logits2d)
 
       total_probs = logprobs2d + tf.reshape(beam_probs, [-1, 1])
@@ -229,7 +218,7 @@ class NLCModel(object):
 
     loop_vars = [time_0, beam_probs_0, beam_seqs_0, cand_probs_0, cand_seqs_0] + states_0
     ret_vars = tf.while_loop(cond=beam_cond, body=beam_step, loop_vars=loop_vars, back_prop=False)
-#    time, beam_probs, beam_seqs, cand_probs, cand_seqs, _ = ret_vars
+    #    time, beam_probs, beam_seqs, cand_probs, cand_seqs, _ = ret_vars
     cand_seqs = ret_vars[4]
     cand_probs = ret_vars[3]
     self.beam_output = cand_seqs
