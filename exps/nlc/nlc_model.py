@@ -191,7 +191,7 @@ class NLCModel(object):
       batch_size = tf.shape(beam_probs)[0]
       inputs = tf.reshape(tf.slice(beam_seqs, [0, time], [batch_size, 1]), [batch_size])
       decoder_input = embedding_ops.embedding_lookup(self.L_dec, inputs)
-      decoder_output, state_output = self.decoder_graph(decoder_input, states)
+      decoder_output, statse_output = self.decoder_graph(decoder_input, states)
 
       with vs.variable_scope("Logistic", reuse=True):
         do2d = tf.reshape(decoder_output, [-1, self.size])

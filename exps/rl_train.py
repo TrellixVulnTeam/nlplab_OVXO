@@ -264,7 +264,8 @@ if __name__ == '__main__':
     #     FLAGS.data_dir, FLAGS.max_vocab_size,
     #     tokenizer=get_tokenizer(FLAGS))  # FLAGS.tokenizer.lower()
 
-    path_2_ptb_data = "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/ptb_data/"
+    # path_2_ptb_data = "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/ptb_data/"
+    path_2_ptb_data = FLAGS.data_dir + "/ptb_data"
 
     # x_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.x"
     # y_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.y"
