@@ -241,17 +241,25 @@ if __name__ == '__main__':
     # x_train, y_train, x_dev, y_dev, vocab_path = nlc_data.prepare_nlc_data(
     #     FLAGS.data_dir, FLAGS.max_vocab_size,
     #     tokenizer=get_tokenizer(FLAGS))  # FLAGS.tokenizer.lower()
+    
+    path_2_ptb_data = "/home/alex/stanford_dev/sisl/rllab/ptb_data/"
 
-    x_train = FLAGS.data_dir + "ptb_data/train.ids.x"
-    y_train = FLAGS.data_dir + "ptb_data/train.ids.y"
+    #x_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.x"
+    #y_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.y"
 
-    x_dev = FLAGS.data_dir + "ptb_data/valid.ids.x"
-    y_dev = FLAGS.data_dir + "ptb_data/valid.ids.y"
+    #x_dev = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.x"
+    #y_dev = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.y"
 
-    vocab_path = FLAGS.data_dir + "ptb_data/vocab.dat"
+    x_train = "{}/train.ids.x".format(path_2_ptb_data)
+    y_train = "{}/train.ids.y".format(path_2_ptb_data)
 
-    source_tokens, source_mask, target_tokens, target_mask = build_data(fnamex=FLAGS.data_dir + "ptb_data/train.ids.x",
-                                                                        fnamey=FLAGS.data_dir + "ptb_data/train.ids.y",
+    x_dev = "{}/valid.ids.x".format(path_2_ptb_data)
+    y_dev = "{}/valid.ids.y".format(path_2_ptb_data)
+
+    vocab_path = "{}/vocab.dat".format(path_2_ptb_data)
+
+    source_tokens, source_mask, target_tokens, target_mask = build_data(fnamex="{}/train.ids.x".format(path_2_ptb_data),
+                                                                        fnamey="{}/train.ids.y".format(path_2_ptb_data),
                                                                         num_layers=1, max_seq_len=200)
 
     vocab, _ = nlc_data.initialize_vocabulary(vocab_path)
