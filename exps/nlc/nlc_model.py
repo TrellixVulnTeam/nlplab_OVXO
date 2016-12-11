@@ -64,7 +64,7 @@ class GRUCellAttn(rnn_cell.GRUCell):
         out = tf.nn.relu(out_logits)
       _slice_map = tf.slice(weights, [0, 0, 0], [-1, -1, 1])
       self.attn_map = tf.squeeze(_slice_map)
-      return (out, out) 
+      return (out, out)
 
 class NLCModel(object):
   def __init__(self, vocab_size, size, num_layers, max_gradient_norm, batch_size, learning_rate,
@@ -373,15 +373,15 @@ class NLCModel(object):
     outputs = session.run(output_feed, input_feed)
 
     return outputs[0], outputs[1]
-  
+
   def save_decoder_to_h5(self,sess,title="NLC_weights"):
-    
+
     def _preface(L, path):
       return [(path+"{}:0".format(name),val) for (name,val) in L]
-    
+
     def _pull(var, gru, tensor_name):
       L = []
-      
+
       if tensor_name == "Matrix":
         M = var.eval(session=sess)
         if gru == "Gates":
@@ -389,86 +389,86 @@ class NLCModel(object):
           W_xr, W_xu = np.split(W1,2,axis=1)
           W_hr, W_hu = np.split(W2,2,axis=1)
           L += [("W_xr",W_xr),("W_xu",W_xu),("W_hr",W_hr),("W_hu",W_hu)]
-          
+
         elif gru == "Candidate":
           W_xc, W_hc = M[:self.size], M[self.size:]
           L += [("W_xc",W_xc),("W_hc",W_hc)]
-          
+
         elif gru == "Attn1":
           W_hs = M
           L += [("W_hs",W_hs)]
-          
+
         elif gru == "Attn2":
           W_gamma = M
           L += [("W_gamma",W_gamma)]
-          
+
         elif gru == "AttnConcat":
           W_concat = M
           L += [("W_concat",W_concat)]
-          
+
         elif gru == "Logistic":
           W = M
           L += [("W",W)]
-          
+
         else:
           raise NotImplementedError
-                
+
       elif tensor_name == "Bias":
         b = var.eval(session=sess)
         if gru == "Gates":
           b_r, b_u = np.split(b,2)
           L += [("b_r",b_r),("b_u",b_u)]
-          
+
         elif gru == "Candidate":
           b_c = b
           L += [("b_c",b_c)]
-          
+
         elif gru == "Attn1":
           b_hs = b
           L += [("b_hs",b_hs)]
-          
+
         elif gru == "Attn2":
           b_gamma = b
           L += [("b_gamma",b_gamma)]
-          
+
         elif gru == "AttnConcat":
           b_concat = b
           L += [("b_concat",b_concat)]
-          
+
         elif gru == "Logistic":
           b = b
           L += [("b",b)]
-          
+
         else:
           raise NotImplementedError
-          
+
       return L
-    
+
     L = []
     base_path = "iter00000/gru_policy/prob_network/"
     VARS = filter(lambda x: x.name.split('/')[0] == "NLC" and ("DecoderAttnCell" in x.name.split('/') or
                                                                "Logistic" in x.name.split('/')),
                   tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES))
-    
+
     for var in VARS:
       names = var.name.split('/')
       tensor_name = names[-1].split(":")[0]
-        
+
       if "Attn1" in names:
         path = base_path + "attn/gru/"
         l = _pull(var, "Attn1", tensor_name)
         L += _preface(l,path)
-        
+
       if "Attn2" in names:
         path = base_path + "attn/gru/"
         l = _pull(var, "Attn2", tensor_name)
         L += _preface(l,path)
-        
+
       if "AttnConcat" in names:
         path = base_path + "attn/gru/"
         l = _pull(var, "AttnConcat", tensor_name)
         L += _preface(l,path)
-        
+
       if "Gates" in names:
         path = base_path + "gru/"
         l = _pull(var, "Gates", tensor_name)
@@ -477,7 +477,7 @@ class NLCModel(object):
         path = base_path + "gru/"
         l = _pull(var, "Candidate", tensor_name)
         L += _preface(l,path)
-        
+
       if "Logistic" in names:
         path = base_path + "output_flat/"
         l = _pull(var, "Logistic", tensor_name)
@@ -487,14 +487,14 @@ class NLCModel(object):
     with h5py.File("./weights/{}.h5".format(title),"w") as hf:
       for name, data in L:
         hf.create_dataset(name, data=data)
-  
+
 if __name__ == '__main__':
   with tf.variable_scope("NLC") as scope:
     A = tf.get_collection(tf.GraphKeys, scope="NLC/NLC/Decoder")
-    
+
     nn = NLCModel(100, 150, 1, 1.0, 30,
                1e-3, 0.99, False)
-    
+
     sess= tf.Session()
     sess.run(tf.initialize_all_variables())
     nn.save_decoder_to_h5(sess)
