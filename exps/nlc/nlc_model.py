@@ -173,6 +173,17 @@ class NLCModel(object):
 
     return decoder_output, decoder_state_output
 
+  def setup_beam(self):
+    time_0 = tf.constant(0)
+    beam_seqs_0 = tf.constant([[nlc_data.SOS_ID]])
+    beam_probs_0 = tf.constant([0.])
+
+    cand_seqs_0 = tf.constant([[nlc_data.EOS_ID]])
+    cand_probs_0 = tf.constant([-3e38])
+
+    state_0 = tf.zeros([1, self.size])
+    states_0 = [state_0] * self.num_layers
+
     def beam_cond(time, beam_probs, beam_seqs, cand_probs, cand_seqs, *states):
       return tf.reduce_max(beam_probs) >= tf.reduce_min(cand_probs)
 
