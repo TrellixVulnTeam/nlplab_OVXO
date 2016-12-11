@@ -14,7 +14,7 @@ import calendar
 import os.path as osp
 
 from sandbox.rocky.tf.envs.base import TfEnv
-from exps.nlc_env import NLCEnv, DataDistributor
+from exps.nlc_env import NLCEnv, DataDistributor, levenshtein
 # from exps.preprocess import pair_iter
 from exps.nlc.util import pair_iter
 from exps.nlc.nlc_model import NLCModel
@@ -105,8 +105,28 @@ def validate(model, sess, x_dev, y_dev):
     valid_cost = sum(valid_costs) / float(sum(valid_lengths))
     return valid_cost
 
-def train_seq2seq(model, sess, x_dev, y_dev, x_train, y_train):
 
+def get_cer(model, sess, x_train, y_train):
+    from exps.nlc.decode import decode_beam
+    rl_batchsize = 32  # matches the enviornment batch
+
+    total_cer = []
+    for source_tokens, source_mask, target_tokens, target_mask in pair_iter(x_train, y_train, rl_batchsize,
+                                                                            FLAGS.num_layers):
+        # we decode them and compute CER per batch, and do AVERAGE!
+        # in terms of evaluation of the trained policy, we just take the last 50 iterations' rewards and
+        # calculate mean
+        encoder_output = model.encode(sess, source_tokens, source_mask)
+        beam_toks, probs = decode_beam(model, sess, encoder_output, max_beam_size=2)  # beam-size fixed at 1
+        # we only do maximum decoding, no beam decoding
+        best_tok = beam_toks[0]  # first one is the best one
+        print best_tok
+
+        sys.exit(0)
+
+
+
+def train_seq2seq(model, sess, x_dev, y_dev, x_train, y_train):
     print('Initial validation cost: %f' % validate(model, sess, x_dev, y_dev))
 
     if False:
@@ -175,6 +195,7 @@ def train_seq2seq(model, sess, x_dev, y_dev, x_train, y_train):
 
     return model
 
+
 class BaselineMLP(MLP, Baseline):
     """
     Same as the old BaselineMLP with optimizer replaced
@@ -223,6 +244,7 @@ class BaselineMLP(MLP, Baseline):
         # self._regressor.fit(observations, returns.reshape((-1, 1)))
         self._optimizer.optimize([observations, returns[..., None]])
 
+
 if __name__ == '__main__':
 
     # comment this out when running for real
@@ -241,14 +263,14 @@ if __name__ == '__main__':
     # x_train, y_train, x_dev, y_dev, vocab_path = nlc_data.prepare_nlc_data(
     #     FLAGS.data_dir, FLAGS.max_vocab_size,
     #     tokenizer=get_tokenizer(FLAGS))  # FLAGS.tokenizer.lower()
-    
-    path_2_ptb_data = "/home/alex/stanford_dev/sisl/rllab/ptb_data/"
 
-    #x_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.x"
-    #y_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.y"
+    path_2_ptb_data = "/Users/Aimingnie/Documents/School/Stanford/AA228/nlplab/ptb_data/"
 
-    #x_dev = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.x"
-    #y_dev = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.y"
+    # x_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.x"
+    # y_train = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/train.ids.y"
+
+    # x_dev = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.x"
+    # y_dev = "/Users/Aimingnie/Documents" + "/School/Stanford/AA228/nlplab/ptb_data/valid.ids.y"
 
     x_train = "{}/train.ids.x".format(path_2_ptb_data)
     y_train = "{}/train.ids.y".format(path_2_ptb_data)
@@ -274,11 +296,13 @@ if __name__ == '__main__':
         if not FLAGS.rl_only:
             model = train_seq2seq(model, sess, x_dev, y_dev, x_train, y_train)
 
+        get_cer(model, sess, x_train, y_train)
+
         # save weights to h5
         model.save_decoder_to_h5(sess, title="NLC_weights")
 
-    # ======== Actor-critic Training =========
-    # note that we are still inside the TF session scope
+        # ======== Actor-critic Training =========
+        # note that we are still inside the TF session scope
 
         # building an enviornment
         # notice we are still in previous session!
@@ -318,30 +342,30 @@ if __name__ == '__main__':
                                       hidden_nonlinearity=tf.nn.relu,
                                       word_embed_dim=config["gru_size"],
                                       )  # in character Seq2Seq,
-                                    # word_emb and hid_size are the same
+        # word_emb and hid_size are the same
         policy.load_params("NLC_weights", 0, [])
 
         # create a delayed policy network
         delayed_policy = CategoricalGRUPolicy(name="gru_delayed_policy", env_spec=env.spec,
-                                      distributor=ddist, config=config,
-                                      hidden_dim=config["gru_size"],
-                                      hidden_nonlinearity=tf.nn.relu,
-                                      word_embed_dim=config["gru_size"],
-                                      )
+                                              distributor=ddist, config=config,
+                                              hidden_dim=config["gru_size"],
+                                              hidden_nonlinearity=tf.nn.relu,
+                                              word_embed_dim=config["gru_size"],
+                                              )
 
         delayed_policy.load_params("NLC_weights", 0, [])
 
         # create a critic network
 
         critic = RewardGRUNetwork(name="gru_critic", config=config,
-                                      hidden_dim=config["gru_size"],
-                                      hidden_nonlinearity=tf.nn.relu,)
+                                  hidden_dim=config["gru_size"],
+                                  hidden_nonlinearity=tf.nn.relu, )
 
         # create a target critic (assign same weights)
 
         target_critic = RewardGRUNetwork(name="gru_target_critic", config=config,
-                                      hidden_dim=config["gru_size"],
-                                      hidden_nonlinearity=tf.nn.relu,)
+                                         hidden_dim=config["gru_size"],
+                                         hidden_nonlinearity=tf.nn.relu, )
 
         # pretrain critic (let's not pretrain it yet)
 
@@ -376,5 +400,3 @@ if __name__ == '__main__':
 
         # runner = RLLabRunner(algo, FLAGS, exp_dir)
         # runner.train()
-
-

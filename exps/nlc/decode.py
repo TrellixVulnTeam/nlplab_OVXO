@@ -31,25 +31,25 @@ import tensorflow as tf
 
 import kenlm
 
-import nlc_model
-import nlc_data
+import exps.nlc.nlc_model as nlc_model
+import exps.nlc.nlc_data as nlc_data
 
-tf.app.flags.DEFINE_float("learning_rate", 0.001, "Learning rate.")
-tf.app.flags.DEFINE_float("learning_rate_decay_factor", 0.95, "Learning rate decays by this much.")
-tf.app.flags.DEFINE_float("max_gradient_norm", 5.0, "Clip gradients to this norm.")
-tf.app.flags.DEFINE_float("dropout", 0.1, "Fraction of units randomly dropped on non-recurrent connections.")
-tf.app.flags.DEFINE_integer("batch_size", 128, "Batch size to use during training.")
-tf.app.flags.DEFINE_integer("epochs", 0, "Number of epochs to train.")
-tf.app.flags.DEFINE_integer("size", 400, "Size of each model layer.")
-tf.app.flags.DEFINE_integer("num_layers", 3, "Number of layers in the model.")
-tf.app.flags.DEFINE_integer("max_vocab_size", 40000, "Vocabulary size limit.")
-tf.app.flags.DEFINE_integer("max_seq_len", 200, "Maximum sequence length.")
-tf.app.flags.DEFINE_string("data_dir", "/tmp", "Data directory")
-tf.app.flags.DEFINE_string("train_dir", "/tmp", "Training directory.")
-tf.app.flags.DEFINE_string("tokenizer", "CHAR", "Set to WORD to train word level model.")
-tf.app.flags.DEFINE_integer("beam_size", 8, "Size of beam.")
-tf.app.flags.DEFINE_string("lmfile", None, "arpa file of the language model.")
-tf.app.flags.DEFINE_float("alpha", 0.3, "Language model relative weight.")
+# tf.app.flags.DEFINE_float("learning_rate", 0.001, "Learning rate.")
+# tf.app.flags.DEFINE_float("learning_rate_decay_factor", 0.95, "Learning rate decays by this much.")
+# tf.app.flags.DEFINE_float("max_gradient_norm", 5.0, "Clip gradients to this norm.")
+# tf.app.flags.DEFINE_float("dropout", 0.1, "Fraction of units randomly dropped on non-recurrent connections.")
+# tf.app.flags.DEFINE_integer("batch_size", 128, "Batch size to use during training.")
+# tf.app.flags.DEFINE_integer("epochs", 0, "Number of epochs to train.")
+# tf.app.flags.DEFINE_integer("size", 400, "Size of each model layer.")
+# tf.app.flags.DEFINE_integer("num_layers", 3, "Number of layers in the model.")
+# tf.app.flags.DEFINE_integer("max_vocab_size", 40000, "Vocabulary size limit.")
+# tf.app.flags.DEFINE_integer("max_seq_len", 200, "Maximum sequence length.")
+# tf.app.flags.DEFINE_string("data_dir", "/tmp", "Data directory")
+# tf.app.flags.DEFINE_string("train_dir", "/tmp", "Training directory.")
+# tf.app.flags.DEFINE_string("tokenizer", "CHAR", "Set to WORD to train word level model.")
+# tf.app.flags.DEFINE_integer("beam_size", 8, "Size of beam.")
+# tf.app.flags.DEFINE_string("lmfile", None, "arpa file of the language model.")
+# tf.app.flags.DEFINE_float("alpha", 0.3, "Language model relative weight.")
 
 FLAGS = tf.app.flags.FLAGS
 reverse_vocab, vocab = None, None

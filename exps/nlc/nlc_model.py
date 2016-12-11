@@ -97,7 +97,7 @@ class NLCModel(object):
       self.setup_decoder()
       self.setup_loss()
 
-      #self.setup_beam()
+      self.setup_beam()
 
     params = tf.trainable_variables()
     if not forward_only:
